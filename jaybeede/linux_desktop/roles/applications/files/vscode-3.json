@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "cmdR-1",
+            "command": "${command:git.refresh}"
+        },
+        {
+            "label": "cmdR-2",
+            "command": "${command:workbench.files.action.refreshFilesExplorer}"
+        },
+        {
+            "label": "cmdR-All",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "cmdR-1",
+                "cmdR-2"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

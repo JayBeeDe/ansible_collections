@@ -1,0 +1,14 @@
+- name: test my new module
+  hosts: localhost
+  tasks:
+    - name: run the new module
+      gnome_extensions:
+        url: "https://github.com/home-sweet-gnome/dash-to-panel/releases/download/v40/dash-to-panel@jderose9.github.com_v40.zip"
+        action: uninstall
+        scope: system
+      register: testout
+    - name: dump test output
+      debug:
+        msg: "{{ testout }}"
+  become: yes
+  become_user: "default"

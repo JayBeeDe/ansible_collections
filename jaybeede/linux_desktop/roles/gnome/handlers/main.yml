@@ -1,0 +1,9 @@
+- name: Reload gnome
+  command: "killall -1 gnome-shell"
+  listen:
+    - Reload gnome
+    - Reload gnome sleep
+- name: wait 5 seconds
+  pause:
+    seconds: 5
+  listen: Reload gnome sleep

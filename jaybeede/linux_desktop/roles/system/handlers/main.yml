@@ -1,0 +1,26 @@
+- name: "Kernel attributes update"
+  command: sysctl -p
+
+- name: "Update grub"
+  command: update-grub
+
+- name: "Restart firewalld"
+  systemd:
+    name: "firewalld"
+    state: restarted
+    enabled: yes
+
+- name: "Restart libvirtd"
+  systemd:
+    name: "libvirtd"
+    state: restarted
+    enabled: yes
+
+- name: "Restart sshd"
+  systemd:
+    name: "ssh"
+    state: restarted
+    enabled: yes
+
+- name: "Fix broken packages"
+  shell: apt --fix-broken -y install

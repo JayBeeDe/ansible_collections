@@ -1,0 +1,8 @@
+{
+    "ANSIBLE_MODULE_ARGS": {
+        "url": "https://github.com/neffo/bing-wallpaper-gnome-extension",
+        "scope": "system",
+        "action": "enable",
+        "force": "True"
+    }
+}

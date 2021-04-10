@@ -1,0 +1,6 @@
+**/__pycache__/**
+*.log
+*.old
+**/files/Bookmarks
+**/group_vars/all.yml
+**/vault-tmp

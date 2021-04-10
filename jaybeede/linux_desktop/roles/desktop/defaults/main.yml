@@ -1,0 +1,7 @@
+user: default
+home: "/home/{{ user }}"
+kdbx_path: "{{ home }}/.ssh/{{ user }}.kdbx"
+key_path: "{{ home }}/.ssh/{{ user }}.key"
+rdp_name: windows
+rdp_host: "{{ rdp_name }}"
+rdp_port: 3389

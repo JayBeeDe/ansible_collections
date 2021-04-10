@@ -1,0 +1,461 @@
+---
+- block:
+    - name: "Setting correct permissions to {{ home }}/Documents/..."
+      file:
+        path: "{{ home }}/Documents/"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        recurse: yes
+
+    - name: "Setting correct permissions to /var/log/..."
+      file:
+        path: "/var/log/"
+        mode: "0777"
+      changed_when: false
+
+    - name: "Configuring pulseaudio (1/5)..."
+      lineinfile:
+        path: /etc/pulse/default.pa
+        state: present
+        regexp: "^load-module module-combine channels.*channel_map.*$"
+        line: "load-module module-combine channels=6 channel_map=front-left,front-right,rear-left,rear-right,front-center,lfe"
+        backup: no
+      notify: Restart pulseaudio
+
+    - name: "Configuring pulseaudio (2/5)..."
+      lineinfile:
+        path: /etc/pulse/daemon.conf
+        state: present
+        regexp: "^.*remixing-produce-lfe.*$"
+        line: "remixing-produce-lfe = yes"
+        backup: no
+      notify: Restart pulseaudio
+
+    - name: "Configuring pulseaudio (3/5)..."
+      lineinfile:
+        path: /etc/pulse/daemon.conf
+        state: present
+        regexp: "^.*remixing-consume-lfe.*$"
+        line: "remixing-consume-lfe = yes"
+        backup: no
+      notify: Restart pulseaudio
+
+    - name: "Configuring pulseaudio (4/5)..."
+      lineinfile:
+        path: /etc/pulse/daemon.conf
+        state: present
+        regexp: "^.*default-sample-channels.*$"
+        line: "default-sample-channels = 6"
+        backup: no
+      notify: Restart pulseaudio
+
+    - name: "Configuring pulseaudio (5/5)..."
+      lineinfile:
+        path: /etc/pulse/daemon.conf
+        state: present
+        regexp: "^.*default-channel-map.*$"
+        line: "default-channel-map = front-left,front-right,rear-left,rear-right,front-center,lfe"
+        backup: no
+      notify: Restart pulseaudio
+
+    - name: "Configuring chromium..."
+      file:
+        path: /etc/chromium/policies/managed
+        state: directory
+        mode: "0755"
+        owner: "root"
+        group: "root"
+
+    - name: "Configuring chromium - Policies..."
+      copy:
+        src: "{{ role_path }}/files/chromium.json"
+        dest: "/etc/chromium/policies/managed/settings.json"
+        mode: "0644"
+        owner: "root"
+        group: "root"
+  # # # /etc/pulse/default.pa
+  # # #.ifexists module-switch-on-connect.so
+  # # #load-module module-switch-on-connect
+  # # #.endif
+- block:
+    - name: "Configuring KeepassXC (1/2)..."
+      file:
+        path: "{{ home }}/.config/keepassxc/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring KeepassXC (2/2)..."
+      copy:
+        src: "{{ role_path }}/files/keepassxc.ini"
+        dest: "{{ home }}/.config/keepassxc/keepassxc.ini"
+        mode: "0664"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring VLC (1/3)..."
+      file:
+        path: "{{ home }}/.config/vlc/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring VLC (2/3)..."
+      copy:
+        src: "{{ role_path }}/files/vlc.conf"
+        dest: "{{ home }}/.config/vlc/vlc-qt-interface.conf"
+        mode: "0664"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring VLC (3/3)..."
+      copy:
+        src: "{{ role_path }}/files/vlc-2"
+        dest: "{{ home }}/.config/vlc/vlcrc"
+        mode: "0600"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring conky (1/5)..."
+      file:
+        path: "{{ home }}/.conky/default/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring conky (2/5)..."
+      copy:
+        src: "{{ role_path }}/files/conky.conf"
+        dest: "{{ home }}/.conky/default/default.conf"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+      notify: Refresh font information cache
+
+    - name: "Configuring conky (3/5)..."
+      copy:
+        src: "{{ role_path }}/files/favicon.png"
+        dest: "{{ home }}/.conky/default/favicon.png"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+      notify: Refresh font information cache
+
+    - name: "Setting Conky (4/5)..."
+      file:
+        path: "{{ home }}/.local/share/fonts/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Setting Conky (5/5)..."
+      copy:
+        src: "{{ role_path }}/files/GE-Inspira-Bold.ttf"
+        dest: "{{ home }}/.local/share/fonts/GE-Inspira-Bold.ttf"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+      notify: Refresh font information cache
+
+    - name: "Configuring flameshot (1/2)..."
+      file:
+        path: "{{ home }}/.config/flameshot/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring flameshot (2/2)..."
+      copy:
+        src: "{{ role_path }}/files/flameshot.ini"
+        dest: "{{ home }}/.config/flameshot/flameshot.ini"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring vscode (1/5)..."
+      file:
+        path: "{{ home }}/.config/Code/User/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring vscode (2/5)..."
+      copy:
+        src: "{{ role_path }}/files/vscode.json"
+        dest: "{{ home }}/.config/Code/User/settings.json"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring vscode (3/5)..."
+      copy:
+        src: "{{ role_path }}/files/vscode-2.json"
+        dest: "{{ home }}/.config/Code/User/keybindings.json"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring vscode (4/5)..."
+      copy:
+        src: "{{ role_path }}/files/vscode-3.json"
+        dest: "{{ home }}/.config/Code/User/tasks.json"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring vscode - Installing extensions (5/5)..."
+      command: code --install-extension "{{ item }}"
+      loop:
+        - aeschli.vscode-css-formatter
+        - aswinkumar863.smarty-template-support
+        - bibhasdn.unique-lines
+        - chaunceykiwi.json-tree-view
+        - dhoeric.ansible-vault
+        - emilast.logfilehighlighter
+        - foxundermoon.shell-format
+        - geeebe.duplicate
+        - golang.Go
+        - junstyle.php-cs-fixer
+        - ms-azuretools.vscode-docker
+        - ms-python.python
+        - ms-vscode.cpptools
+        - redhat.vscode-xml
+        - redhat.vscode-yaml
+        - timonwong.shellcheck
+        - tyriar.sort-lines
+        - vsciot-vscode.vscode-arduino
+        - zhiyuan-lin.simple-perl
+      register: ext
+      changed_when: "'already installed' not in ext.stdout"
+
+    - name: "Configuring perlcritic (for vscode extension)..."
+      copy:
+        src: "{{ role_path }}/files/perlcritic"
+        dest: "{{ home }}/.perlcriticrc"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring terminator (1/2)..."
+      file:
+        path: "{{ home }}/.config/terminator/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring terminator (2/2)..."
+      copy:
+        src: "{{ role_path }}/files/terminator.ini"
+        dest: "{{ home }}/.config/terminator/config"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring remmina (1/10)..."
+      file:
+        path: "{{ home }}/.config/remmina/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring remmina (2/10)..."
+      copy:
+        src: "{{ role_path }}/files/remmina.ini"
+        dest: "{{ home }}/.config/remmina/remmina.pref"
+        mode: "0664"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring remmina (3/10)..."
+      file:
+        path: "{{ home }}/.local/share/remmina/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring remmina (4/10)..."
+      copy:
+        src: "{{ role_path }}/files/remmina-2.ini"
+        dest: "{{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"
+        mode: "0664"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        force: no
+
+    - name: "Configuring remmina (5/10)..."
+      lineinfile:
+        path: "{{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"
+        state: present
+        regexp: "^name=.*$"
+        line: "name={{ rdp_name }}"
+        backup: no
+
+    - name: "Configuring remmina (6/10)..."
+      lineinfile:
+        path: "{{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"
+        state: present
+        regexp: "^server=.*$"
+        line: "server={{ rdp_name }}:{{ rdp_port }}"
+        backup: no
+
+    - name: "Configuring remmina (7/10)..."
+      lineinfile:
+        path: "{{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"
+        state: present
+        regexp: "^username=.*$"
+        line: "username={{ rdp_user }}"
+        backup: no
+
+    - name: "Configuring remmina (8/10)..."
+      lineinfile:
+        path: "{{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"
+        state: present
+        regexp: "^sharefolder=.*$"
+        line: "sharefolder={{ rdp_sharefolder }}"
+        backup: no
+
+    - name: "Configuring remmina (9/10)..."
+      file:
+        path: "{{ home }}/.local/share/icons/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring remmina (10/10)..."
+      copy:
+        src: "{{ role_path }}/files/windows.png"
+        dest: "{{ home }}/.local/share/icons/windows.png"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring user scripts (1/2)..."
+      file:
+        path: "{{ home }}/.local/share/scripts/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring user scripts (2/2)..."
+      copy:
+        src: "{{ role_path }}/files/connectWindows.sh"
+        dest: "{{ home }}/.local/share/scripts/connectWindows.sh"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        force: no
+
+    - name: "Configuring nemo (1/2)..."
+      command: xdg-mime default nemo.desktop inode/directory application/x-gnome-saved-search
+      changed_when: false
+
+    # - name: "Configuring nemo (2/2)..."
+    #   dconf: key="/org/gnome/desktop/background/show-desktop-icons" value="false"
+
+    - name: "Configuring libreoffice templates (1/2)..."
+      file:
+        path: "{{ home }}/Templates/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring libreoffice templates (2/2)..."
+      copy:
+        src: "{{ role_path }}/files/Default.ott"
+        dest: "{{ home }}/Templates/Default.ott"
+        mode: "0664"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring chromium - Bookmarks (1/2)..."
+      file:
+        path: "{{ home }}/.config/chromium/Default/"
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring chromium - Bookmarks (2/2)..."
+      copy:
+        src: "{{ role_path }}/files/Bookmarks"
+        dest: "{{ home }}/.config/chromium/Default/Bookmarks"
+        mode: "0600"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring chromium - Search Engines..."
+      copy:
+        src: "{{ role_path }}/files/chromium-2.conf"
+        dest: "{{ home }}/.config/chromium/Default/Web Data"
+        mode: "0600"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    # - name: "Configuring chromium - Fixing beta version popup at startup"
+    #   replace:
+    #     path: "/usr/share/applications/chromium-browser.desktop"
+    #     regexp: "^Exec.chromium-browser.*$"
+    #     replace: 'Exec=env GOOGLE_API_KEY="no" GOOGLE_DEFAULT_CLIENT_ID="no" GOOGLE_DEFAULT_CLIENT_SECRET="no" chromium-browser'
+    #     backup: no
+
+    # - name: "Configuring chromium - Dark Theme..."
+    #   replace:
+    #     path: "{{ home }}/snap/chromium/current/.config/gtk-3.0/settings.ini"
+    #     regexp: "^gtk-application-prefer-dark-theme=[0-9]+$"
+    #     replace: "gtk-application-prefer-dark-theme=1"
+    #     backup: no
+
+    - name: "Logical evaluation..."
+      stat:
+        path: "{{ home }}/.config/onedrive/config"
+      register: onedrive
+
+    - name: "Configuring OneDrive (1/2)..."
+      copy:
+        src: "{{ role_path }}/files/onedrive.cfg"
+        dest: "{{ home }}/.config/onedrive/config"
+        mode: "0664"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+      when: not onedrive.stat.exists
+
+    - name: "Configuring OneDrive (2/2)..."
+      replace:
+        path: "{{ home }}/.config/onedrive/config"
+        regexp: "^sync_dir =.+$"
+        replace: 'sync_dir = "{{ onedrive_path }}"'
+        backup: no
+      when: not onedrive.stat.exists
+
+    - name: "Setting up git identity (1/2)..."
+      git_config:
+        name: user.email
+        scope: global
+        value: "{{ git_email }}"
+
+    - name: "Setting up git identity (2/2)..."
+      git_config:
+        name: user.name
+        scope: global
+        value: "{{ git_name }}"
+
+    # # #GTK+
+    # # # enable-force-dark=Enabled
+    # # # --enable-force-dark
+    # # # "/home/user/snap/chromium/common/chromium/Local State"
+    # # # enabled_labs_experiments":["enable-force-dark@1"]
+  become: yes
+  become_user: "{{ user }}"

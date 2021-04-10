@@ -1,0 +1,84 @@
+{
+    "editor.fontSize": 12,
+    "window.menuBarVisibility": "visible",
+    "window.titleBarStyle": "custom",
+    "workbench.statusBar.visible": true,
+    "workbench.activityBar.visible": false,
+    "editor.renderControlCharacters": true,
+    "breadcrumbs.enabled": true,
+    "workbench.startupEditor": "newUntitledFile",
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#1A1A1A",
+        "statusBar.noFolderBackground": "#212121",
+        "statusBar.debuggingBackground": "#263238"
+    },
+    "workbench.editor.revealIfOpen": true,
+    "editor.mouseWheelZoom": true,
+    "window.zoomLevel": 0,
+    "files.exclude": {
+        ".*/": true
+    },
+    "files.watcherExclude": {
+        "**/.git/**": true
+    },
+    "files.hotExit": "off",
+    "window.restoreWindows": "folders",
+    "editor.wordWrap": "on",
+    "window.newWindowDimensions": "maximized",
+    "explorer.confirmDelete": false,
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "scope": "log.error",
+                "settings": {
+                    "fontStyle": "bold"
+                }
+            },
+            {
+                "scope": "log.warning",
+                "settings": {
+                    "fontStyle": "bold"
+                }
+            }
+        ]
+    },
+    "logFileHighlighter.customPatterns": [
+        {
+            "pattern": "^.*(((O|o)(K|k))|((S|s)(U|u)(C|c){2}(E|e)(S|s){2})).*$",
+            "foreground": "#00FF6A"
+        },
+        {
+            "pattern": "^.*((I|i)(N|n)(F|f)(O|o)).*$",
+            "foreground": "#0046FF"
+        },
+        {
+            "pattern": "^.*((W|w)(A|a)(R|r)(N|n)(I|i)(N|n)(G|g)).*$",
+            "foreground": "#f4ad42"
+        },
+        {
+            "pattern": "^.*(((E|e)(R|r){2}(O|o)(R|r))|((F|f)(A|a)(I|i)(L|l))|((C|c)(R|r)(I|i)(T|t)(I|i)(C|c))).*$",
+            "foreground": "#af1f1f"
+        }
+    ],
+    "python.linting.pylintArgs": [
+        "--max-line-length=500",
+        "--indent-size=4"
+    ],
+    "python.formatting.autopep8Args": [
+        "--max-line-length=500",
+        "--indent-size=4",
+        "--ignore=E402"
+    ],
+    "python.showStartPage": false,
+    "git.autofetch": true,
+    "shellcheck.run": "onSave",
+    "shellcheck.exclude": [],
+    "shellcheck.ignorePatterns": {
+        "**/.git/*.*": true,
+        "**/Personal-Wiki/**/*.*": true,
+        "**/*.zsh": true
+    },
+    "shellcheck.enableQuickFix": true,
+    "editor.largeFileOptimizations": true,
+    "sortLines.sortEntireFile": true
+}

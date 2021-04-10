@@ -1,0 +1,4 @@
+- name: Restart pulseaudio
+  shell: killall pulseaudio
+- name: "Refresh font information cache"
+  command: fc-cache -f

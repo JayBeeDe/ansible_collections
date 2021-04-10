@@ -1,0 +1,475 @@
+---
+- block:
+    # - name: "Configuring system network (1/2)..."
+    #   shell: nmcli con delete "net-{{ network_interface }}" || true
+    #   changed_when: false
+
+    - name: "Configuring system network (2/2)..."
+      nmcli:
+        type: ethernet
+        conn_name: "net-{{ network_interface }}"
+        ifname: "{{ network_interface }}"
+        ip4: "{{ network_ip }}/{{ network_subnet | ipaddr('prefix') }}"
+        gw4: "{{ network_subnet | ipaddr('1') | ipaddr('ip') }}"
+
+        dns4:
+          - "{{ network_dns }}"
+        autoconnect: yes
+        state:
+          present
+          #####NOTE that library may need to be patched here
+          #####/usr/lib/python3/dist-packages/ansible/modules/net_tools/nmcli.py line 567
+          ############FROM
+          #####try:
+          ##### import gi
+          ##### gi.require_version('NMClient', '1.0')
+          ##### gi.require_version('NetworkManager', '1.0')
+          ##### from gi.repository import NetworkManager, NMClient
+          ############REPLACE BY
+          ##### try:
+          ##### import gi
+          ##### gi.require_version('NM', '1.0')
+          ##### from gi.repository import NM
+
+    - name: "Configuring sshd (1/5)..."
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?Port [0-9]+$"
+        replace: "Port {{ ssh_port }}"
+        backup: no
+      notify: Restart sshd
+
+    - name: "Configuring sshd (2/5)..."
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?UseDNS .+$"
+        replace: "UseDNS no"
+        backup: no
+      notify: Restart sshd
+
+    - name: "Configuring sshd (3/5)..."
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?PermitRootLogin .+$"
+        replace: "PermitRootLogin prohibit-password"
+        backup: no
+      notify: Restart sshd
+
+    - name: "Configuring sshd (4/5)..."
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?PermitEmptyPasswords .+$"
+        replace: "PermitEmptyPasswords no"
+        backup: no
+      notify: Restart sshd
+
+    - name: "Configuring sshd (5/5)..."
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: "^AllowUsers root@localhost root@127.0.0.1 {{ user }}@127.0.0.1 {{ user }}@localhost {{ user }}@{{ network_subnet | ipaddr('network') | regex_replace('\\.0$','.*') }} root@{{ network_subnet | ipaddr('network') | regex_replace('\\.0$','.*') }}"
+        line: "AllowUsers root@localhost root@127.0.0.1 {{ user }}@127.0.0.1 {{ user }}@localhost {{ user }}@{{ network_subnet | ipaddr('network') | regex_replace('\\.0$','.*') }} root@{{ network_subnet | ipaddr('network') | regex_replace('\\.0$','.*') }}"
+        backup: no
+      notify: Restart sshd
+
+    - name: "Configuring firewalld (1/3)..."
+      copy:
+        src: "{{ role_path }}/files/firewalld.xml"
+        dest: /etc/firewalld/zones/public.xml
+        mode: "0644"
+        owner: "root"
+        group: "root"
+        force: no
+      notify: Restart firewalld
+
+    - name: "Configuring firewalld (2/3)..."
+      replace:
+        path: /etc/firewalld/zones/public.xml
+        regexp: "private-network-ansible-template"
+        replace: "{{ network_subnet }}"
+        backup: no
+      notify: Restart firewalld
+
+    - name: "Configuring firewalld (3/3)..."
+      replace:
+        path: /etc/firewalld/zones/public.xml
+        regexp: "ssh-port-ansible-template"
+        replace: "{{ ssh_port | string }}"
+        backup: no
+      notify: Restart firewalld
+
+    - name: "Disabling ufw..."
+      systemd:
+        name: "ufw"
+        state: stopped
+        enabled: no
+      notify: Restart firewalld
+
+    - name: "Configuring libvirt... (1/5)"
+      copy:
+        src: "{{ role_path }}/files/libvirt-network.xml"
+        dest: /etc/libvirt/qemu/networks/default.xml
+        mode: "0777"
+        owner: libvirt-qemu
+        group: libvirt-qemu
+        force: no
+      notify: Restart libvirtd
+
+    - name: "Configuring libvirt... (2/5)"
+      replace:
+        path: /etc/libvirt/qemu/networks/default.xml
+        regexp: private-network-net-ansible-template
+        replace: "{{ network_subnet | ipaddr('1') | ipaddr('ip') }}" # A.B.C.0/24 -> A.B.C.1
+        backup: no
+      notify: Restart libvirtd
+
+    - name: "Configuring libvirt... (3/5)"
+      replace:
+        path: /etc/libvirt/qemu/networks/default.xml
+        regexp: private-network-mask-ansible-template
+        replace: "{{ network_subnet | ipaddr('netmask') }}" # A.B.C.0/24 -> 255.255.255.0
+        backup: no
+      notify: Restart libvirtd
+
+    - name: "Configuring libvirt... (4/5)"
+      copy:
+        src: "{{ role_path }}/files/libvirt-vm.xml"
+        dest: "/etc/libvirt/qemu/{{ rdp_name }}.xml"
+        mode: "0777"
+        owner: libvirt-qemu
+        group: libvirt-qemu
+        force: no
+      notify: Restart libvirtd
+
+    - name: "Configuring libvirt... (5/5)"
+      replace:
+        path: "/etc/libvirt/qemu/{{ rdp_name }}.xml"
+        regexp: rdp_name
+        replace: "{{ rdp_name }}"
+        backup: no
+      notify: Restart libvirtd
+
+    - name: "Configuring fs.inotify.max_user_watches for vscode..."
+      lineinfile:
+        path: /etc/sysctl.conf
+        state: present
+        regexp: ^fs.inotify.max_user_watches.*$
+        line: "fs.inotify.max_user_watches = 524288"
+        backup: no
+      notify: Kernel attributes update
+
+    - name: "Configuring grub (1/2)..."
+      lineinfile:
+        path: /etc/default/grub
+        state: present
+        regexp: "^(GRUB_TIMEOUT=)([0-9]+)?$"
+        line: "GRUB_TIMEOUT=0"
+        backup: no
+      notify: Update grub
+
+    - name: "Configuring grub (2/2)..."
+      lineinfile:
+        path: /etc/default/grub
+        state: present
+        regexp: "^(GRUB_RECORDFAIL_TIMEOUT=)([0-9]+)?$"
+        line: "GRUB_RECORDFAIL_TIMEOUT=0"
+        backup: no
+      notify: Update grub
+
+    - name: "Logical evaluation..."
+      stat:
+        path: "/boot/efi/EFI/refind/refind.conf"
+      register: f
+
+    - name: "Logical evaluation..."
+      set_fact:
+        refindConfPath: "/boot/efi/EFI/BOOT/refind.conf"
+      when: not f.stat.exists
+
+    - name: "Logical evaluation..."
+      set_fact:
+        refindConfPath: "/boot/efi/EFI/refind/refind.conf"
+      when: f.stat.exists
+
+    - name: "Configuring Refind..."
+      replace:
+        path: "{{ refindConfPath }}"
+        regexp: "^(timeout )([0-9]+)?$"
+        replace: '\g<1>2'
+        backup: no
+      notify: Update grub
+
+    - name: "Masking ctrl-alt-del.target..."
+      systemd:
+        name: "ctrl-alt-del.target"
+        enabled: no
+        masked: yes
+        daemon_reload: yes
+
+    - name: "Configuring motd..."
+      copy:
+        src: "{{ role_path }}/files/motd"
+        dest: /etc/motd
+        mode: "0755"
+        owner: "root"
+        group: "root"
+
+    - name: "Preparing installation script context..."
+      file:
+        path: "/tmp/brprinter-installer.log"
+        state: absent
+      changed_when: false
+
+    - name: "Preparing installation script context..."
+      file:
+        path: "/tmp/brprinter-installer.log"
+        state: touch
+        mode: "0777"
+        owner: "root"
+      changed_when: false
+
+    - name: "Preparing installation script context..."
+      copy:
+        src: "{{ role_path }}/files/brprinter-installer.sh"
+        dest: /tmp/brprinter-installer.sh
+        mode: "0755"
+        owner: "root"
+        group: "root"
+        force: no
+      changed_when: false
+
+    - name: "Installing Printer..."
+      shell: echo -e "{{ printer_model }}\n1\n{{ printer_ip }}" | /bin/bash "/tmp/brprinter-installer.sh"
+      args:
+        chdir: "/tmp/"
+      register: printer
+      changed_when: "'Creation du dossier ' in printer.stdout"
+      notify: Fix broken packages
+
+    - name: "Logical evaluation..."
+      shell: /usr/bin/lpstat -d | grep "{{ printer_model }}" | cat
+      register: defaultPrinter
+      changed_when: false
+
+    - name: "Set default printer..."
+      shell: /usr/sbin/lpadmin -d "{{ printer_model }}"
+      when: defaultPrinter.stdout | length == 0
+
+    - name: "Cleaning artefacts..."
+      file:
+        state: absent
+        path: "/tmp/packages/"
+      changed_when: false
+
+    # - name: "Configuring fstab... (1/3)"
+    #   mount:
+    #     path: /VMs
+    #     src: UUID=2890edb1-6786-4491-83cc-133667a80824
+    #     fstype: ext4
+    #     opts: defaults
+    #     state: mounted
+
+    # - name: "Configuring fstab... (2/3)"
+    #   mount:
+    #     path: /Films
+    #     src: UUID=18B2EA1DB2E9FF5E
+    #     fstype: ntfs-3g
+    #     opts: rw,auto,gid=100,uid=1000,nls=utf8,umask=002
+    #     state: mounted
+
+    # - name: "Configuring fstab... (3/3)"
+    #   mount:
+    #     path: /Musique
+    #     src: UUID=14D00075D0005F7C
+    #     fstype: ntfs-3g
+    #     opts: rw,auto,gid=100,uid=1000,nls=utf8,umask=002
+    #     state: mounted
+
+    - name: "Preparing SSH for root user..."
+      file:
+        path: /root/.ssh/
+        state: directory
+        mode: "0755"
+        owner: "root"
+        group: "root"
+
+    - name: "Generating SSH key pair for root user..."
+      openssh_keypair:
+        path: /root/.ssh/id_rsa
+        size: 4096
+        type: rsa
+
+    # - name: "Set authorized key for user root..."
+    #   authorized_key:
+    #     user: root
+    #     state: present
+    #     key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+    #     ## suspected to be run locally...
+
+    - name: "Checking known_hosts..."
+      stat:
+        path: "/root/.ssh/known_hosts"
+      register: p
+
+    - name: "Set known_hosts for user root..."
+      shell: ssh-keyscan -p "{{ ssh_port }}" -H localhost >> "/root/.ssh/known_hosts"
+      when: p.stat.exists == False
+
+    - name: "Configuring aliases for root user (1/2)..."
+      copy:
+        src: "{{ role_path }}/files/bash_aliases"
+        dest: /root/.bash_aliases
+        mode: "0755"
+        owner: "root"
+        group: "root"
+        force: no
+
+    - name: "Configuring aliases for root user (2/2)..."
+      lineinfile:
+        path: /root/.bashrc
+        state: present
+        regexp: ^(\s*)(.|source)( ~/.bash_aliases)(\s*)$
+        line: ". ~/.bash_aliases"
+        backup: no
+
+    - name: "Overriding env variables to {{ user }} for root user (1/3)..."
+      replace:
+        path: /root/.bash_aliases
+        regexp: '\$VPJP'
+        replace: "{{ git_rootrepo }}/"
+        backup: no
+      changed_when: false
+
+    - name: "Overriding env variables to {{ user }} for root user (2/3)..."
+      replace:
+        path: /root/.bash_aliases
+        regexp: '\$HOME'
+        replace: "{{ home }}/"
+        backup: no
+      changed_when: false
+
+    - name: "Overriding env variables to {{ user }} for root user (3/3)..."
+      replace:
+        path: /root/.bash_aliases
+        regexp: '\$USER'
+        replace: "{{ user }}"
+        backup: no
+      changed_when: false
+
+    - name: "Check if {{ user }} exists"
+      getent:
+        database: passwd
+        # key: "user"
+        key: "{{ user }}"
+        fail_key: False
+      register: userExists
+
+    - name: "Creating {{ user }} user with SSH key..."
+      user:
+        name: "{{ user }}"
+        shell: /bin/bash
+        createhome: yes # create_home since Ansible 2.5
+        password: "{{ password | password_hash('sha512') }}"
+        generate_ssh_key: yes
+        ssh_key_file: "{{ home }}/.ssh/id_rsa"
+        ssh_key_bits: 4096
+        ssh_key_type: rsa
+      when: not userExists.ansible_facts.getent_passwd[user]
+
+    - name: "Configuring rc local service (1/2)..."
+      copy:
+        src: "{{ role_path }}/files/configure-wakeup.sh"
+        dest: /etc/rc.local
+        mode: "0755"
+        owner: "root"
+        group: "root"
+        force: no
+
+    - name: "Configuring rc local service (2/2)..."
+      copy:
+        src: "{{ role_path }}/files/rc-local.service"
+        dest: /etc/systemd/system/rc-local.service
+        mode: "0644"
+        owner: "root"
+        group: "root"
+        force: no
+
+    - name: "Enabling rc-local service..."
+      systemd:
+        name: "rc-local"
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+  environment:
+    PWD: ""
+
+- block:
+
+    - name: "Fix owner of the generated pub key"
+      file:
+        path: "{{ home }}/.ssh/id_rsa.pub"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: "0777"
+      changed_when: false # to be checked
+
+    - name: "Fix owner of the generated priv key"
+      file:
+        path: "{{ home }}/.ssh/id_rsa"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    # - name: "Set authorized key for user {{ user }}..."
+    #   authorized_key:
+    #     user: "{{ user }}"
+    #     state: present
+    #     key: "{{ lookup('file', '{{ home }}/.ssh/id_rsa.pub') }}"
+    #     ## suspected to be run locally...
+
+    - name: "Fix owner of the generated pub key 2"
+      file:
+        path: "{{ home }}/.ssh/id_rsa.pub"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: "0644"
+      changed_when: false # to be checked
+
+    - name: "Checking known_hosts..."
+      stat:
+        path: "{{ home }}/.ssh/known_hosts"
+      register: p
+
+    - name: "Set known_hosts for user {{ user }}..."
+      shell: ssh-keyscan -p "{{ ssh_port }}" -H localhost >> "{{ home }}/.ssh/known_hosts"
+      when: p.stat.exists == False
+
+    - name: "Configuring aliases for {{ user }} user (1/2)..."
+      copy:
+        src: "{{ role_path }}/files/bash_aliases"
+        dest: "{{ home }}/.bash_aliases"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        force: no
+
+    - name: "Configuring aliases for {{ user }} user (2/2)..."
+      lineinfile:
+        path: "{{ home }}/.bashrc"
+        state: present
+        regexp: ^(\s*)(.|source)( ~/.bash_aliases)(\s*)$
+        line: ". ~/.bash_aliases"
+        backup: no
+
+    - name: "Overriding env variables to {{ user }} for {{ user }} user..."
+      replace:
+        path: "{{ home }}/.bash_aliases"
+        regexp: '\$VPJP'
+        replace: "{{ git_rootrepo }}/"
+        backup: no
+      changed_when: false
+
+  become: yes
+  become_user: "{{ user }}"
+  environment:
+    PWD: ""
