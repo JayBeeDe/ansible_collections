@@ -1,11 +1,11 @@
 ---
 namespace: jaybeede
 name: linux_desktop
-version: 2.0.3
+version: 2.0.9
 readme: README.md
 authors:
   - JayBee <jb.social@outlook.com>
-description: your collection description
+description: roles & modules to quicky deploy a Ubuntu desktop computer
 license:
   - GPL-3.0-or-later
 tags:

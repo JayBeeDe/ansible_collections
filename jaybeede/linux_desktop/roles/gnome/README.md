@@ -1,38 +1,49 @@
-Role Name
+gnome
 =========
 
-A brief description of the role goes here.
+Gnome configuration for linux desktop: gnome extensions, dark-mode, night-light, evince, nemo, power settings, notifications, wallpaper, keyboard shortcuts.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+[gnome_extensions](../../plugins/modules/gnome_extensions.py) and [keyboard_shortcuts](../../plugins/modules/keyboard_shortcuts.py) modules are required for that role.
+[json2variant](../../plugins/filter/json2variant.py) filter is required for that role.
+
+:warning: /usr/share/gnome-shell/extensions/ must have recursively 777 as chmod when scope is set to system.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+Variable Name | Description
+------------- | -----------
+user | The target machine session username
+home | The target machine session username's home directory
+email | Email to display on the gnome banner message
+git_rootrepo | Path to the git root repo (personal)
+nickname | Nickname to display on the gnome banner message
+tokenGithub | GitHub token to bypass GitHub API limitation when downloading gnome extension
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Playbook should contain at least the following content:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```yaml
+- hosts: all
+  gather_facts: true
+  collections:
+    - jaybeede.linux_desktop
+  tasks:
+    - import_role:
+        name: gnome
+```
 
 License
 -------
 
-BSD
+[GPL-3.0-or-later](../../LICENSE)
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+JayBee <jb.social@outlook.com>
