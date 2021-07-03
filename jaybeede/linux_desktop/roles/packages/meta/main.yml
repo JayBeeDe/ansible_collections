@@ -1,16 +1,19 @@
 ---
 galaxy_info:
   author: JayBee <jb.social@outlook.com>
-  description: packages role
-  company: OVHcloud
+  description: Packages for linux desktop
   license: GPL-3.0-or-later
-  min_ansible_version: "2.1"
   galaxy_tags:
   - "linux"
   - "ubuntu"
   - "desktop"
   - "packages"
+  - "apt"
+  - "language"
+  - "regional"
+  - "repo"
+  - "snap"
   platforms:
-    - name: GenericLinux
+    - name: Ubuntu
       versions:
         - any

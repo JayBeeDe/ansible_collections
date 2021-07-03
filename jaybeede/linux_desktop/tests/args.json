@@ -3,7 +3,6 @@
         "url": "https://github.com/home-sweet-gnome/dash-to-panel",
         "scope": "system",
         "action": "install",
-        "force": "True",
-        "tokenGithub": "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"
+        "force": "True"
     }
 }

@@ -27,9 +27,12 @@ sys.path.append("/usr/lib/python3/dist-packages/ansible/modules/system")
 from unarchive import ZipArchive
 from dconf import DconfPreference, DBusWrapper
 
-DOCUMENTATION = """
+DOCUMENTATION = '''
+---
 module: gnome_extensions
 author: JayBee
+version_added: "2.0.0"
+short_description: Manage gnome extensions
 description: Ansible Module to manage (install, update, uninstall, enable, disable) gnome extensions. Gnome extensions can be downloaded from official community website, from the GitHub extension repo, or directly from a custom private or public URL. When run as root, gnome extension will be system wide otherwise will be user wide installed.
 
 options:
@@ -51,9 +54,9 @@ options:
   tokenGitlab:
     description: personal GitLab token. If provided, in case GitLab repo URL is provided, calls to GitLab API will be limited to 2000 per minute instead of 500 per minute (tokenGitlab might never be necessary in this ansible module)
     required: no
-"""
+'''
 
-EXAMPLES = """
+EXAMPLES = '''
 
 Basic example, module will try to download the latest version that is compatible with your gnome-shell version:
 
@@ -94,12 +97,12 @@ Handler required:
   - name: "Reload gnome"
     command: killall -1 gnome-shell
 
-"""
+'''
 
-RETURN = """
+RETURN = '''
 results:
   description: return the dict describing the created desktop file
-"""
+'''
 
 extensionSystemWideBasePath = "/usr/share/gnome-shell/extensions"
 extensionUserWideBasePath = os.environ["HOME"] + "/.local/share/gnome-shell/extensions"

@@ -1,16 +1,27 @@
 ---
 galaxy_info:
   author: JayBee <jb.social@outlook.com>
-  description: applications role
-  company: OVHcloud
+  description: Desktop applications configuration
   license: GPL-3.0-or-later
-  min_ansible_version: "2.1"
   galaxy_tags:
   - "linux"
   - "ubuntu"
   - "desktop"
   - "applications"
+  - "chromium"
+  - "conky"
+  - "flameshot"
+  - "git"
+  - "keepassxc"
+  - "libreoffice"
+  - "nemo"
+  - "onedrive"
+  - "pulseaudio"
+  - "remmina"
+  - "terminator"
+  - "vlc"
+  - "vscode"
   platforms:
-    - name: GenericLinux
+    - name: Ubuntu
       versions:
         - any

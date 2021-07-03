@@ -18,10 +18,13 @@ from dconf import DconfPreference, DBusWrapper
 import syslog
 from ansible.module_utils.basic import AnsibleModule
 
-DOCUMENTATION = """
+DOCUMENTATION = '''
+---
 module: keyboard_shortcuts
 author: JayBee
-description: Ansible Module to create keyboard sortcuts on linux workstation running in gnome
+version_added: "2.0.0"
+short_description: Create keyboard sortcuts on linux workstation running gnome
+description: Ansible Module to create keyboard sortcuts on linux workstation running gnome
 
 options:
   binding:
@@ -36,9 +39,9 @@ options:
   dynamic:
     description: For builtin binding, set dynamic (non-static) keybinding (static by default)
     required: no
-"""
+'''
 
-EXAMPLES = """
+EXAMPLES = '''
   - name: "Creating calculator shortcut"
     keyboard_shortcuts:
       binding: "<Super>c"
@@ -49,12 +52,12 @@ EXAMPLES = """
       binding: "<Primary><Alt>eacute"
       command: "/bin/bash $HOME/Documents/git/mynicescript.sh arg"
       name: "Push Projets Perso"
-"""
+'''
 
-RETURN = """
+RETURN = '''
 results:
   description: return the dict describing the created shortcut
-"""
+'''
 
 builtinCommands = [
     {"name": "calculator", "description": "Launch calculator"},

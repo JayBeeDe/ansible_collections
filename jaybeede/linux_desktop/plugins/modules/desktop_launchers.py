@@ -14,11 +14,13 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
 import collections
 
-DOCUMENTATION = """
+DOCUMENTATION = '''
+---
 module: desktop_launchers
 author: JayBee
-description: Ansible Module to create .desktop files according the freedesktop.org specifications
-more details: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#recognized-keys
+version_added: "2.0.0"
+short_description: Create desktop files according the freedesktop.org specifications
+description: Ansible Module to create .desktop files according the freedesktop.org specifications: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#recognized-keys
 
 options:
   source:
@@ -94,9 +96,9 @@ options:
     description: PrefersNonDefaultGPU argument (see freedesktop specifications)
     required: no
 
-"""
+'''
 
-EXAMPLES = """
+EXAMPLES = '''
   - name: "Creating VLC application shortcut"
     desktop_launchers:
       target: "/usr/bin/vlc --started-from-file %U"
@@ -109,12 +111,12 @@ EXAMPLES = """
       location: "$HOME/Desktop/JayBeeDe.desktop"
       freedesktop_Type: "Link"
     register: testout
-"""
+'''
 
-RETURN = """
+RETURN = '''
 results:
   description: return the dict describing the created desktop file
-"""
+'''
 
 
 def resolvePath(path, partialResolve=False):

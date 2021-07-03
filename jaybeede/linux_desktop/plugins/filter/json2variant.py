@@ -1,13 +1,13 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-def jsonToVariant(lstInput, deep=0):
+def json2variant(lstInput, deep=0):
     if isinstance(lstInput, list):
         out = "["
         for item in lstInput:
             if out != "[":
                 out += ","
-            out += jsonToVariant(item, deep+1)
+            out += json2variant(item, deep+1)
         out += "]"
     else:
         out = str(lstInput)
@@ -23,5 +23,5 @@ class FilterModule(object):
 
     def filters(self):
         return {
-            'jsonToVariant': jsonToVariant
+            'json2variant': json2variant
         }

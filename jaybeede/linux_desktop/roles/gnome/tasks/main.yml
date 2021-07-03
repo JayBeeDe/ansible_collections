@@ -925,8 +925,8 @@
   become: yes
   become_user: "{{ user }}"
   vars:
-    mttdata: "{{ lookup('file', '{{ role_path }}/files/minimize-to-tray.json') | from_json | jaybeede.linux_desktop.jsonToVariant2 }}"
-    dashtopanel: "{{ lookup('file', '{{ role_path }}/files/dash-to-panel.json') | from_json | jaybeede.linux_desktop.jsonToVariant2 }}"
+    mttdata: "{{ lookup('file', '{{ role_path }}/files/minimize-to-tray.json') | from_json | jaybeede.linux_desktop.json2variant }}"
+    dashtopanel: "{{ lookup('file', '{{ role_path }}/files/dash-to-panel.json') | from_json | jaybeede.linux_desktop.json2variant }}"
   environment:
     HOME: "/home/{{ user }}"
     USER: "{{ user }}"

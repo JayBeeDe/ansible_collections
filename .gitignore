@@ -1,5 +1,6 @@
 **/__pycache__/**
 *.log
+*.tar.gz
 *.old
 **/files/Bookmarks
 **/group_vars/all.yml

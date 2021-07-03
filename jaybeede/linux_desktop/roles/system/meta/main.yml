@@ -1,16 +1,28 @@
 ---
 galaxy_info:
   author: JayBee <jb.social@outlook.com>
-  description: system role
-  company: OVHcloud
+  description: Services, printer and shell configuration for linux desktop
   license: GPL-3.0-or-later
-  min_ansible_version: "2.1"
   galaxy_tags:
   - "linux"
   - "ubuntu"
   - "desktop"
   - "system"
+  - "bash-aliases"
+  - "bash"
+  - "env-variables"
+  - "firewalld"
+  - "grub"
+  - "libvirtd"
+  - "motd"
+  - "networking"
+  - "printer"
+  - "rc-local"
+  - "refind"
+  - "ssh"
+  - "sshd"
+  - "systemd"
   platforms:
-    - name: GenericLinux
+    - name: Ubuntu
       versions:
         - any

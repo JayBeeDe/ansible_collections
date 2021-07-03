@@ -1,16 +1,28 @@
 ---
 galaxy_info:
   author: JayBee <jb.social@outlook.com>
-  description: gnome role
-  company: OVHcloud
+  description: Gnome configuration for linux desktop
   license: GPL-3.0-or-later
-  min_ansible_version: "2.1"
   galaxy_tags:
   - "linux"
   - "ubuntu"
   - "desktop"
   - "gnome"
+  - "arc-menu"
+  - "dark-mode"
+  - "dash-to-panel"
+  - "evince"
+  - "extensions"
+  - "gnome-shell"
+  - "keyboard-shortcuts"
+  - "nemo"
+  - "night-light"
+  - "notifications"
+  - "plymouth"
+  - "put-window"
+  - "start-screen"
+  - "wallpaper"
   platforms:
-    - name: GenericLinux
+    - name: Ubuntu
       versions:
         - any
