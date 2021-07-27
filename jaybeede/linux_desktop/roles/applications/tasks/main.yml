@@ -213,6 +213,7 @@
     - name: "Configuring vscode - Installing extensions (5/5)..."
       command: code --install-extension "{{ item }}"
       loop:
+        - adpyke.vscode-sql-formatter
         - aeschli.vscode-css-formatter
         - aswinkumar863.smarty-template-support
         - bibhasdn.unique-lines
@@ -220,17 +221,25 @@
         - dhoeric.ansible-vault
         - emilast.logfilehighlighter
         - foxundermoon.shell-format
+        - gamunu.vscode-yarn
         - geeebe.duplicate
-        - golang.Go
+        - golang.go
+        - hediet.vscode-drawio
+        - hogashi.crontab-syntax-highlight
         - junstyle.php-cs-fixer
         - ms-azuretools.vscode-docker
         - ms-python.python
+        - ms-python.vscode-pylance
+        - ms-toolsai.jupyter
         - ms-vscode.cpptools
+        - pstreule.codebucket
+        - redhat.vscode-commons
         - redhat.vscode-xml
         - redhat.vscode-yaml
         - timonwong.shellcheck
         - tyriar.sort-lines
         - vsciot-vscode.vscode-arduino
+        - wingrunr21.vscode-ruby
         - zhiyuan-lin.simple-perl
       register: ext
       changed_when: "'already installed' not in ext.stdout"
