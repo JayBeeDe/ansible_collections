@@ -100,23 +100,23 @@
 
 - name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (2/3)"
   apt_repository:
-    repo: deb http://packages.linuxmint.com ulyana upstream
+    repo: deb http://packages.linuxmint.com uma upstream
     state: present
   when: not f2.stat.exists
 
 - name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (3/3)"
   copy:
-    dest: "/etc/apt/preferences.d/mint-ulyssa-pin"
+    dest: "/etc/apt/preferences.d/mint-uma-pin"
     mode: "0644"
     owner: "root"
     group: "root"
     content: |
-      # Allow upgrading only chromium from Ulyssa repository
+      # Allow upgrading only chromium from uma repository
       Package: chromium
       Pin: origin packages.linuxmint.com
       Pin-Priority: 1002
 
-      # Never prefer other packages from the Ulyssa repository
+      # Never prefer other packages from the uma repository
       Package: *
       Pin: origin packages.linuxmint.com
       Pin-Priority: 1
