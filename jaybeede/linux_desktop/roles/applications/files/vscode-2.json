@@ -65,5 +65,13 @@
         "key": "ctrl+r",
         "command": "workbench.action.tasks.runTask",
         "args": "cmdR-All"
+    },
+    {
+        "key": "ctrl+shift+e",
+        "command": "workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "ctrl+b",
+        "command": "codebucket.open"
     }
 ]

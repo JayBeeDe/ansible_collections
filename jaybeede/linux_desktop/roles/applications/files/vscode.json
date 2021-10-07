@@ -1,31 +1,16 @@
 {
-    "editor.fontSize": 12,
-    "window.menuBarVisibility": "visible",
-    "window.titleBarStyle": "custom",
-    "workbench.statusBar.visible": true,
-    "workbench.activityBar.visible": false,
-    "editor.renderControlCharacters": true,
+    "[dockerfile]": {
+        "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+    },
     "breadcrumbs.enabled": true,
-    "workbench.startupEditor": "newUntitledFile",
-    "workbench.colorCustomizations": {
-        "statusBar.background": "#1A1A1A",
-        "statusBar.noFolderBackground": "#212121",
-        "statusBar.debuggingBackground": "#263238"
-    },
-    "workbench.editor.revealIfOpen": true,
+    "debug.console.fontSize": 12,
+    "debug.console.lineHeight": 7,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.copyWithSyntaxHighlighting": false,
+    "editor.fontSize": 12,
+    "editor.largeFileOptimizations": true,
     "editor.mouseWheelZoom": true,
-    "window.zoomLevel": 0,
-    "files.exclude": {
-        ".*/": true
-    },
-    "files.watcherExclude": {
-        "**/.git/**": true
-    },
-    "files.hotExit": "off",
-    "window.restoreWindows": "folders",
-    "editor.wordWrap": "on",
-    "window.newWindowDimensions": "maximized",
-    "explorer.confirmDelete": false,
+    "editor.renderWhitespace": "none",
     "editor.tokenColorCustomizations": {
         "textMateRules": [
             {
@@ -42,43 +27,110 @@
             }
         ]
     },
+    "editor.wordWrap": "on",
+    "explorer.confirmDelete": false,
+    "files.associations": {
+        "*.inc": "perl"
+    },
+    "files.exclude": {
+        ".*/": true,
+        "**/*.old.tar.gz": true,
+        "**/*.old": true,
+        "**/*.bck": true,
+        "**/*~": true,
+        "**/reinstallserverexecutor/tools/steps": true,
+        "**/.code-workspace": true,
+        "**/.vscode": true
+    },
+    "files.hotExit": "off",
+    "files.watcherExclude": {
+        ".*/": true,
+        "**/*.old.tar.gz": true,
+        "**/*.old": true,
+        "**/*.bck": true,
+        "**/*~": true,
+        "**/reinstallserverexecutor/tools/steps": true,
+        "**/.code-workspace": true,
+        "**/.vscode": true
+    },
+    "git.autofetch": true,
+    "git.autorefresh": true,
     "logFileHighlighter.customPatterns": [
         {
-            "pattern": "^.*(((O|o)(K|k))|((S|s)(U|u)(C|c){2}(E|e)(S|s){2})).*$",
-            "foreground": "#00FF6A"
+            "pattern": "^.*(ok|success|Ok|OK|Success|SUCCESS).*$",
+            "background": "#00FF6A",
+            "foreground": "#000000",
+            "fontStyle": "bold"
         },
         {
-            "pattern": "^.*((I|i)(N|n)(F|f)(O|o)).*$",
-            "foreground": "#0046FF"
+            "pattern": "^.*(info|Info|INFO).*$",
+            "background": "#0046FF",
+            "foreground": "#FFFFFF",
+            "fontStyle": "bold"
         },
         {
-            "pattern": "^.*((W|w)(A|a)(R|r)(N|n)(I|i)(N|n)(G|g)).*$",
-            "foreground": "#f4ad42"
+            "pattern": "^.*(warn|Warn|WARN|unable|Unable|UNABLE|cannot|Cannot|CANNOT|can't|CAN'T).*$",
+            "background": "#f4ad42",
+            "foreground": "#000000",
+            "fontStyle": "bold"
         },
         {
-            "pattern": "^.*(((E|e)(R|r){2}(O|o)(R|r))|((F|f)(A|a)(I|i)(L|l))|((C|c)(R|r)(I|i)(T|t)(I|i)(C|c))).*$",
-            "foreground": "#af1f1f"
+            "pattern": "^.*(fail|error|Fail|Error|FAIL|ERROR).*$",
+            "background": "#af1f1f",
+            "foreground": "#FFFFFF",
+            "fontStyle": "bold"
         }
     ],
-    "python.linting.pylintArgs": [
-        "--max-line-length=500",
-        "--indent-size=4"
-    ],
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "python.analysis.completeFunctionParens": true,
+    "python.autoComplete.addBrackets": true,
     "python.formatting.autopep8Args": [
         "--max-line-length=500",
         "--indent-size=4",
         "--ignore=E402"
     ],
+    "python.linting.pylintArgs": [
+        "--max-line-length=500",
+        "--indent-size=4"
+    ],
     "python.showStartPage": false,
-    "git.autofetch": true,
-    "shellcheck.run": "onSave",
+    "redhat.telemetry.enabled": true,
+    "shellcheck.enableQuickFix": true,
     "shellcheck.exclude": [],
     "shellcheck.ignorePatterns": {
         "**/.git/*.*": true,
         "**/Personal-Wiki/**/*.*": true,
         "**/*.zsh": true
     },
-    "shellcheck.enableQuickFix": true,
-    "editor.largeFileOptimizations": true,
-    "sortLines.sortEntireFile": true
+    "shellcheck.run": "onSave",
+    "simple-perl.perltidyArgs": [
+        "-q",
+        "-l=0"
+    ],
+    "sortLines.sortEntireFile": true,
+    "update.mode": "none",
+    "update.showReleaseNotes": false,
+    "window.menuBarVisibility": "visible",
+    "window.newWindowDimensions": "maximized",
+    "window.restoreWindows": "folders",
+    "window.titleBarStyle": "custom",
+    "window.zoomLevel": 0,
+    "workbench.activityBar.visible": false,
+    "workbench.colorCustomizations": {
+        "titleBar.activeBackground": "#414141",
+        "titleBar.activeForeground": "#FFFFFF",
+        "statusBar.background": "#1A1A1A",
+        "statusBar.noFolderBackground": "#212121",
+        "statusBar.debuggingBackground": "#263238"
+    },
+    "workbench.editor.revealIfOpen": true,
+    "workbench.editor.wrapTabs": true,
+    "workbench.editorAssociations": {
+        "*.ipynb": "jupyter-notebook"
+    },
+    "workbench.startupEditor": "newUntitledFile",
+    "workbench.statusBar.visible": true
 }
