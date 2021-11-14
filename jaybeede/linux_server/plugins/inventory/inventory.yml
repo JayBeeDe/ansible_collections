@@ -8,13 +8,9 @@ all:
     git_email: "{{ email }}"
     git_name: "{{ nickname }}"
     git_rootrepo: "{{ home }}/Documents/Projets-Perso"
-    language: fr
+    locale: C
     network_dns: "8.8.8.8"
-    network_ip: "172.31.55.139"
-    network_subnet: "172.31.55.0/24"
-    rdp_host: "172.31.55.2"
-    rdp_name: JBD-CLI-CLB
-    rdp_port: "{{ vault_rdp_port }}"
-    rdp_user: "{{ vault_rdp_user }}"
+    ssh_port: "{{ vault_ssh_port }}"
+    allowed_ip: "{{ vault_allowed_ip }}"
   hosts:
     ansible-2:

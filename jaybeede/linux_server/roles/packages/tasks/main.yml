@@ -13,76 +13,62 @@
       - tree
       - curl
       - net-tools
-      - gnome-shell-extensions
-      - gnome-tweak-tool
-      - dconf-editor
-      - terminator
       - refind
-      - qemu-kvm
-      - qemu
-      - virt-manager
-      - virtinst
-      - qemu-guest-agent
-      - remmina
-      - bridge-utils
-      - cpu-checker
-      - qemu-utils
       - git
-      - qt5ct
-      - qt5-style-plugins
       - firewalld
       - jq
-      - xdotool
-      - ccze
-      - libnm-dev
-      - python3-gi
-      - pylint
-      - ntfs-3g
-      - imagemagick
       - units
       - nmap
-      - gparted
-      - libperl-critic-perl
-      - perltidy
-      - id3v2
       - initramfs-tools
-      - timeshift
-      - lua5.4
       - pip
-      - acpitool
       - ansible # needed by gnome_extensions module
+      - gnupg
+      - lsb-release
+
+- name: "Logical evaluation..."
+  stat:
+    path: "/etc/apt/sources.list.d/docker.list"
+  register: f
+
+- name: "Adding Docker Repo key"
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+  when: not f.stat.exists
+
+- name: "Configuring Docker Repo"
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+  when: not f.stat.exists
+
+- name: "Install Docker..."
+  apt:
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+  notify: Restart docker
+  when: not f.stat.exists
 
 - name: "Install locate package..."
   apt:
     pkg: locate
   notify: Run updatedb
 
-- name: "Install pulseaudio related packages..."
-  apt:
-    pkg:
-      - pulseaudio
-      - pulseaudio-utils
-      - pavucontrol
-      - pulseaudio-equalizer
-      - pulseeffects
-      - lsp-plugins
-      - libasound2-plugins-extra
+- name: "Configure Regional language (1/2)"
+  community.general.locale_gen:
+    name: "{{ locale }}.UTF-8"
+    state: present
 
-- name: "Install Regional Packages..."
-  apt:
-    pkg:
-      - "hunspell-{{ language }}"
-      - "hunspell-{{ language }}-revised"
-      - "libreoffice-l10n-{{ language }}"
-      - "hyphen-{{ language }}"
-      - "mythes-{{ language }}"
+- name: "Configure Regional language (2/2)"
+  command: localectl set-locale LANG={{ locale }}.UTF-8 LC_ALL={{ locale }}.UTF-8
 
-- name: "Removing some default Applications..."
-  apt:
-    pkg:
-      - firefox
-    state: absent
-    purge: yes
+# - name: "Removing some default Applications..."
+#   apt:
+#     pkg:
+#       - blabla
+#     state: absent
+#     purge: yes
 
 - name: "Remove dependencies that are no longer required"
   apt:
