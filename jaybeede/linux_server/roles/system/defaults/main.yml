@@ -1,0 +1,14 @@
+user: default
+home: "/home/{{ user }}"
+git_rootrepo: "{{ home }}/git"
+network_dns: "8.8.8.8"
+network_interface: "{{ ansible_default_ipv4.interface }}"
+network_ip: "192.168.1.2"
+network_subnet: "192.168.1.0/24"
+printer_ip: "192.168.1.20"
+printer_model: MFC-8690DW
+rdp_name: windows
+ssh_port: 22
+
+#network_gateway, network_mask
+# network_subnet

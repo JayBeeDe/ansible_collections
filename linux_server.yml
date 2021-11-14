@@ -1,0 +1,9 @@
+- hosts: all
+  gather_facts: true
+  collections:
+    - jaybeede.linux_server
+  tasks:
+    - import_role:
+        name: packages
+    - import_role:
+        name: system

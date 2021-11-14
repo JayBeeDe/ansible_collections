@@ -1,0 +1,26 @@
+---
+galaxy_info:
+  author: JayBee <jb.social@outlook.com>
+  description: Services and shell configuration for linux server
+  license: GPL-3.0-or-later
+  galaxy_tags:
+  - "linux"
+  - "debian"
+  - "system"
+  - "bash-aliases"
+  - "bash"
+  - "env-variables"
+  - "firewalld"
+  - "grub"
+  - "libvirtd"
+  - "motd"
+  - "networking"
+  - "rc-local"
+  - "refind"
+  - "ssh"
+  - "sshd"
+  - "systemd"
+  platforms:
+    - name: Debian
+      versions:
+        - any

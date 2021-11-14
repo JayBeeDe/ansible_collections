@@ -1,0 +1,20 @@
+all:
+  vars:
+    user: "{{ vault_user }}"
+    password: "{{ vault_password }}"  # if user doesn't exist, user will be created with specified password. Otherwise, password will not be updated
+    home: "/home/{{ user }}"
+    email: "{{ vault_email }}"
+    nickname: "{{ vault_nickname }}"
+    git_email: "{{ email }}"
+    git_name: "{{ nickname }}"
+    git_rootrepo: "{{ home }}/Documents/Projets-Perso"
+    language: fr
+    network_dns: "8.8.8.8"
+    network_ip: "172.31.55.139"
+    network_subnet: "172.31.55.0/24"
+    rdp_host: "172.31.55.2"
+    rdp_name: JBD-CLI-CLB
+    rdp_port: "{{ vault_rdp_port }}"
+    rdp_user: "{{ vault_rdp_user }}"
+  hosts:
+    ansible-2:

@@ -1,0 +1,8 @@
+{
+    "ANSIBLE_MODULE_ARGS": {
+        "url": "https://github.com/home-sweet-gnome/dash-to-panel",
+        "scope": "system",
+        "action": "install",
+        "force": "True"
+    }
+}

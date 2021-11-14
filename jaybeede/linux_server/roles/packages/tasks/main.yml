@@ -1,0 +1,91 @@
+---
+- apt: name=aptitude state=present
+
+- name: "install system updates for debian systems (1/2)"
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: "install system updates for debian systems (2/2)"
+  apt: upgrade=safe
+
+- name: "Install some system tools..."
+  apt:
+    pkg:
+      - tree
+      - curl
+      - net-tools
+      - gnome-shell-extensions
+      - gnome-tweak-tool
+      - dconf-editor
+      - terminator
+      - refind
+      - qemu-kvm
+      - qemu
+      - virt-manager
+      - virtinst
+      - qemu-guest-agent
+      - remmina
+      - bridge-utils
+      - cpu-checker
+      - qemu-utils
+      - git
+      - qt5ct
+      - qt5-style-plugins
+      - firewalld
+      - jq
+      - xdotool
+      - ccze
+      - libnm-dev
+      - python3-gi
+      - pylint
+      - ntfs-3g
+      - imagemagick
+      - units
+      - nmap
+      - gparted
+      - libperl-critic-perl
+      - perltidy
+      - id3v2
+      - initramfs-tools
+      - timeshift
+      - lua5.4
+      - pip
+      - acpitool
+      - ansible # needed by gnome_extensions module
+
+- name: "Install locate package..."
+  apt:
+    pkg: locate
+  notify: Run updatedb
+
+- name: "Install pulseaudio related packages..."
+  apt:
+    pkg:
+      - pulseaudio
+      - pulseaudio-utils
+      - pavucontrol
+      - pulseaudio-equalizer
+      - pulseeffects
+      - lsp-plugins
+      - libasound2-plugins-extra
+
+- name: "Install Regional Packages..."
+  apt:
+    pkg:
+      - "hunspell-{{ language }}"
+      - "hunspell-{{ language }}-revised"
+      - "libreoffice-l10n-{{ language }}"
+      - "hyphen-{{ language }}"
+      - "mythes-{{ language }}"
+
+- name: "Removing some default Applications..."
+  apt:
+    pkg:
+      - firefox
+    state: absent
+    purge: yes
+
+- name: "Remove dependencies that are no longer required"
+  apt:
+    autoremove: yes
+#remove at the end fswatch
+#libsodium-dev
