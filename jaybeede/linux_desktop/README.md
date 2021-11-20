@@ -81,6 +81,8 @@ Create a file all.yml into group_vars directory with the following content:
 ```yaml
 vault_user: "my vault_user"
 vault_password: "my vault_password"  # if user doesn't exist, user will be created with specified password. Otherwise, password will not be updated
+vault_ssh_port: "my vault_ssh_port"
+vault_ssh_host1: "my vault_ssh_host1"
 vault_email: "my vault_email"
 vault_nickname: "my vault_nickname"
 vault_kdbx_path: "my vault_kdbx_path"
@@ -112,7 +114,7 @@ Warning: All roles dependencies must be met:<br />
 
 ## Quick start
 
-You can put all the roles within the following order in your playbook (let's call it all.yml):
+You can put all the roles within the following order in your playbook (let's call it linux_desktop.yml):
 
 ```yaml
 - hosts: all
@@ -143,5 +145,5 @@ For the description of all variables, see the role documentation.
 Then, once ready, you just need to run:
 
 ```bash
-sudo ansible-playbook all.yml -i jaybeede/linux_desktop/plugins/inventory/inventory.yml --ask-vault-pass
+ansible-playbook linux_desktop.yml -i jaybeede/linux_desktop/plugins/inventory/inventory.yml --ask-vault-pass
 ```

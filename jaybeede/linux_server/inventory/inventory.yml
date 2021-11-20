@@ -1,16 +1,19 @@
 all:
   vars:
     user: "{{ vault_user }}"
-    password: "{{ vault_password }}"  # if user doesn't exist, user will be created with specified password. Otherwise, password will not be updated
+    password: "{{ vault_password }}" # if user doesn't exist, user will be created with specified password. Otherwise, password will not be updated
     home: "/home/{{ user }}"
     email: "{{ vault_email }}"
     nickname: "{{ vault_nickname }}"
     git_email: "{{ email }}"
     git_name: "{{ nickname }}"
     git_rootrepo: "{{ home }}/Documents/Projets-Perso"
-    locale: C
+    locale: en_US
     network_dns: "8.8.8.8"
     ssh_port: "{{ vault_ssh_port }}"
     allowed_ip: "{{ vault_allowed_ip }}"
   hosts:
-    ansible-2:
+    server:
+      ansible_host: "{{ vault_ssh_host1 }}"
+      ansible_port: "{{ ssh_port }}"
+      ansible_user: "{{ user }}"

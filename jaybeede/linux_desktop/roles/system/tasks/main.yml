@@ -404,8 +404,10 @@
   environment:
     PWD: ""
 
-- block:
+  become: yes
+  become_user: "root"
 
+- block:
     - name: "Fix owner of the generated pub key"
       file:
         path: "{{ home }}/.ssh/id_rsa.pub"

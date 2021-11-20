@@ -78,6 +78,9 @@
   # # #.ifexists module-switch-on-connect.so
   # # #load-module module-switch-on-connect
   # # #.endif
+
+  become: yes
+  become_user: "root"
 - block:
     - name: "Configuring KeepassXC (1/2)..."
       file:

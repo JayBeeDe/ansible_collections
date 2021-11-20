@@ -16,6 +16,9 @@
         group: "root"
         recurse: yes
 
+  become: yes
+  become_user: "root"
+
 - block:
     - name: "Installing and enabling Gnome Extensions (forcing mode)..."
       gnome_extensions:

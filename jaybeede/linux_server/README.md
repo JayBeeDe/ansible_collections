@@ -67,7 +67,7 @@ Warning: All roles dependencies must be met:<br />
 
 ## Quick start
 
-You can put all the roles within the following order in your playbook (let's call it all.yml):
+You can put all the roles within the following order in your playbook (let's call it linux_server.yml):
 
 ```yaml
 - hosts: all
@@ -84,12 +84,12 @@ You can put all the roles within the following order in your playbook (let's cal
 Warning: Order is important:
 > * Packages role is required by other roles and must be installed FIRST.
 
-Then you need to create an inventory file that contains all the variables: see [plugins/inventory/inventory.yml](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/plugins/inventory/inventory.yml) file.
+Then you need to create an inventory file that contains all the variables: see [plugins/inventory/inventory.yml](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/inventory/inventory.yml) file.
 
 For the description of all variables, see the role documentation.
 
 Then, once ready, you just need to run:
 
 ```bash
-sudo ansible-playbook all.yml -i jaybeede/linux_server/plugins/inventory/inventory.yml --ask-vault-pass
+ansible-playbook linux_server.yml -i jaybeede/linux_server/inventory/inventory.yml --ask-vault-pass
 ```

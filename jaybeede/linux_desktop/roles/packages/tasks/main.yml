@@ -1,226 +1,231 @@
 ---
-- apt: name=aptitude state=present
+- block:
+    - apt: name=aptitude state=present
 
-- name: "install system updates for ubuntu systems (1/2)"
-  apt: update_cache=yes cache_valid_time=3600
+    - name: "install system updates for ubuntu systems (1/2)"
+      apt: update_cache=yes cache_valid_time=3600
 
-- name: "install system updates for ubuntu systems (2/2)"
-  apt: upgrade=safe
+    - name: "install system updates for ubuntu systems (2/2)"
+      apt: upgrade=safe
 
-- name: "Install some system tools..."
-  apt:
-    pkg:
-      - tree
-      - curl
-      - net-tools
-      - gnome-shell-extensions
-      - gnome-tweak-tool
-      - dconf-editor
-      - terminator
-      - refind
-      - qemu-kvm
-      - qemu
-      - virt-manager
-      - virtinst
-      - qemu-guest-agent
-      - remmina
-      - bridge-utils
-      - cpu-checker
-      - qemu-utils
-      - git
-      - qt5ct
-      - qt5-style-plugins
-      - firewalld
-      - jq
-      - xdotool
-      - ccze
-      - libnm-dev
-      - python3-gi
-      - pylint
-      - ntfs-3g
-      - imagemagick
-      - units
-      - nmap
-      - gparted
-      - libperl-critic-perl
-      - perltidy
-      - id3v2
-      - initramfs-tools
-      - timeshift
-      - lua5.4
-      - pip
-      - acpitool
-      - ansible # needed by gnome_extensions module
+    - name: "Install some system tools..."
+      apt:
+        pkg:
+          - sshpass
+          - tree
+          - curl
+          - net-tools
+          - gnome-shell-extensions
+          - gnome-tweak-tool
+          - dconf-editor
+          - terminator
+          - refind
+          - qemu-kvm
+          - qemu
+          - virt-manager
+          - virtinst
+          - qemu-guest-agent
+          - remmina
+          - bridge-utils
+          - cpu-checker
+          - qemu-utils
+          - git
+          - qt5ct
+          - qt5-style-plugins
+          - firewalld
+          - jq
+          - xdotool
+          - ccze
+          - libnm-dev
+          - python3-gi
+          - pylint
+          - ntfs-3g
+          - imagemagick
+          - units
+          - nmap
+          - gparted
+          - libperl-critic-perl
+          - perltidy
+          - id3v2
+          - initramfs-tools
+          - timeshift
+          - lua5.4
+          - pip
+          - acpitool
+          - ansible # needed by gnome_extensions module
 
-- name: "Install locate package..."
-  apt:
-    pkg: locate
-  notify: Run updatedb
+    - name: "Install locate package..."
+      apt:
+        pkg: locate
+      notify: Run updatedb
 
-- name: "Install pulseaudio related packages..."
-  apt:
-    pkg:
-      - pulseaudio
-      - pulseaudio-utils
-      - pavucontrol
-      - pulseaudio-equalizer
-      - pulseeffects
-      - lsp-plugins
-      - libasound2-plugins-extra
+    - name: "Install pulseaudio related packages..."
+      apt:
+        pkg:
+          - pulseaudio
+          - pulseaudio-utils
+          - pavucontrol
+          - pulseaudio-equalizer
+          - pulseeffects
+          - lsp-plugins
+          - libasound2-plugins-extra
 
-- name: "Logical evaluation..."
-  stat:
-    path: "/etc/apt/sources.list.d/vscode.list"
-  register: f
+    - name: "Logical evaluation..."
+      stat:
+        path: "/etc/apt/sources.list.d/vscode.list"
+      register: f
 
-- name: "Adding ms Repo key"
-  apt_key:
-    url: https://packages.microsoft.com/keys/microsoft.asc
-    state: present
-  when: not f.stat.exists
+    - name: "Adding ms Repo key"
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+      when: not f.stat.exists
 
-- name: "Configuring Microsoft Repo"
-  apt_repository:
-    repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
-  when: not f.stat.exists
+    - name: "Configuring Microsoft Repo"
+      apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+      when: not f.stat.exists
 
-- name: "Fixing Repo..."
-  shell: mv "/etc/apt/sources.list.d/packages_microsoft_com_repos_vscode.list" "/etc/apt/sources.list.d/vscode.list"
-  when: not f.stat.exists
+    - name: "Fixing Repo..."
+      shell: mv "/etc/apt/sources.list.d/packages_microsoft_com_repos_vscode.list" "/etc/apt/sources.list.d/vscode.list"
+      when: not f.stat.exists
 
-- name: "Logical evaluation..."
-  stat:
-    path: "/etc/apt/sources.list.d/mint.list"
-  register: f2
+    - name: "Logical evaluation..."
+      stat:
+        path: "/etc/apt/sources.list.d/mint.list"
+      register: f2
 
-- name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (1/3)"
-  apt:
-    deb: http://packages.linuxmint.com/pool/main/l/linuxmint-keyring/linuxmint-keyring_2016.05.26_all.deb
-  when: not f2.stat.exists
+    - name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (1/3)"
+      apt:
+        deb: http://packages.linuxmint.com/pool/main/l/linuxmint-keyring/linuxmint-keyring_2016.05.26_all.deb
+      when: not f2.stat.exists
 
-- name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (2/3)"
-  apt_repository:
-    repo: deb http://packages.linuxmint.com uma upstream
-    state: present
-  when: not f2.stat.exists
+    - name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (2/3)"
+      apt_repository:
+        repo: deb http://packages.linuxmint.com uma upstream
+        state: present
+      when: not f2.stat.exists
 
-- name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (3/3)"
-  copy:
-    dest: "/etc/apt/preferences.d/mint-uma-pin"
-    mode: "0644"
-    owner: "root"
-    group: "root"
-    content: |
-      # Allow upgrading only chromium from uma repository
-      Package: chromium
-      Pin: origin packages.linuxmint.com
-      Pin-Priority: 1002
+    - name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (3/3)"
+      copy:
+        dest: "/etc/apt/preferences.d/mint-uma-pin"
+        mode: "0644"
+        owner: "root"
+        group: "root"
+        content: |
+          # Allow upgrading only chromium from uma repository
+          Package: chromium
+          Pin: origin packages.linuxmint.com
+          Pin-Priority: 1002
 
-      # Never prefer other packages from the uma repository
-      Package: *
-      Pin: origin packages.linuxmint.com
-      Pin-Priority: 1
-  when: not f2.stat.exists
+          # Never prefer other packages from the uma repository
+          Package: *
+          Pin: origin packages.linuxmint.com
+          Pin-Priority: 1
+      when: not f2.stat.exists
 
-- name: "Install Desktop Applications (1/3)..."
-  apt:
-    pkg:
-      - vlc
-      - libreoffice-gtk
-      - libreoffice
-      - chromium
-      - code
-      - krita
-      - flameshot
-      - p7zip-full
-      - evolution
-      - evolution-ews
-      - nemo
-      - keepassxc
-      - xsel
-      - telegram-desktop
-      - conky
-      - openssh-server
-      - gpick
-      - audacity
-      - soundconverter
-      - handbrake
-      - gnome-shell-extension-gsconnect
-      - gnome-shell-extension-gsconnect-browsers
-      # - gir1.2-ebook
-      # - gir1.2-ebookcontacts
-      # - gir1.2-edataserver
+    - name: "Install Desktop Applications (1/3)..."
+      apt:
+        pkg:
+          - vlc
+          - libreoffice-gtk
+          - libreoffice
+          - chromium
+          - code
+          - krita
+          - flameshot
+          - p7zip-full
+          - evolution
+          - evolution-ews
+          - nemo
+          - keepassxc
+          - xsel
+          - telegram-desktop
+          - conky
+          - openssh-server
+          - gpick
+          - audacity
+          - soundconverter
+          - handbrake
+          - gnome-shell-extension-gsconnect
+          - gnome-shell-extension-gsconnect-browsers
+          # - gir1.2-ebook
+          # - gir1.2-ebookcontacts
+          # - gir1.2-edataserver
 
-# - name: "Install motionbox related packages..."
-#   apt:
-#     pkg:
-#     - libtorrent-dev
-#     - libboost-all-dev
-#     - libdvd-pkg to check interactifve !!!!!! dpkg-reconfigure libdvd-pkg interactive too
-#     - ubuntu-restricted-extras interactifve
+    # - name: "Install motionbox related packages..."
+    #   apt:
+    #     pkg:
+    #     - libtorrent-dev
+    #     - libboost-all-dev
+    #     - libdvd-pkg to check interactifve !!!!!! dpkg-reconfigure libdvd-pkg interactive too
+    #     - ubuntu-restricted-extras interactifve
 
-# kodi
-# kodi-pvr-iptvsimple
+    # kodi
+    # kodi-pvr-iptvsimple
 
-- name: "Install Desktop Applications (2/3)..."
-  snap:
-    name:
-      - p3x-onenote
-      - drawio
+    - name: "Install Desktop Applications (2/3)..."
+      snap:
+        name:
+          - p3x-onenote
+          - drawio
 
-- name: "Install Desktop Applications (3/3)..."
-  snap:
-    name:
-      - skype
-      - dmd
-    classic: yes
+    - name: "Install Desktop Applications (3/3)..."
+      snap:
+        name:
+          - skype
+          - dmd
+        classic: yes
 
-#snap shfmt
-#for shell formatter extension ?
+    #snap shfmt
+    #for shell formatter extension ?
 
-- name: "Configuring onedrive Repo"
-  apt_repository:
-    repo: ppa:yann1ck/onedrive
+    - name: "Configuring onedrive Repo"
+      apt_repository:
+        repo: ppa:yann1ck/onedrive
 
-- name: "Install onedrive related packages..."
-  apt:
-    pkg:
-      - build-essential
-      - libcurl4-openssl-dev
-      - libsqlite3-dev
-      - libnotify-dev
-      - onedrive
+    - name: "Install onedrive related packages..."
+      apt:
+        pkg:
+          - build-essential
+          - libcurl4-openssl-dev
+          - libsqlite3-dev
+          - libnotify-dev
+          - onedrive
 
-- name: "Install Regional Packages..."
-  apt:
-    pkg:
-      - "hunspell-{{ language }}"
-      - "hunspell-{{ language }}-revised"
-      - "libreoffice-l10n-{{ language }}"
-      - "hyphen-{{ language }}"
-      - "mythes-{{ language }}"
+    - name: "Install Regional Packages..."
+      apt:
+        pkg:
+          - "hunspell-{{ language }}"
+          - "hunspell-{{ language }}-revised"
+          - "libreoffice-l10n-{{ language }}"
+          - "hyphen-{{ language }}"
+          - "mythes-{{ language }}"
 
-- name: "Removing some default Desktop Applications..."
-  apt:
-    pkg:
-      - firefox
-      - aisleriot
-      - cheese
-      - gnome-mahjongg
-      - gnome-mines
-      - gnome-sudoku
-      - gnome-todo
-      - rhythmbox
-      - thunderbird
-      - totem
-      - transmission-gtk
-      - virt-viewer
-      - gnome-initial-setup
-    state: absent
-    purge: yes
+    - name: "Removing some default Desktop Applications..."
+      apt:
+        pkg:
+          - firefox
+          - aisleriot
+          - cheese
+          - gnome-mahjongg
+          - gnome-mines
+          - gnome-sudoku
+          - gnome-todo
+          - rhythmbox
+          - thunderbird
+          - totem
+          - transmission-gtk
+          - virt-viewer
+          - gnome-initial-setup
+        state: absent
+        purge: yes
 
-- name: "Remove dependencies that are no longer required"
-  apt:
-    autoremove: yes
-#remove at the end fswatch
-#libsodium-dev
+    - name: "Remove dependencies that are no longer required"
+      apt:
+        autoremove: yes
+  #remove at the end fswatch
+  #libsodium-dev
+
+  become: yes
+  become_user: "root"
