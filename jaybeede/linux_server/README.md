@@ -8,6 +8,7 @@ linux_server collection provides a set of ready to use roles & modules to quicky
 
 * [packages](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/packages/README.md)
 * [system](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/system/README.md)
+* [docker](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/docker/README.md)
 
 ## Features overview
 
@@ -63,7 +64,6 @@ Partitioning is **NOT** configured by the collection.<br />
 Warning: All roles dependencies must be met:<br />
 * system role:<br />
   - /VMs will be used as folder to store the local virtual machine file. Please ensure you have enough space.<br />
-  - nmcli python library might need to be patched. Please remplace (or ensure the content is already ok): see [system role documentation for details](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/system/README.md)<br />
 
 ## Quick start
 
@@ -79,6 +79,8 @@ You can put all the roles within the following order in your playbook (let's cal
         name: packages
     - import_role:
         name: system
+    - import_role:
+        name: docker
 ```
 
 Warning: Order is important:

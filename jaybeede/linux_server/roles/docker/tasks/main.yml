@@ -1,10 +1,80 @@
 ---
 - block:
+    # - name: Pulling docker images
+    #   community.docker.docker_image:
+    #     source: pull
+    #     name: "{{ item }}"
+    #   loop:
+    #     - wordpress
+    #     - etherpad/etherpad
+    #     - kanboard/kanboard
+    #     - jbd92/limesurvey:stable
+    #     - jbd92/racktables
+    #     - alpine:3.7
+    #     - guacamole/guacamole
+    #     - guacamole/guacd
+    #     - mysql:5.7
+
+    # - name: Create a volume
+    #   community.docker.docker_volume:
+    #     name: "{{ item }}"
+    #   loop:
+    #     - jawanndennui-vol
+    #     - web-proxyconf-vol
+    #     - web-proxydata-vol
+
+    # - name: Running jawanndenn-ui
+    #   community.docker.docker_container:
+    #     detach: yes
+    #     hostname: jawanndenn-ui
+    #     image: jbd92/jawanndenn
+    #     interactive: yes
+    #     name: jawanndenn-ui
+    #     recreate: yes # to check
+    #     restart_policy: always
+    #     restart: yes
+    #     state: started
+    #     tty: yes
+    #     volumes:
+    #       - jawanndennui-vol:/data
+    #     env:
+    #       urlPrefix: jawanndenn
     
-    - name: Pull an image
-      community.docker.docker_image:
-        name: pacur/centos-7
-        source: pull
+    - name: Get infos on volume
+      community.docker.docker_volume_info:
+        name: web-proxyconf-vol
+      register: webproxyconfvolpath
+
+    - name: "Configuring web-proxy..."
+      copy:
+        src: "{{ role_path }}/files/service-web-proxy-http.cfg"
+        dest: "{{ webproxyconfvolpath.volume.Mountpoint }}/nginx.conf"
+        mode: "0755"
+        owner: "root"
+        group: "root"
+        force: no
+
+    - name: Running web-proxy
+      community.docker.docker_container:
+        detach: yes
+        hostname: web-proxy
+        image: nginx:1.15.5
+        interactive: yes
+        name: web-proxy
+        recreate: yes # to check
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - "jawanndenn-ui:jawanndenn-ui"
+        exposed_ports:
+          - 80:80
+        volumes:
+          - web-proxyconf-vol:/etc/nginx/
+          - web-proxydata-vol:/var/www/
+        env:
+          urlPrefix: jawanndenn
 
   become: yes
   become_user: "root"

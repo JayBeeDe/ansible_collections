@@ -26,6 +26,7 @@
           - ansible # needed by gnome_extensions module
           - gnupg
           - lsb-release
+          - python3-docker
 
     - name: "Logical evaluation..."
       stat:
