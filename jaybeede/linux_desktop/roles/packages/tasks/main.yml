@@ -34,6 +34,7 @@
           - qt5-style-plugins
           - firewalld
           - jq
+          - network-manager
           - xdotool
           - ccze
           - libnm-dev

@@ -1,10 +1,6 @@
 ---
 - block:
-    # - name: "Configuring system network (1/2)..."
-    #   shell: nmcli con delete "net-{{ network_interface }}" || true
-    #   changed_when: false
-
-    - name: "Configuring system network (2/2)..."
+    - name: "Configuring system network..."
       nmcli:
         type: ethernet
         conn_name: "net-{{ network_interface }}"
@@ -12,21 +8,7 @@
         dns4:
           - "{{ network_dns }}"
         autoconnect: yes
-        state:
-          present
-          #####NOTE that library may need to be patched here
-          #####/usr/lib/python3/dist-packages/ansible/modules/net_tools/nmcli.py line 567
-          ############FROM
-          #####try:
-          ##### import gi
-          ##### gi.require_version('NMClient', '1.0')
-          ##### gi.require_version('NetworkManager', '1.0')
-          ##### from gi.repository import NetworkManager, NMClient
-          ############REPLACE BY
-          ##### try:
-          ##### import gi
-          ##### gi.require_version('NM', '1.0')
-          ##### from gi.repository import NM
+        state: present
 
     - name: "Configuring sshd (1/5)..."
       replace:
@@ -59,6 +41,66 @@
         replace: "PermitEmptyPasswords no"
         backup: no
       notify: Restart sshd
+
+    - name: "Check if {{ user }} exists"
+      getent:
+        database: passwd
+        key: "{{ user }}"
+        fail_key: False
+      register: userExists
+
+    - name: "Getting {{ user }} secondary groups (1/2)..."
+      getent:
+        database: group
+        split: ":"
+        fail_key: False
+      register: sourceUserGroups
+
+    - name: "Getting {{ user }} secondary groups (2/2)..."
+      set_fact:
+        targetUserGroups: "{{ sourceUserGroups.ansible_facts.getent_group | dict2items | jaybeede.linux_server.groups2str(user='debian') }},sudo"
+
+    - name: "Check if {{ user }} has ssh key"
+      stat:
+        path: "{{ home }}/.ssh/id_rsa"
+      register: userHasSshKey
+
+    - name: "Creating {{ user }} user with SSH key..."
+      user:
+        name: "{{ user }}"
+        comment: "{{ user }}"
+        group: "{{ user }}"
+        groups: "{{ targetUserGroups }}"
+        shell: /bin/bash
+        createhome: yes # create_home since Ansible 2.5
+        password: "{{ password | password_hash('sha512') }}"
+        generate_ssh_key: yes
+        ssh_key_file: "{{ home }}/.ssh/id_rsa"
+        ssh_key_bits: 4096
+        ssh_key_type: rsa
+      # when: user not in userExists.ansible_facts.getent_passwd or not userHasSshKey.stat.exists
+
+    - name: "Configuring passwordless sudo for user {{ user }}"
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: "^%sudo"
+        line: "%sudo ALL=(ALL) NOPASSWD: ALL"
+        validate: visudo -cf %s
+
+    - name: "{{ user }} user will be used as a replacement of {{ ansible_user }} user (1/2)"
+      set_fact:
+        oldUser: "{{ ansible_user }}"
+
+    - name: "{{ user }} user will be used as a replacement of {{ ansible_user }} user (1/2)"
+      set_fact:
+        ansible_user: "{{ user }}" # note that we are not impotent because if we remove debian user then we cannot play it again
+
+    # - name: "Removing {{ oldUser }} user..."
+    #   user:
+    #     name: "{{ oldUser }}"
+    #     remove: yes
+    #     state: absent
 
     - name: "Configuring sshd (5/5)..."
       lineinfile:
@@ -93,13 +135,6 @@
         regexp: "ssh-port-ansible-template"
         replace: "{{ ssh_port | string }}"
         backup: no
-      notify: Restart firewalld
-
-    - name: "Disabling ufw..."
-      systemd:
-        name: "ufw"
-        state: stopped
-        enabled: no
       notify: Restart firewalld
 
     - name: "Configuring fs.inotify.max_user_watches for vscode..."
@@ -238,31 +273,12 @@
         backup: no
       changed_when: false
 
-    - name: "Check if {{ user }} exists"
-      getent:
-        database: passwd
-        # key: "user"
-        key: "{{ user }}"
-        fail_key: False
-      register: userExists
-
-    - name: "Creating {{ user }} user with SSH key..."
-      user:
-        name: "{{ user }}"
-        shell: /bin/bash
-        createhome: yes # create_home since Ansible 2.5
-        password: "{{ password | password_hash('sha512') }}"
-        generate_ssh_key: yes
-        ssh_key_file: "{{ home }}/.ssh/id_rsa"
-        ssh_key_bits: 4096
-        ssh_key_type: rsa
-      when: not userExists.ansible_facts.getent_passwd[user]
-
+  become: yes
+  become_user: "root"
   environment:
     PWD: ""
 
 - block:
-
     - name: "Fix owner of the generated pub key"
       file:
         path: "{{ home }}/.ssh/id_rsa.pub"

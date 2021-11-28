@@ -364,9 +364,16 @@
         fail_key: False
       register: userExists
 
+    - name: "Check if {{ user }} has ssh key"
+      stat:
+        path: "{{ home }}/.ssh/id_rsa"
+      register: userHasSshKey
+
     - name: "Creating {{ user }} user with SSH key..."
       user:
         name: "{{ user }}"
+        comment: "{{ user }}"
+        group: "{{ user }}"
         shell: /bin/bash
         createhome: yes # create_home since Ansible 2.5
         password: "{{ password | password_hash('sha512') }}"
@@ -374,7 +381,7 @@
         ssh_key_file: "{{ home }}/.ssh/id_rsa"
         ssh_key_bits: 4096
         ssh_key_type: rsa
-      when: not userExists.ansible_facts.getent_passwd[user]
+      when: user not in userExists.ansible_facts.getent_passwd or not userHasSshKey.stat.exists
 
     - name: "Configuring rc local service (1/2)..."
       copy:

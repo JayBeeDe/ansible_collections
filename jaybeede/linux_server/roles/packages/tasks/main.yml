@@ -18,6 +18,7 @@
           - git
           - firewalld
           - jq
+          - network-manager
           - units
           - nmap
           - initramfs-tools

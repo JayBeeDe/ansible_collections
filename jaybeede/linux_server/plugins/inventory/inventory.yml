@@ -11,9 +11,9 @@ all:
     locale: en_US
     network_dns: "8.8.8.8"
     ssh_port: "{{ vault_ssh_port }}"
-    allowed_ip: "{{ vault_allowed_ip }}"
+    allowed_ip: "{{ hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[0] }}"
   hosts:
     server:
       ansible_host: "{{ vault_ssh_host1 }}"
       ansible_port: "{{ ssh_port }}"
-      ansible_user: "{{ user }}"
+      ansible_user: "debian" # is changed to {{ user }} once {{ user }} created, note that debian user is not removed
