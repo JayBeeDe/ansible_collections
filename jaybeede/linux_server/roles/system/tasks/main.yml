@@ -1,5 +1,17 @@
 ---
 - block:
+    - name: Set a hostname (1/2)
+      ansible.builtin.hostname:
+        name: "{{ ansible_host }}"
+
+    - name: Set a hostname (2/2)
+      lineinfile:
+        dest: "/etc/hosts"
+        regexp: "^127.0.1.1\t+.+$"
+        line: "127.0.1.1\t{{ ansible_host }}"
+        state: present
+        backup: no
+
     - name: "Configuring system network..."
       nmcli:
         type: ethernet
@@ -277,7 +289,6 @@
   become_user: "root"
   environment:
     PWD: ""
-
 - block:
     - name: "Fix owner of the generated pub key"
       file:

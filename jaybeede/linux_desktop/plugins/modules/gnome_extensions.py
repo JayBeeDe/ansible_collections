@@ -20,8 +20,8 @@ import collections
 import json
 import pdb
 
-sys.path.append("/usr/lib/python3/dist-packages/ansible/modules/files")
-sys.path.append("/usr/lib/python3/dist-packages/ansible/modules/system")
+sys.path.append("/usr/lib/python3/dist-packages/ansible/modules")
+sys.path.append("/usr/lib/python3/dist-packages/ansible_collections/community/general/plugins/modules")
 # TODO to be improved
 
 from unarchive import ZipArchive
@@ -225,6 +225,7 @@ def getUrlSourceType(url):
 
 
 def runCmd(cmd, errorMsg="Error while running CMD command"):
+    cmd = cmd + " 2>/dev/null"
     cmdArr = cmd.split(" ")
     realErrorMsg = re.sub("CMD", cmdArr[0], errorMsg)
     realErrorMsg = re.sub("ARG", " ".join(cmdArr[1:]), realErrorMsg)
@@ -356,7 +357,8 @@ def installExtension(module, url, scope="system", version=0, force=False, token=
                 if checkLocalExtensionInstalled(uuid) != scope:
                     hasChanged = uninstallExtension(module, uuid)
             for gsVersionCompatibilityItem in gsVersionCompatibilityList:
-                if gsVersion == tag2version(gsVersionCompatibilityItem) or force is True:
+                if force is True or gsVersion == tag2version(gsVersionCompatibilityItem) or (float(int(tag2version(gsVersionCompatibilityItem))) == tag2version(gsVersionCompatibilityItem) and int(gsVersion) == int(tag2version(gsVersionCompatibilityItem))):
+                # force is True or xx.yy == xx.yy or xx = xx.0
                     foundFlag = True
                     break
             if foundFlag:

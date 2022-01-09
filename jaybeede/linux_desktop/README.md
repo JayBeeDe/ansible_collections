@@ -142,7 +142,11 @@ Then you need to create an inventory file that contains all the variables: see [
 
 For the description of all variables, see the role documentation.
 
-Then, once ready, you just need to run:
+Define your current user as sudoer:
+
+echo "my-username  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/my-username
+
+Then, once ready, you just need to run as current user:
 
 ```bash
 ansible-playbook linux_desktop.yml -i jaybeede/linux_desktop/plugins/inventory/inventory.yml --ask-vault-pass

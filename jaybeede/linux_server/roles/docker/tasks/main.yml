@@ -15,31 +15,37 @@
     #     - guacamole/guacd
     #     - mysql:5.7
 
-    # - name: Create a volume
-    #   community.docker.docker_volume:
-    #     name: "{{ item }}"
-    #   loop:
-    #     - jawanndennui-vol
-    #     - web-proxyconf-vol
-    #     - web-proxydata-vol
+    - name: Pulling docker images tmp
+      community.docker.docker_image:
+        source: pull
+        name: "jbd92/jawanndenn:2"
+        force_source: yes
 
-    # - name: Running jawanndenn-ui
-    #   community.docker.docker_container:
-    #     detach: yes
-    #     hostname: jawanndenn-ui
-    #     image: jbd92/jawanndenn
-    #     interactive: yes
-    #     name: jawanndenn-ui
-    #     recreate: yes # to check
-    #     restart_policy: always
-    #     restart: yes
-    #     state: started
-    #     tty: yes
-    #     volumes:
-    #       - jawanndennui-vol:/data
-    #     env:
-    #       urlPrefix: jawanndenn
-    
+    - name: Create a volume
+      community.docker.docker_volume:
+        name: "{{ item }}"
+      loop:
+        - jawanndennui-vol
+        - web-proxyconf-vol
+        - web-proxydata-vol
+
+    - name: Running jawanndenn-ui
+      community.docker.docker_container:
+        detach: yes
+        hostname: jawanndenn-ui
+        image: jbd92/jawanndenn:2
+        interactive: yes
+        name: jawanndenn-ui
+        recreate: yes # to check
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        volumes:
+          - jawanndennui-vol:/data
+        env:
+          urlPrefix: jawanndenn
+
     - name: Get infos on volume
       community.docker.docker_volume_info:
         name: web-proxyconf-vol
