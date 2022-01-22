@@ -53,6 +53,7 @@
           - lua5.4
           - pip
           - acpitool
+          - libgettextpo-dev
           - ansible # needed by gnome_extensions module
 
     - name: "Install locate package..."

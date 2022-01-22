@@ -29,10 +29,10 @@
         tokenGithub: "{{ tokenGithub }}"
       loop:
         - https://extensions.gnome.org/extension-data/panel-date-formatatareao.es.v5.shell-extension.zip
-        - https://extensions.gnome.org/extension-data/removeaccesibility%40lomegor.v16.shell-extension.zip
-        - https://extensions.gnome.org/extension-data/steal-my-focus%40kagesenshi.org.v4.shell-extension.zip
-        - https://github.com/GSConnect/gnome-shell-extension-gsconnect
-        - https://github.com/mpdeimos/gnome-shell-remove-dropdown-arrows
+        # - https://extensions.gnome.org/extension-data/removeaccesibility%40lomegor.v16.shell-extension.zip
+        # - https://extensions.gnome.org/extension-data/steal-my-focus%40kagesenshi.org.v4.shell-extension.zip
+        # - https://github.com/GSConnect/gnome-shell-extension-gsconnect
+        # - https://github.com/mpdeimos/gnome-shell-remove-dropdown-arrows
         - https://github.com/oae/gnome-shell-minimize-to-tray
       ignore_errors: True
 
@@ -150,7 +150,7 @@
       dconf: key="/org/gnome/settings-daemon/plugins/color/night-light-enabled" value="true"
 
     - name: "Configuring zoom factor"
-      dconf: key="org/gnome/desktop/wm/preferences/button-layout" value="appmenu:minimize,maximize,close"
+      dconf: key="/org/gnome/desktop/wm/preferences/button-layout" value="'appmenu:minimize,maximize,close'"
 
     - name: "Configuring zoom factor"
       dconf: key="/org/gnome/desktop/interface/text-scaling-factor" value="1.2"
@@ -512,16 +512,16 @@
       dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover" value="false"
 
     - name: Configuring dash-to-panel (3/49)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-convexity" value="{'RIPPLE': 2.0, 'PLANK': 1.0, 'SIMPLE': 0.0}"
+      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-convexity" value="{'RIPPLE':2.0,'PLANK':1.0,'SIMPLE':0.0}"
 
     - name: Configuring dash-to-panel (4/49)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-extent" value="{'RIPPLE': 4, 'PLANK': 4, 'SIMPLE': 1}"
+      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-extent" value="{'RIPPLE':4,'PLANK':4,'SIMPLE':1}"
 
     - name: Configuring dash-to-panel (5/49)...
       dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-type" value="'SIMPLE'"
 
     - name: Configuring dash-to-panel (6/49)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-zoom" value="{'SIMPLE': 1.0, 'RIPPLE': 1.25, 'PLANK': 1.05}"
+      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-zoom" value="{'SIMPLE':1.0,'RIPPLE':1.25,'PLANK':1.05}"
 
     - name: Configuring dash-to-panel (7/49)...
       dconf: key="/org/gnome/shell/extensions/dash-to-panel/appicon-margin" value="0"
