@@ -64,8 +64,7 @@
     - name: "Configuring nemo autostart shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/nemo-autostart.desktop"
-        freedesktop_Name: "Nemo"
-        target: 'bash -c "sleep 5; keepassxc "{{ kdbx_path }}" --keyfile "{{ key_path }}" 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done & disown;"'
+        target: "nemo-desktop"
         location: "$HOME/.config/autostart/nemo-autostart.desktop"
   become: yes
   become_user: "{{ user }}"

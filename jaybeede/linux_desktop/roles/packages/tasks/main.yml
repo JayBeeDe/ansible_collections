@@ -1,12 +1,12 @@
 ---
 - block:
-    - apt: name=aptitude state=present
+    # - apt: name=aptitude state=present
 
-    - name: "install system updates for ubuntu systems (1/2)"
-      apt: update_cache=yes cache_valid_time=3600
+    # - name: "install system updates for ubuntu systems (1/2)"
+    #   apt: update_cache=yes cache_valid_time=3600
 
-    - name: "install system updates for ubuntu systems (2/2)"
-      apt: upgrade=safe
+    # - name: "install system updates for ubuntu systems (2/2)"
+    #   apt: upgrade=safe
 
     - name: "Install some system tools..."
       apt:
@@ -54,6 +54,7 @@
           - pip
           - acpitool
           - libgettextpo-dev
+          - kdocker
           - ansible # needed by gnome_extensions module
 
     - name: "Install locate package..."
@@ -104,23 +105,23 @@
 
     - name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (2/3)"
       apt_repository:
-        repo: deb http://packages.linuxmint.com uma upstream
+        repo: deb http://packages.linuxmint.com una upstream
         state: present
       when: not f2.stat.exists
 
     - name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (3/3)"
       copy:
-        dest: "/etc/apt/preferences.d/mint-uma-pin"
+        dest: "/etc/apt/preferences.d/mint-una-pin"
         mode: "0644"
         owner: "root"
         group: "root"
         content: |
-          # Allow upgrading only chromium from uma repository
+          # Allow upgrading only chromium from una repository
           Package: chromium
           Pin: origin packages.linuxmint.com
           Pin-Priority: 1002
 
-          # Never prefer other packages from the uma repository
+          # Never prefer other packages from the una repository
           Package: *
           Pin: origin packages.linuxmint.com
           Pin-Priority: 1
@@ -182,9 +183,21 @@
     #snap shfmt
     #for shell formatter extension ?
 
+    - name: "Logical evaluation..."
+      stat:
+        path: "/etc/apt/sources.list.d/onedrive.list"
+      register: f3
+
+    - name: "Adding onedrive Repo key"
+      apt_key:
+        url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_21.10/Release.key
+        state: present
+      when: not f3.stat.exists
+
     - name: "Configuring onedrive Repo"
       apt_repository:
-        repo: ppa:yann1ck/onedrive
+        repo: deb https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_21.10/ ./
+      when: not f3.stat.exists
 
     - name: "Install onedrive related packages..."
       apt:

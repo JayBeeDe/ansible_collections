@@ -226,8 +226,10 @@ def main():
         if re.search(r"^\/.*", target):
             # "/usr/bin/vlc --started-from-file %U"s
             newName = os.path.basename(re.compile(r"^((\/\S*)+) .*$").match(target).groups()[0])
-        else:
+        elif re.search(r"^(\S+) .*$", target):
             newName = re.compile(r"^(\S+) .*$").match(target).groups()[0]
+        else:
+            newName = target
     if "Name" not in desktop:
         desktop["Name"] = newName
     desktop["Name[en_US]"] = desktop["Name"]
@@ -296,9 +298,9 @@ def main():
         if re.search(r"^\/.*", target):
             newDir = os.path.dirname(re.compile(r"^((\/\S*)+) .*$").match(target).groups()[0])
         if newDir is not None:
-            newPath = newDir + "/" + desktop["Name"]
+            newPath = newDir + "/" + desktop["Name"].lower()
         else:
-            newPath = desktop["Name"]
+            newPath = desktop["Name"].lower()
         if "Path" not in desktop and newDir is not None:
             desktop["Path"] = newDir
         if "TryExec" not in desktop:

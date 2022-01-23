@@ -349,23 +349,24 @@ def installExtension(module, url, scope="system", version=0, force=False, token=
         downloadUrl = ""  # just to go in the while loop
         while(downloadUrl is not None):
             downloadUrl = repo2url(url, version, token)
-            tmpPath = downloadExtension(module, downloadUrl)
-            extensionMetadataFileJson = getFileMetadata(tmpPath + "/metadata.json")
-            gsVersionCompatibilityList = extensionMetadataFileJson["shell-version"]
-            uuid = extensionMetadataFileJson["uuid"]
-            if checkLocalExtensionInstalled(uuid) is not None:
-                if checkLocalExtensionInstalled(uuid) != scope:
-                    hasChanged = uninstallExtension(module, uuid)
-            for gsVersionCompatibilityItem in gsVersionCompatibilityList:
-                if force is True or gsVersion == tag2version(gsVersionCompatibilityItem) or (float(int(tag2version(gsVersionCompatibilityItem))) == tag2version(gsVersionCompatibilityItem) and int(gsVersion) == int(tag2version(gsVersionCompatibilityItem))):
-                # force is True or xx.yy == xx.yy or xx = xx.0
-                    foundFlag = True
+            if downloadUrl is not None:
+                tmpPath = downloadExtension(module, downloadUrl)
+                extensionMetadataFileJson = getFileMetadata(tmpPath + "/metadata.json")
+                gsVersionCompatibilityList = extensionMetadataFileJson["shell-version"]
+                uuid = extensionMetadataFileJson["uuid"]
+                if checkLocalExtensionInstalled(uuid) is not None:
+                    if checkLocalExtensionInstalled(uuid) != scope:
+                        hasChanged = uninstallExtension(module, uuid)
+                for gsVersionCompatibilityItem in gsVersionCompatibilityList:
+                    if force is True or gsVersion == tag2version(gsVersionCompatibilityItem) or (float(int(tag2version(gsVersionCompatibilityItem))) == tag2version(gsVersionCompatibilityItem) and int(gsVersion) == int(tag2version(gsVersionCompatibilityItem))):
+                    # force is True or xx.yy == xx.yy or xx = xx.0
+                        foundFlag = True
+                        break
+                if foundFlag:
                     break
-            if foundFlag:
-                break
-            version = version - 1
+                version = version - 1
         if downloadUrl is None:
-            raise AnsibleError("No version found for " + uuid + " compatible with gnome shell version " + str(gsVersion) + "(only compatible with version " + ", ".join(gsVersionCompatibilityList) + ")")
+            raise AnsibleError("No version found for " + uuid + " compatible with gnome shell version " + str(gsVersion) + " (only compatible with version " + ", ".join(gsVersionCompatibilityList) + ")")
     else:
         tmpPath = downloadExtension(module, repo2url(url, version, token))
         extensionMetadataFileJson = getFileMetadata(tmpPath + "/metadata.json")
@@ -375,7 +376,7 @@ def installExtension(module, url, scope="system", version=0, force=False, token=
             if checkLocalExtensionInstalled(uuid) != scope:
                 hasChanged = uninstallExtension(module, uuid)
         for gsVersionCompatibilityItem in gsVersionCompatibilityList:
-            if gsVersion == tag2version(gsVersionCompatibilityItem) or force is True:
+            if force is True or gsVersion == tag2version(gsVersionCompatibilityItem) or (float(int(tag2version(gsVersionCompatibilityItem))) == tag2version(gsVersionCompatibilityItem) and int(gsVersion) == int(tag2version(gsVersionCompatibilityItem))):
                 foundFlag = True
                 break
         if not foundFlag:
