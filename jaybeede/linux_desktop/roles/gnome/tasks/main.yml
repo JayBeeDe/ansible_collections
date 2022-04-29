@@ -335,11 +335,11 @@
     - name: "Configuring notifications (20/22)..."
       dconf: key="/org/gnome/desktop/notifications/application/code/enable" value="false"
 
-    - name: "Configuring notifications (21/22)..."
-      dconf: key="/org/gnome/desktop/notifications/application/chromium-chromium/enable" value="false"
+    # - name: "Configuring notifications (21/22)..."
+    #   dconf: key="/org/gnome/desktop/notifications/application/chromium-chromium/enable" value="false"
 
-    - name: "Configuring notifications (22/22)..."
-      dconf: key="/org/gnome/desktop/notifications/application/chromium-browser/enable" value="false"
+    # - name: "Configuring notifications (22/22)..."
+    #   dconf: key="/org/gnome/desktop/notifications/application/chromium-browser/enable" value="false"
 
     - name: Configuring unblank extension (1/2)...
       dconf: key="/org/gnome/shell/extensions/unblank/time" value="0"

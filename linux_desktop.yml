@@ -5,10 +5,10 @@
   tasks:
     # - import_role:
     #     name: packages
-    - import_role:
-        name: system
     # - import_role:
-    #     name: applications
+    #     name: system
+    - import_role:
+        name: applications
     # - import_role:
     #     name: desktop
     # - import_role:
