@@ -1,12 +1,69 @@
 ---
 - block:
-    # - apt: name=aptitude state=present
+    - name: "Logical evaluation..."
+      stat:
+        path: "/etc/apt/sources.list.d/vscode.list"
+      register: f
 
-    # - name: "install system updates for ubuntu systems (1/2)"
-    #   apt: update_cache=yes cache_valid_time=3600
+    - name: "Adding Microsoft Repo key"
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+      when: not f.stat.exists
 
-    # - name: "install system updates for ubuntu systems (2/2)"
-    #   apt: upgrade=safe
+    - name: "Configuring Microsoft Repo"
+      apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+      when: not f.stat.exists
+
+    - name: "Fixing Microsoft Repo..."
+      command: mv "/etc/apt/sources.list.d/packages_microsoft_com_repos_vscode.list" "/etc/apt/sources.list.d/vscode.list"
+      when: not f.stat.exists
+
+    - name: "Logical evaluation..."
+      stat:
+        path: "/etc/apt/sources.list.d/google-chrome.list"
+      register: f2
+
+    - name: "Adding Google Repo key"
+      apt_key:
+        url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+        state: present
+      when: not f2.stat.exists
+
+    - name: "Configuring Google Repo"
+      apt_repository:
+        repo: deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main
+      when: not f2.stat.exists
+
+    - name: "Fixing Google Repo..."
+      command: mv "/etc/apt/sources.list.d/dl_google_com_linux_chrome_deb.list" "/etc/apt/sources.list.d/google-chrome.list"
+      when: not f2.stat.exists
+
+    - name: "Logical evaluation..."
+      stat:
+        path: "/etc/apt/sources.list.d/onedrive.list"
+      register: f3
+
+    - name: "Adding onedrive Repo key"
+      apt_key:
+        url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_21.10/Release.key
+        state: present
+      when: not f3.stat.exists
+
+    - name: "Configuring onedrive Repo"
+      apt_repository:
+        repo: deb https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_21.10/ ./
+      when: not f3.stat.exists
+
+    - name: "Fixing onedrive Repo..."
+      command: mv "/etc/apt/sources.list.d/download_opensuse_org_repositories_home_npreining_debian_ubuntu_onedrive_xUbuntu_21_10.list" "/etc/apt/sources.list.d/onedrive.list"
+      when: not f3.stat.exists
+
+    - name: "install system updates for ubuntu systems"
+      apt:
+        upgrade: safe
+        cache_valid_time: 3600
 
     - name: "Install some system tools..."
       apt:
@@ -62,78 +119,13 @@
         pkg: locate
       notify: Run updatedb
 
-    - name: "Install pulseaudio related packages..."
-      apt:
-        pkg:
-          - pulseaudio
-          - pulseaudio-utils
-          - pavucontrol
-          - pulseaudio-equalizer
-          - pulseeffects
-          - lsp-plugins
-          - libasound2-plugins-extra
-
-    - name: "Logical evaluation..."
-      stat:
-        path: "/etc/apt/sources.list.d/vscode.list"
-      register: f
-
-    - name: "Adding ms Repo key"
-      apt_key:
-        url: https://packages.microsoft.com/keys/microsoft.asc
-        state: present
-      when: not f.stat.exists
-
-    - name: "Configuring Microsoft Repo"
-      apt_repository:
-        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
-      when: not f.stat.exists
-
-    - name: "Fixing Repo..."
-      shell: mv "/etc/apt/sources.list.d/packages_microsoft_com_repos_vscode.list" "/etc/apt/sources.list.d/vscode.list"
-      when: not f.stat.exists
-
-    - name: "Logical evaluation..."
-      stat:
-        path: "/etc/apt/sources.list.d/mint.list"
-      register: f2
-
-    - name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (1/3)"
-      apt:
-        deb: http://packages.linuxmint.com/pool/main/l/linuxmint-keyring/linuxmint-keyring_2016.05.26_all.deb
-      when: not f2.stat.exists
-
-    - name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (2/3)"
-      apt_repository:
-        repo: deb http://packages.linuxmint.com una upstream
-        state: present
-      when: not f2.stat.exists
-
-    - name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (3/3)"
-      copy:
-        dest: "/etc/apt/preferences.d/mint-una-pin"
-        mode: "0644"
-        owner: "root"
-        group: "root"
-        content: |
-          # Allow upgrading only chromium from una repository
-          Package: chromium
-          Pin: origin packages.linuxmint.com
-          Pin-Priority: 1002
-
-          # Never prefer other packages from the una repository
-          Package: *
-          Pin: origin packages.linuxmint.com
-          Pin-Priority: 1
-      when: not f2.stat.exists
-
     - name: "Install Desktop Applications (1/3)..."
       apt:
         pkg:
           - vlc
           - libreoffice-gtk
           - libreoffice
-          - chromium
+          - google-chrome-stable
           - code
           - krita
           - flameshot
@@ -164,9 +156,6 @@
     #     - libdvd-pkg to check interactifve !!!!!! dpkg-reconfigure libdvd-pkg interactive too
     #     - ubuntu-restricted-extras interactifve
 
-    # kodi
-    # kodi-pvr-iptvsimple
-
     - name: "Install Desktop Applications (2/3)..."
       snap:
         name:
@@ -182,22 +171,6 @@
 
     #snap shfmt
     #for shell formatter extension ?
-
-    - name: "Logical evaluation..."
-      stat:
-        path: "/etc/apt/sources.list.d/onedrive.list"
-      register: f3
-
-    - name: "Adding onedrive Repo key"
-      apt_key:
-        url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_21.10/Release.key
-        state: present
-      when: not f3.stat.exists
-
-    - name: "Configuring onedrive Repo"
-      apt_repository:
-        repo: deb https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_21.10/ ./
-      when: not f3.stat.exists
 
     - name: "Install onedrive related packages..."
       apt:
@@ -220,19 +193,25 @@
     - name: "Removing some default Desktop Applications..."
       apt:
         pkg:
-          - firefox
           - aisleriot
+          - brasero
           - cheese
+          - com.github.donadigo.eddy
+          - firefox
+          - foot
+          - geary
+          - gnome-initial-setup
           - gnome-mahjongg
           - gnome-mines
           - gnome-sudoku
           - gnome-todo
+          - mpv
           - rhythmbox
+          - soundconverter
           - thunderbird
           - totem
           - transmission-gtk
           - virt-viewer
-          - gnome-initial-setup
         state: absent
         purge: yes
 
