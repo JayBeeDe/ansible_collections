@@ -12,8 +12,8 @@ all:
     key_path: "{{ vault_key_path }}"
     language: fr
     network_dns: "8.8.8.8"
-    network_ip: "172.31.55.139"
-    network_subnet: "172.31.55.0/24"
+    network_ip: "192.168.1.21"
+    network_subnet: "192.168.1.0/24"
     ssh_port: "{{ vault_ssh_port }}"
     printer_ip: "192.168.1.16"
     printer_model: DCP-7070DW

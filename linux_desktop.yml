@@ -3,10 +3,10 @@
   collections:
     - jaybeede.linux_desktop
   tasks:
-    - import_role:
-        name: packages
     # - import_role:
-    #     name: system
+    #     name: packages
+    - import_role:
+        name: system
     # - import_role:
     #     name: applications
     # - import_role:
