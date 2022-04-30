@@ -50,17 +50,15 @@ function waitNetworkToBeUp() {
 	while [ $i -lt $conf_VMTimeout ]
 	do
 	 	sleep 1
-	 	bypassErrorOn
-		res=$(ping -c 1 -w 2 -i 1 $ip)
-		bypassErrorOff
-		li
-			if [ "$(echo $line | grep '1 received, 0% packet loss')" != "" ]; then
-				IFS=$DIFS
-				flagError=0
-				echo 0
-	  			break 3
-			fi
-		lo
+		set +e
+		ping -c 1 -w 2 -i 1 $ip 2>&1 >/dev/null
+		res=$?
+		set -e
+		if [ $res == 0 ]; then
+			flagError=0
+			echo 0
+			break 2
+		fi
 		i=$((i+1))
 	done
 	if [ "$flagError" != 0 ]; then
@@ -70,7 +68,7 @@ function waitNetworkToBeUp() {
 
 #########################main script
 
-ip=$(cat $filePath | grep -P \"^server=\" | sed -r \"s/^server=(.*):[0-9]+$/\1/g\")
+ip=$(cat $filePath | grep -P "^server=" | sed -r "s/^server=(.*):[0-9]+$/\1/g")
 echo -e "\e[32mConnecting to target $ip...\e[0m"
 
 vmState=$(virsh list --state-running --name | grep $ip)

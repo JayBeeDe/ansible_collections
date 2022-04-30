@@ -29,7 +29,7 @@
       desktop_launchers:
         freedesktop_Name: "Windows"
         freedesktop_Comment: "Connect to Ms Windows"
-        freedesktop_Icon: "$HOME/.local/share/icons/windows.png"
+        freedesktop_Icon: "{{ home }}/.local/share/icons/windows.png"
         freedesktop_Categories: "Utility"
         target: 'bash -c "{{ home }}/.local/share/scripts/connectWindows.sh {{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"'
         location: "$HOME/.local/share/applications/connectWindows.desktop"
@@ -37,9 +37,9 @@
       desktop_launchers:
         freedesktop_Name: "Windows"
         freedesktop_Comment: "Connect to Ms Windows"
-        freedesktop_Icon: "$HOME/.local/share/icons/windows.png"
+        freedesktop_Icon: "{{ home }}/.local/share/icons/windows.png"
         freedesktop_Categories: "Utility"
-        target: 'bash -c "bash {{ home }}/.local/share/scripts/connectWindows.sh {{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"'
+        target: 'bash -c "{{ home }}/.local/share/scripts/connectWindows.sh .local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"'
         location: "$DIRECTORY_DESKTOP/connectWindows.desktop"
     - name: "Configuring conky autostart shortcut..."
       desktop_launchers:
