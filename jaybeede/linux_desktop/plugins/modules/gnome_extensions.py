@@ -359,7 +359,7 @@ def installExtension(module, url, scope="system", version=0, force=False, token=
                         hasChanged = uninstallExtension(module, uuid)
                 for gsVersionCompatibilityItem in gsVersionCompatibilityList:
                     if force is True or gsVersion == tag2version(gsVersionCompatibilityItem) or (float(int(tag2version(gsVersionCompatibilityItem))) == tag2version(gsVersionCompatibilityItem) and int(gsVersion) == int(tag2version(gsVersionCompatibilityItem))):
-                    # force is True or xx.yy == xx.yy or xx = xx.0
+                        # force is True or xx.yy == xx.yy or xx = xx.0
                         foundFlag = True
                         break
                 if foundFlag:
@@ -400,9 +400,10 @@ def installExtension(module, url, scope="system", version=0, force=False, token=
     if not os.path.isdir(extensionBasePath + "/md5sum"):
         os.mkdir(extensionBasePath + "/md5sum")
         os.chmod(extensionBasePath + "/md5sum", 0o777)
-    if os.path.isfile(extensionBasePath + "/md5sum/" + uuid + ".txt"):
-        os.remove(extensionBasePath + "/md5sum/" + uuid + ".txt")
-    os.rename(extensionBasePath + "/" + uuid + "/md5sum.txt", extensionBasePath + "/md5sum/" + uuid + ".txt")
+    if os.path.isfile(extensionBasePath + "/" + uuid + "/md5sum.txt"):
+        if os.path.isfile(extensionBasePath + "/md5sum/" + uuid + ".txt"):
+            os.remove(extensionBasePath + "/md5sum/" + uuid + ".txt")
+        os.rename(extensionBasePath + "/" + uuid + "/md5sum.txt", extensionBasePath + "/md5sum/" + uuid + ".txt")
     if os.path.isdir(tempfile.gettempdir() + "/gnome_extensions"):
         try:
             shutil.rmtree(tempfile.gettempdir() + "/gnome_extensions")

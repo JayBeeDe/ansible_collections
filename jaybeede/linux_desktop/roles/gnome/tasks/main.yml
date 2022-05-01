@@ -44,22 +44,25 @@
         - https://github.com/kgshank/gse-sound-output-device-chooser
         - https://github.com/neffo/bing-wallpaper-gnome-extension
         - https://github.com/darkretailer/gnome-shell-extension_maxi
-        - https://gitlab.com/arcmenu/ArcMenu
       notify: Reload gnome sleep
       ignore_errors: True
 
     - meta: flush_handlers
 
+    - name: "Installing and enabling Arc-menu Extension..."
+      gnome_extensions:
+        url: https://gitlab.com/arcmenu/ArcMenu
+        action: enable
+        scope: system
+        tokenGithub: "{{ tokenGithub }}"
+      notify: Reload gnome sleep
+      ignore_errors: True
+      register: arcMenu
+
     - name: "Patching arc menu gnome extension..."
-      copy:
-        src: "{{ role_path }}/files/gschemas.compiled"
-        dest: "/usr/share/gnome-shell/extensions/arcmenu@arcmenu.com/schemas/gschemas.compiled"
-        mode: "0777"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-        force: no
+      command: glib-compile-schemas /usr/share/gnome-shell/extensions/arcmenu@arcmenu.com/schemas/
       notify: Reload gnome
-    # will be enable as soon as bug with arcmenu/ArcMenu fixed
+      when: arcMenu.changed
 
     - meta: flush_handlers
 
@@ -72,13 +75,13 @@
     - name: "Setting Start Screen (3/3)..."
       dconf: key="/org/gnome/login-screen/banner-message-text" value="'{{ nickname }} {{ email }}'"
 
-    - name: "Set dark mode (1/3)"
-      dconf: key="/org/gnome/desktop/interface/gtk-theme" value="'Adwaita-dark'"
+    - name: "Set theme color (1/2)"
+      dconf: key="/org/gnome/desktop/interface/gtk-theme" value="'Yaru-prussiangreen-dark'"
 
-    # - name: "Set dark mode (2/3)..."
-    #   dconf: key="/org/gnome/shell/enabled-extensions" value="['user-theme@gnome-shell-extensions.gcampax.github.com']"
+    - name: "Set theme color (2/2)"
+      dconf: key="/org/gnome/desktop/interface/icon-theme" value="'Yaru-prussiangreen'"
 
-    - name: "Set dark mode (3/3)"
+    - name: "Set dark mode"
       dconf: key="/org/gnome/shell/extensions/user-theme/name" value="'Yaru-dark'"
 
     - name: "Configuring qt dark mode (1/2)..."

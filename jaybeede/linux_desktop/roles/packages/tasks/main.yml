@@ -110,9 +110,13 @@
           - lua5.4
           - pip
           - acpitool
-          - libgettextpo-dev
           - kdocker
           - ansible # needed by gnome_extensions module
+          - gettext # needed by arc-menu gnome extension
+          - gir1.2-gmenu-3.0 # needed by arc-menu gnome extension
+          - gnome-menus # needed by arc-menu gnome extension
+          - libgettextpo-dev # needed by arc-menu gnome extension
+          - libglib2.0-bin # needed by arc-menu gnome extension
 
     - name: "Install locate package..."
       apt:
