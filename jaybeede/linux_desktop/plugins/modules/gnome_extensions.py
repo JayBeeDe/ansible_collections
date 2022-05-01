@@ -249,6 +249,12 @@ def getFileMetadata(path):
     return extensionMetadataFileJson
 
 
+def setFileMetadata(path, content):
+    with open(path, "w") as extensionMetadataFile:
+        json.dump(content, extensionMetadataFile)
+    return getFileMetadata(path)
+
+
 def getLocalExtensionMetadata(uuid, raiseFlag=True):
     for baseDir in extensionSystemWideBasePath, extensionUserWideBasePath:
         if os.path.isdir(baseDir):
@@ -360,6 +366,9 @@ def installExtension(module, url, scope="system", version=0, force=False, token=
                 for gsVersionCompatibilityItem in gsVersionCompatibilityList:
                     if force is True or gsVersion == tag2version(gsVersionCompatibilityItem) or (float(int(tag2version(gsVersionCompatibilityItem))) == tag2version(gsVersionCompatibilityItem) and int(gsVersion) == int(tag2version(gsVersionCompatibilityItem))):
                         # force is True or xx.yy == xx.yy or xx = xx.0
+                        if force is True:
+                            extensionMetadataFileJson["shell-version"].append(str(int(float(gsVersion))))
+                            extensionMetadataFileJson = setFileMetadata(tmpPath + "/metadata.json", extensionMetadataFileJson)
                         foundFlag = True
                         break
                 if foundFlag:
@@ -377,6 +386,9 @@ def installExtension(module, url, scope="system", version=0, force=False, token=
                 hasChanged = uninstallExtension(module, uuid)
         for gsVersionCompatibilityItem in gsVersionCompatibilityList:
             if force is True or gsVersion == tag2version(gsVersionCompatibilityItem) or (float(int(tag2version(gsVersionCompatibilityItem))) == tag2version(gsVersionCompatibilityItem) and int(gsVersion) == int(tag2version(gsVersionCompatibilityItem))):
+                if force is True:
+                    extensionMetadataFileJson["shell-version"].append(str(int(float(gsVersion))))
+                    extensionMetadataFileJson = setFileMetadata(tmpPath + "/metadata.json", extensionMetadataFileJson)
                 foundFlag = True
                 break
         if not foundFlag:
