@@ -4,6 +4,9 @@
     "NewTabPageLocation": "https://google.com/",
     "RestoreOnStartup": 5,
     "ShowHomeButton": true,
+    "ExtensionInstallBlocklist": [
+        "ghbmnnjooekpmoecnnnilnnbdlolhkhi"
+    ],
     "ExtensionInstallForcelist": [
         "gighmmpiobklfepjocnamgkkbiglidom",
         "lfpjkncokllnfokkgpkobnkbkmelfefj",
