@@ -47,17 +47,17 @@
 
     - name: "Adding onedrive Repo key"
       apt_key:
-        url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_21.10/Release.key
+        url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/Release.key
         state: present
       when: not f3.stat.exists
 
     - name: "Configuring onedrive Repo"
       apt_repository:
-        repo: deb https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_21.10/ ./
+        repo: deb https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/ ./
       when: not f3.stat.exists
 
     - name: "Fixing onedrive Repo..."
-      command: mv "/etc/apt/sources.list.d/download_opensuse_org_repositories_home_npreining_debian_ubuntu_onedrive_xUbuntu_21_10.list" "/etc/apt/sources.list.d/onedrive.list"
+      command: mv "/etc/apt/sources.list.d/download_opensuse_org_repositories_home_npreining_debian_ubuntu_onedrive_xUbuntu_22_04.list" "/etc/apt/sources.list.d/onedrive.list"
       when: not f3.stat.exists
 
     - name: "install system updates for ubuntu systems"
