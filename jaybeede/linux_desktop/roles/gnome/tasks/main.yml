@@ -762,6 +762,9 @@
     - name: Disabling dock-panel...
       dconf: key="/org/gnome/shell/extensions/dash-to-dock" value="true"
 
+    - name: Configuring weather location...
+      dconf: key="/org/gnome/shell/weather/locations" value="[<(uint32 2, <('Paris, France', '', false, [(0.85321683829071748, 0.040313557183657346)], [(0.8528842336256599, 0.040724343395436846)])>)>]"
+
     - name: "Setting Up shortcuts (1/20)..."
       keyboard_shortcuts:
         name: logout

@@ -12,6 +12,7 @@ from pprint import pprint
 import collections
 
 sys.path.append("/usr/lib/python3/dist-packages/ansible/modules/system")
+sys.path.append("/usr/lib/python3/dist-packages/ansible_collections/community/general/plugins/modules/system")
 # TODO to be improved
 
 from dconf import DconfPreference, DBusWrapper
