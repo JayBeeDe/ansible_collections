@@ -408,13 +408,12 @@
         enabled: yes
         daemon_reload: yes
 
-    - name: "Configuring wayland as window manager..."
-      lineinfile:
-        path: /etc/gdm3/custom.conf
-        state: present
-        regexp: ^#?\s+fs.inotify.max_user_watches.*$
-        line: "WaylandEnable=true"
-        backup: no
+    # - name: "Configuring wayland as window manager..."
+    #   lineinfile:
+    #     path: /etc/gdm3/custom.conf
+    #     state: present
+    #     line: "WaylandEnable=true"
+    #     backup: no
 
   environment:
     PWD: ""

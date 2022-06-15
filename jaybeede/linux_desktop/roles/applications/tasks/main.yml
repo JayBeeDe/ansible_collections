@@ -169,12 +169,14 @@
       loop:
         - adpyke.vscode-sql-formatter
         - aeschli.vscode-css-formatter
-        - aswinkumar863.smarty-template-support
+        - alefragnani.project-manager
         - bibhasdn.unique-lines
-        - chaunceykiwi.json-tree-view
-        - coolbear.systemd-unit-file
+        - codezombiech.gitignore
+        - DavidAnson.vscode-markdownlint
         - dhoeric.ansible-vault
-        - emilast.logfilehighlighter
+        - EditorConfig.EditorConfig
+        - emilast.LogFileHighlighter
+        - exiasr.hadolint
         - foxundermoon.shell-format
         - gamunu.vscode-yarn
         - geeebe.duplicate
@@ -182,20 +184,24 @@
         - hediet.vscode-drawio
         - hogashi.crontab-syntax-highlight
         - junstyle.php-cs-fixer
+        - mhutchie.git-graph
+        - mkhl.shfmt
         - ms-azuretools.vscode-docker
         - ms-python.python
-        - ms-python.vscode-pylance
         - ms-toolsai.jupyter
+        - ms-toolsai.jupyter-keymap
+        - ms-toolsai.jupyter-renderers
         - ms-vscode.cpptools
-        - pstreule.codebucket
+        - nico-castell.linux-desktop-file
+        - redhat.ansible
         - redhat.vscode-commons
         - redhat.vscode-xml
         - redhat.vscode-yaml
         - timonwong.shellcheck
-        - tyriar.sort-lines
-        - vsciot-vscode.vscode-arduino
+        - Tyriar.sort-lines
         - wingrunr21.vscode-ruby
         - zhiyuan-lin.simple-perl
+        - ziyasal.vscode-open-in-github
       register: ext
       changed_when: "'already installed' not in ext.stdout"
 

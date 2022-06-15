@@ -2,7 +2,7 @@
     "[dockerfile]": {
         "editor.defaultFormatter": "ms-azuretools.vscode-docker"
     },
-    "breadcrumbs.enabled": true,
+    "search.followSymlinks": false,
     "debug.console.fontSize": 12,
     "debug.console.lineHeight": 7,
     "diffEditor.ignoreTrimWhitespace": false,
@@ -30,30 +30,33 @@
     "editor.wordWrap": "on",
     "explorer.confirmDelete": false,
     "files.associations": {
-        "*.inc": "perl"
+        "*.inc": "perl",
+        "Dockerfile": "dockerfile"
     },
     "files.exclude": {
+        "**/.git/**": true,
         ".*/": true,
         "**/*.old.tar.gz": true,
         "**/*.old": true,
         "**/*.bck": true,
+        "**/*.tdy": true,
         "**/*~": true,
-        "**/reinstallserverexecutor/tools/steps": true,
         "**/.code-workspace": true,
         "**/.vscode": true
     },
     "files.hotExit": "off",
     "files.watcherExclude": {
+        "**/.git/**": true,
         ".*/": true,
         "**/*.old.tar.gz": true,
         "**/*.old": true,
         "**/*.bck": true,
+        "**/*.tdy": true,
         "**/*~": true,
-        "**/reinstallserverexecutor/tools/steps": true,
         "**/.code-workspace": true,
-        "**/.vscode": true
+        "**/.vscode": true,
     },
-    "git.autofetch": true,
+    "git.autofetch": "all",
     "git.autorefresh": true,
     "logFileHighlighter.customPatterns": [
         {
@@ -85,19 +88,24 @@
         "default": "right",
         "jupyter-notebook": "left"
     },
-    "python.analysis.completeFunctionParens": true,
-    "python.autoComplete.addBrackets": true,
     "python.formatting.autopep8Args": [
         "--max-line-length=500",
         "--indent-size=4",
         "--ignore=E402"
     ],
+    "python.linting.pylintEnabled": true,
     "python.linting.pylintArgs": [
-        "--max-line-length=500",
-        "--indent-size=4"
+        "-r",
+        "n",
+        "--rcfile",
+        "/dev/null",
+        "--disable",
+        "attribute-defined-outside-init, import-error, inconsistent-return-statements, invalid-name, line-too-long, locally-disabled, logging-not-lazy, missing-docstring, no-name-in-module, no-self-use, too-many-branches, too-many-instance-attributes, too-many-locals, too-many-nested-blocks, too-many-statements"
     ],
-    "python.showStartPage": false,
-    "redhat.telemetry.enabled": true,
+    "security.workspace.trust.banner": "never",
+    "security.workspace.trust.enabled": false,
+    "security.workspace.trust.startupPrompt": "never",
+    "security.workspace.trust.untrustedFiles": "open",
     "shellcheck.enableQuickFix": true,
     "shellcheck.exclude": [],
     "shellcheck.ignorePatterns": {
@@ -106,9 +114,11 @@
         "**/*.zsh": true
     },
     "shellcheck.run": "onSave",
-    "simple-perl.perltidyArgs": [
-        "-q",
-        "-l=0"
+    "shellcheck.customArgs": [
+        "-x",
+        "-a",
+        "-P",
+        "--"
     ],
     "sortLines.sortEntireFile": true,
     "update.mode": "none",
@@ -117,14 +127,19 @@
     "window.newWindowDimensions": "maximized",
     "window.restoreWindows": "folders",
     "window.titleBarStyle": "custom",
-    "window.zoomLevel": 0,
     "workbench.activityBar.visible": false,
     "workbench.colorCustomizations": {
         "titleBar.activeBackground": "#414141",
         "titleBar.activeForeground": "#FFFFFF",
         "statusBar.background": "#1A1A1A",
         "statusBar.noFolderBackground": "#212121",
-        "statusBar.debuggingBackground": "#263238"
+        "statusBar.debuggingBackground": "#263238",
+        "editor.findMatchBackground": "#eeff00",
+        "editor.findMatchBorder": "#ff0000",
+        "diffEditor.removedTextBackground": "#ff00003f",
+        "diffEditor.removedTextBorder": "#00000000",
+        "diffEditor.insertedTextBackground": "#00ff0060",
+        "diffEditor.insertedTextBorder": "#00000000"
     },
     "workbench.editor.revealIfOpen": true,
     "workbench.editor.wrapTabs": true,
@@ -132,5 +147,43 @@
         "*.ipynb": "jupyter-notebook"
     },
     "workbench.startupEditor": "newUntitledFile",
-    "workbench.statusBar.visible": true
+    "workbench.statusBar.visible": true,
+    "extensions.ignoreRecommendations": true,
+    "zenMode.silentNotifications": false,
+    "redhat.telemetry.enabled": false,
+    "yaml.format.bracketSpacing": true,
+    "[yaml]": {
+        "editor.autoIndent": "full",
+    },
+    "yaml.yamlVersion": "1.2",
+    "yaml.format.singleQuote": false,
+    "markdown.preview.fontSize": 10,
+    "notebook.diff.enablePreview": true,
+    "simple-perl.perltidyArgs": [
+        "-l=0",
+        "-q"
+    ],
+    "markdownlint.config": {
+        "MD004": false,
+        "MD033": false
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "workbench.colorTheme": "Default High Contrast",
+    "[shellscript]": {
+        "editor.defaultFormatter": "mkhl.shfmt"
+    },
+    "git-graph.maxDepthOfRepoSearch": 10,
+    "hadolint.cliOptions": [
+        "--ignore=DL3006",
+        "--ignore=DL3007",
+        "--ignore=DL3008",
+        "--ignore=DL3013",
+        "--ignore=DL3016",
+        "--ignore=DL3018",
+        "--ignore=DL3028",
+        "--no-color"
+    ],
+    "window.zoomLevel": 1
 }

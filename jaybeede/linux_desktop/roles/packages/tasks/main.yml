@@ -111,6 +111,8 @@
           - pip
           - acpitool
           - kdocker
+          - shellcheck
+          - shfmt
           - ansible # needed by gnome_extensions module
           - gettext # needed by arc-menu gnome extension
           - gir1.2-gmenu-3.0 # needed by arc-menu gnome extension
