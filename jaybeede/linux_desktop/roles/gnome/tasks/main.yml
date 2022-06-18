@@ -765,65 +765,52 @@
     - name: Configuring weather location...
       dconf: key="/org/gnome/shell/weather/locations" value="[<(uint32 2, <('Paris, France', '', false, [(0.85321683829071748, 0.040313557183657346)], [(0.8528842336256599, 0.040724343395436846)])>)>]"
 
-    - name: "Setting Up shortcuts (1/20)..."
+    - name: "Disabling useless builtin keyboard shortcuts..."
       keyboard_shortcuts:
-        name: logout
         dynamic: true
+        name: "{{ item }}"
+      loop:
+        - control-center
+        - decrease-text-size
+        - eject
+        - email
+        - help
+        - home
+        - increase-text-size
+        - logout
+        - magnifier
+        - magnifier-zoom-in
+        - magnifier-zoom-out
+        - media
+        - mic-mute
+        - next
+        - on-screen-keyboard
+        - panel-run-dialog
+        - pause
+        - play
+        - previous
+        - restore-shortcuts
+        - screenreader
+        - screensaver
+        - screenshot
+        - screenshot-window
+        - search
+        - show-screen-recording-ui
+        - show-screenshot-ui
+        - stop
+        - switch-input-source
+        - switch-input-source-backward
+        - terminal
+        - toggle-contrast
+        - volume-down
+        - volume-mute
+        - volume-up
+        - www
 
     - name: "Setting Up shortcuts (2/20)..."
       keyboard_shortcuts:
         name: home
         binding: <Super>e
-        dynamic: true
-
-    - name: "Setting Up shortcuts (3/20)..."
-      keyboard_shortcuts:
-        name: screenshot
-        dynamic: true
-
-    - name: "Setting Up shortcuts (4/20)..."
-      keyboard_shortcuts:
-        name: screenshot-clip
-        dynamic: true
-
-    - name: "Setting Up shortcuts (5/20)..."
-      keyboard_shortcuts:
-        name: area-screenshot
-        dynamic: true
-
-    - name: "Setting Up shortcuts (6/20)..."
-      keyboard_shortcuts:
-        name: area-screenshot-clip
-        dynamic: true
-
-    - name: "Setting Up shortcuts (7/20)..."
-      keyboard_shortcuts:
-        name: window-screenshot
-        dynamic: true
-
-    - name: "Setting Up shortcuts (8/20)..."
-      keyboard_shortcuts:
-        name: window-screenshot-clip
-        dynamic: true
-
-    - name: "Setting Up shortcuts (9/20)..."
-      keyboard_shortcuts:
-        name: screencast
-        dynamic: true
-
-    - name: "Setting Up shortcuts (10/20)..."
-      keyboard_shortcuts:
-        name: magnifier
-        dynamic: true
-
-    - name: "Setting Up shortcuts (11/20)..."
-      keyboard_shortcuts:
-        name: magnifier-zoom-in
-        dynamic: true
-
-    - name: "Setting Up shortcuts (12/20)..."
-      keyboard_shortcuts:
-        name: magnifier-zoom-out
         dynamic: true
 
     - name: "Setting Up shortcuts (13/20)..."
