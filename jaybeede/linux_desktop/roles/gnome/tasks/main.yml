@@ -1,70 +1,71 @@
 ---
-# - block:
-#     - name: "Setting Start Screen (1/4)..."
-#       copy:
-#         src: "{{ role_path }}/files/favicon.png"
-#         dest: /usr/share/plymouth/custom.png
-#         mode: "0644"
-#         owner: "root"
-#         group: "root"
+- block:
+    - name: "Setting Start Screen (1/4)..."
+      copy:
+        src: "{{ role_path }}/files/favicon.png"
+        dest: /usr/share/plymouth/custom.png
+        mode: "0644"
+        owner: "root"
+        group: "root"
 
-#     - name: "Preparing gnome extension environment..."
-#       file:
-#         path: "/usr/share/gnome-shell/extensions/"
-#         mode: "0777"
-#         owner: "root"
-#         group: "root"
-#         recurse: yes
+    - name: "Preparing gnome extension environment..."
+      file:
+        path: "/usr/share/gnome-shell/extensions/"
+        mode: "0777"
+        owner: "root"
+        group: "root"
+        recurse: yes
 
-#   become: yes
-#   become_user: "root"
+  become: yes
+  become_user: "root"
 
 - block:
-    # - name: "Installing and enabling Gnome Extensions (forcing mode)..."
-    #   gnome_extensions:
-    #     url: "{{ item }}"
-    #     action: enable
-    #     scope: system
-    #     force: True
-    #     tokenGithub: "{{ tokenGithub }}"
-    #   loop:
-    #     # - https://extensions.gnome.org/extension-data/panel-date-formatatareao.es.v5.shell-extension.zip
-    #     - https://github.com/oae/gnome-shell-minimize-to-tray
-    #     # - https://github.com/darkretailer/gnome-shell-extension_maxi
-    #     # - https://extensions.gnome.org/extension-data/unblanksun.wxggmail.com.v22.shell-extension.zip
-    #   ignore_errors: True
+    - name: "Installing and enabling Gnome Extensions (forcing mode)..."
+      gnome_extensions:
+        url: "{{ item }}"
+        action: enable
+        scope: system
+        force: True
+        tokenGithub: "{{ tokenGithub }}"
+      loop:
+        # - https://extensions.gnome.org/extension-data/panel-date-formatatareao.es.v5.shell-extension.zip
+        - https://github.com/oae/gnome-shell-minimize-to-tray
+        # - https://github.com/darkretailer/gnome-shell-extension_maxi
+        # - https://extensions.gnome.org/extension-data/unblanksun.wxggmail.com.v22.shell-extension.zip
+      ignore_errors: True
 
-    #     - name: "Installing and enabling Gnome Extensions..."
-    #       gnome_extensions:
-    #         url: "{{ item }}"
-    #         action: enable
-    #         scope: system
-    #         tokenGithub: "{{ tokenGithub }}"
-    #       loop:
-    #         - https://github.com/home-sweet-gnome/dash-to-panel
-    #         - https://github.com/kgshank/gse-sound-output-device-chooser
-    #         - https://github.com/neffo/bing-wallpaper-gnome-extension
-    #       notify: Reload gnome sleep
-    #       ignore_errors: True
+    - name: "Installing and enabling Gnome Extensions..."
+      gnome_extensions:
+        url: "{{ item }}"
+        action: enable
+        scope: system
+        tokenGithub: "{{ tokenGithub }}"
+      loop:
+        - https://github.com/home-sweet-gnome/dash-to-panel
+        - https://github.com/kgshank/gse-sound-output-device-chooser
+        - https://github.com/neffo/bing-wallpaper-gnome-extension
+        - pop-shell@system76.com
+      notify: Reload gnome sleep
+      ignore_errors: True
 
-    #     - meta: flush_handlers
+    - meta: flush_handlers
 
-    #     - name: "Installing and enabling Arc-menu Extension..."
-    #       gnome_extensions:
-    #         url: https://gitlab.com/arcmenu/ArcMenu
-    #         action: enable
-    #         scope: system
-    #         tokenGithub: "{{ tokenGithub }}"
-    #       notify: Reload gnome sleep
-    #       ignore_errors: True
-    #       register: arcMenu
+    - name: "Installing and enabling Arc-menu Extension..."
+      gnome_extensions:
+        url: https://gitlab.com/arcmenu/ArcMenu
+        action: enable
+        scope: system
+        tokenGithub: "{{ tokenGithub }}"
+      notify: Reload gnome sleep
+      ignore_errors: True
+      register: arcMenu
 
-    #     - name: "Patching arc menu gnome extension..."
-    #       command: glib-compile-schemas /usr/share/gnome-shell/extensions/arcmenu@arcmenu.com/schemas/
-    #       notify: Reload gnome
-    #       when: arcMenu.changed
+    - name: "Patching arc menu gnome extension..."
+      command: glib-compile-schemas /usr/share/gnome-shell/extensions/arcmenu@arcmenu.com/schemas/
+      notify: Reload gnome
+      when: arcMenu.changed
 
-    #     - meta: flush_handlers
+    - meta: flush_handlers
 
     - name: "Setting Start Screen (1/3)..."
       dconf: key="/org/gnome/login-screen/logo" value="'/usr/share/plymouth/custom.png'"
@@ -765,115 +766,220 @@
     - name: Configuring weather location...
       dconf: key="/org/gnome/shell/weather/locations" value="[<(uint32 2, <('Paris, France', '', false, [(0.85321683829071748, 0.040313557183657346)], [(0.8528842336256599, 0.040724343395436846)])>)>]"
 
-    - name: "Setting Up shortcuts (1/20)..."
+    - name: Disabling useless builtin keyboard shortcuts...
       keyboard_shortcuts:
-        name: logout
         dynamic: true
+        name: "{{ item }}"
+      loop:
+        - activate-launcher
+        - begin-move
+        - begin-resize
+        - cycle-group
+        - cycle-group-backward
+        - cycle-panels
+        - cycle-panels-backward
+        - cycle-windows
+        - cycle-windows-backward
+        - decrease-text-size
+        - eject
+        - email
+        - focus-down
+        - focus-up
+        - help
+        - increase-text-size
+        - logout
+        - magnifier
+        - magnifier-zoom-in
+        - magnifier-zoom-out
+        - management-orientation
+        - media
+        - mic-mute
+        - move-to-workspace-1
+        - move-to-workspace-last
+        - next
+        - on-screen-keyboard
+        - pause
+        - play
+        - pop-monitor-down
+        - pop-monitor-up
+        - pop-workspace-down
+        - pop-workspace-up
+        - previous
+        - restore-shortcuts
+        - screenreader
+        - screensaver
+        - screenshot
+        - screenshot-window
+        - search
+        - show-screen-recording-ui
+        - show-screenshot-ui
+        - stop
+        - switch-applications
+        - switch-applications-backward
+        - switch-group
+        - switch-group-backward
+        - switch-input-source
+        - switch-input-source-backward
+        - switch-panels
+        - switch-panels-backward
+        - switch-to-workspace-1
+        - switch-to-workspace-down
+        - switch-to-workspace-last
+        - switch-to-workspace-up
+        - terminal
+        - tile-accept
+        - tile-enter
+        - tile-move-down
+        - tile-move-left
+        - tile-move-right
+        - tile-move-up
+        - tile-orientation
+        - tile-reject
+        - tile-resize-down
+        - tile-resize-left
+        - tile-resize-right
+        - tile-resize-up
+        - tile-swap-down
+        - tile-swap-left
+        - tile-swap-right
+        - tile-swap-up
+        - toggle-contrast
+        - toggle-floating
+        - toggle-fullscreen
+        - toggle-maximized
+        - toggle-stacking
+        - toggle-stacking-global
+        - toggle-tiling
+        - volume-down
+        - volume-mute
+        - volume-up
+        - www
 
-    - name: "Setting Up shortcuts (2/20)..."
+    - name: Setting Up shortcuts (1/19)...
       keyboard_shortcuts:
+        dynamic: true
         name: home
         binding: <Super>e
+
+    - name: Setting Up shortcuts (2/19)...
+      keyboard_shortcuts:
         dynamic: true
+        name: control-center
+        binding: <Super>i
 
-    - name: "Setting Up shortcuts (3/20)..."
+    - name: Setting Up shortcuts (3/19)...
       keyboard_shortcuts:
-        name: screenshot
         dynamic: true
-
-    - name: "Setting Up shortcuts (4/20)..."
-      keyboard_shortcuts:
-        name: screenshot-clip
-        dynamic: true
-
-    - name: "Setting Up shortcuts (5/20)..."
-      keyboard_shortcuts:
-        name: area-screenshot
-        dynamic: true
-
-    - name: "Setting Up shortcuts (6/20)..."
-      keyboard_shortcuts:
-        name: area-screenshot-clip
-        dynamic: true
-
-    - name: "Setting Up shortcuts (7/20)..."
-      keyboard_shortcuts:
-        name: window-screenshot
-        dynamic: true
-
-    - name: "Setting Up shortcuts (8/20)..."
-      keyboard_shortcuts:
-        name: window-screenshot-clip
-        dynamic: true
-
-    - name: "Setting Up shortcuts (9/20)..."
-      keyboard_shortcuts:
-        name: screencast
-        dynamic: true
-
-    - name: "Setting Up shortcuts (10/20)..."
-      keyboard_shortcuts:
-        name: magnifier
-        dynamic: true
-
-    - name: "Setting Up shortcuts (11/20)..."
-      keyboard_shortcuts:
-        name: magnifier-zoom-in
-        dynamic: true
-
-    - name: "Setting Up shortcuts (12/20)..."
-      keyboard_shortcuts:
-        name: magnifier-zoom-out
-        dynamic: true
-
-    - name: "Setting Up shortcuts (13/20)..."
-      keyboard_shortcuts:
-        name: "Réglages"
-        command: "/usr/bin/gnome-control-center"
-        binding: "<Super>i"
-
-    - name: "Setting Up shortcuts (14/20)..."
-      keyboard_shortcuts:
-        name: "Ajustements"
-        command: "/usr/bin/gnome-tweaks"
-        binding: "<Super>u"
-
-    - name: "Setting Up shortcuts (15/20)..."
-      keyboard_shortcuts:
-        name: "Capture"
-        command: "/usr/bin/flameshot gui"
-        binding: "Print"
-
-    - name: "Setting Up shortcuts (16/20)..."
-      keyboard_shortcuts:
-        name: "Nothing"
-        binding: "<Super>q"
-
-    - name: "Setting Up shortcuts (17/20)..."
-      keyboard_shortcuts:
         name: panel-run-dialog
         binding: <Super>r
-        dynamic: true
 
-    - name: "Setting Up shortcuts (18/20)..."
+    - name: Setting Up shortcuts (4/19)...
       keyboard_shortcuts:
+        dynamic: true
+        name: Ajustements
+        command: /usr/bin/gnome-tweaks
+        binding: <Super>u
+
+    - name: Setting Up shortcuts (5/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: Capture
+        command: /usr/bin/flameshot gui
+        binding: Print
+
+    - name: Setting Up shortcuts (6/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: Nothing
+        binding: <Super>q
+
+    - name: Setting Up shortcuts (7/19)...
+      keyboard_shortcuts:
+        dynamic: true
         name: show-desktop
         binding: <Super>d
-        dynamic: true
 
-    - name: "Setting Up shortcuts (19/20)..."
+    - name: Setting Up shortcuts (8/19)...
       keyboard_shortcuts:
-        name: "Pull Projets Perso"
+        name: Pull Projets Perso
         command: "/bin/bash {{ git_rootrepo }}/Linux-Scripts-Toolkit/manageGit/manageGit.sh {{ git_rootrepo }} pull"
-        binding: "<Primary><Alt>ampersand"
+        binding: <Primary><Alt>ampersand
     # is personal, will not work for you
 
-    - name: "Setting Up shortcuts (20/20)..."
+    - name: Setting Up shortcuts (9/19)...
       keyboard_shortcuts:
-        name: "Push Projets Perso"
+        name: Push Projets Perso
         command: "/bin/bash {{ git_rootrepo }}/Linux-Scripts-Toolkit/manageGit/manageGit.sh {{ git_rootrepo }} push"
-        binding: "<Primary><Alt>eacute"
+        binding: <Primary><Alt>eacute
     # is personal, will not work for you
+
+    - name: Setting Up shortcuts (10/19)...
+      keyboard_shortcuts:
+        name: Terminator
+        command: /usr/bin/terminator
+        binding: <Primary><Alt>t
+
+    - name: Setting Up shortcuts (11/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: close
+        binding: <Alt>F4
+
+    - name: Setting Up shortcuts (12/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: minimize
+        binding: <Super>Down
+
+    - name: Setting Up shortcuts (13/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: maximize
+        binding: <Super>Up
+
+    - name: Setting Up shortcuts (14/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: switch-windows
+        binding: <Alt>Tab
+
+    - name: Setting Up shortcuts (15/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: switch-windows-backward
+        binding: <Shift><Alt>Tab
+
+    - name: Setting Up shortcuts (16/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: toggle-tiled-left
+        binding: <Super>Left
+
+    - name: Setting Up shortcuts (17/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: toggle-tiled-right
+        binding: <Super>Right
+
+    - name: Setting Up shortcuts (18/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: pop-monitor-left
+        binding: <Shift><Super>Left
+
+    - name: Setting Up shortcuts (19/19)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: pop-monitor-right
+        binding: <Shift><Super>Right
+
+    - name: Re-Disabling useless builtin keyboard shortcuts...
+      keyboard_shortcuts:
+        dynamic: true
+        name: "{{ item }}"
+      loop:
+        - focus-left
+        - focus-right
 
   become: yes
   become_user: "{{ user }}"
