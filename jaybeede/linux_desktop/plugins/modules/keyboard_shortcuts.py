@@ -200,7 +200,41 @@ builtinCommands = [
     {"name": "screenshot", "description": "Take a screenshot", "schema": 2},
     {"name": "show-screen-recording-ui", "description": "Record a screencast interactively", "schema": 2},
     {"name": "show-screenshot-ui", "description": "Take a screenshot interactively", "schema": 2},
-    {"name": "restore-shortcuts", "description": "Re-enable shortcuts", "schema": 3}
+    {"name": "restore-shortcuts", "description": "Re-enable shortcuts", "schema": 3},
+    {"name": "activate-launcher", "description": "Search key combo", "schema": 4},
+    {"name": "focus-down", "description": "Focus down window", "schema": 4},
+    {"name": "focus-left", "description": "Focus left window", "schema": 4},
+    {"name": "focus-right", "description": "Focus right window", "schema": 4},
+    {"name": "focus-up", "description": "Focus up window", "schema": 4},
+    {"name": "management-orientation", "description": "Toggle tiling orientation", "schema": 4},
+    {"name": "pop-monitor-down", "description": "Move window to the lower monitor", "schema": 4},
+    {"name": "pop-monitor-left", "description": "Move window to the leftward monitor", "schema": 4},
+    {"name": "pop-monitor-right", "description": "Move window to the rightward monitor", "schema": 4},
+    {"name": "pop-monitor-up", "description": "Move window to the upper monitor", "schema": 4},
+    {"name": "pop-workspace-down", "description": "Move window to the lower workspace", "schema": 4},
+    {"name": "pop-workspace-up", "description": "Move window to the upper workspace", "schema": 4},
+    {"name": "reject", "description": "shortcuts", "schema": 4},
+    {"name": "tile-accept", "description": "Accept tiling changes", "schema": 4},
+    {"name": "tile-enter", "description": "Enter tiling mode", "schema": 4},
+    {"name": "tile-move-down", "description": "Move window down", "schema": 4},
+    {"name": "tile-move-left", "description": "Move window left", "schema": 4},
+    {"name": "tile-move-right", "description": "Move window right", "schema": 4},
+    {"name": "tile-move-up", "description": "Move window up", "schema": 4},
+    {"name": "tile-orientation", "description": "Toggle tiling orientation", "schema": 4},
+    {"name": "tile-resize-down", "description": "Resize window down", "schema": 4},
+    {"name": "tile-resize-left", "description": "Resize window left", "schema": 4},
+    {"name": "tile-resize-right", "description": "Resize window right", "schema": 4},
+    {"name": "tile-resize-up", "description": "Resize window up", "schema": 4},
+    {"name": "tile-swap-down", "description": "Swap window down", "schema": 4},
+    {"name": "tile-swap-left", "description": "Swap window left", "schema": 4},
+    {"name": "tile-swap-right", "description": "Swap window right", "schema": 4},
+    {"name": "tile-swap-up", "description": "Swap window up", "schema": 4},
+    {"name": "toggle-floating", "description": "Toggles a window between floating and tiling", "schema": 4},
+    {"name": "toggle-stacking-global", "description": "Toggle stacking mode outside management mode", "schema": 4},
+    {"name": "toggle-stacking", "description": "Toggle stacking mode inside management mode", "schema": 4},
+    {"name": "toggle-tiling", "description": "Toggles auto-tiling on and off", "schema": 4},
+    {"name": "toggle-tiled-left", "description": "View split on left", "schema": 5},
+    {"name": "toggle-tiled-right", "description": "View split on right", "schema": 5}
 ]
 
 
@@ -257,7 +291,7 @@ def main():
     prefixDconfCustomPath = "/org/gnome/settings-daemon/plugins/media-keys/"
     suffixDconfCustomRootPath = "custom-keybindings"
     suffixDconfCustomPath = suffixDconfCustomRootPath + "/custom"
-    prefixDconfBuiltinAlternatePaths = ["/org/gnome/desktop/wm/keybindings/", "/org/gnome/shell/keybindings/", "/org/gnome/mutter/wayland/keybindings/"]
+    prefixDconfBuiltinAlternatePaths = ["/org/gnome/desktop/wm/keybindings/", "/org/gnome/shell/keybindings/", "/org/gnome/mutter/wayland/keybindings/", "/org/gnome/shell/extensions/pop-shell/", "/org/gnome/mutter/keybindings/"]
     if builtinIndexSchema is None:
         prefixDconfBuiltinPath = prefixDconfCustomPath
     else:
@@ -273,6 +307,7 @@ def main():
         if old_binding_revStatic == "@as []":
             old_binding_revStatic = None
         old_binding = dconf.read(prefixDconfBuiltinPath + name)
+        print(prefixDconfBuiltinPath + name)
     else:
         cursorIndex = 1
         cursorName = dconf.read(prefixDconfCustomPath + suffixDconfCustomPath + str(cursorIndex) + "/name")
@@ -305,6 +340,8 @@ def main():
             hasChanged = True
             # dconf.reset(prefixDconfBuiltinPath + revStaticName)
             dconf.write(prefixDconfBuiltinPath + revStaticName, "@as []")
+        print(old_binding)
+        print(binding)
         if old_binding != axstr(binding):
             hasChanged = True
             dconf.write(prefixDconfBuiltinPath + name, axstr(binding))

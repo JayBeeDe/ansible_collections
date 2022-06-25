@@ -10,22 +10,21 @@ import urllib.parse
 from urllib.parse import quote
 import uuid
 import sys
-import locale
+import locale  # pylint: disable=unused-import
 import re
-from collections import defaultdict
+import pdb  # pylint: disable=unused-import
+import collections  # pylint: disable=unused-import
+import json
+from collections import defaultdict  # pylint: disable=unused-import
 from ansible.module_utils.basic import AnsibleModule
 from ansible.errors import AnsibleError
 from ansible.module_utils.urls import open_url
-import collections
-import json
-import pdb
-
 sys.path.append("/usr/lib/python3/dist-packages/ansible/modules")
 sys.path.append("/usr/lib/python3/dist-packages/ansible_collections/community/general/plugins/modules")
-# TODO to be improved
+# @TODO to be improved
 
-from unarchive import ZipArchive
-from dconf import DconfPreference, DBusWrapper
+from unarchive import ZipArchive  # pylint: disable=wrong-import-position
+from dconf import DconfPreference, DBusWrapper  # pylint: disable=wrong-import-position, unused-import
 
 DOCUMENTATION = '''
 ---
@@ -232,7 +231,7 @@ def runCmd(cmd, errorMsg="Error while running CMD command"):
     try:
         subprocess.check_output(["gnome-shell", "--version"])
     except:
-        raise AnsibleError(realErrorMsg)
+        raise AnsibleError(realErrorMsg)  # pylint: disable=raise-missing-from
     fnret = subprocess.getoutput(cmd)
     return fnret
 
@@ -244,18 +243,18 @@ def getGnomeShellVersion():
 
 
 def getFileMetadata(path):
-    with open(path) as extensionMetadataFile:
+    with open(path, encoding="UTF-8") as extensionMetadataFile:
         extensionMetadataFileJson = json.loads(extensionMetadataFile.read())
     return extensionMetadataFileJson
 
 
 def setFileMetadata(path, content):
-    with open(path, "w") as extensionMetadataFile:
+    with open(path, "w", encoding="UTF-8") as extensionMetadataFile:
         json.dump(content, extensionMetadataFile)
     return getFileMetadata(path)
 
 
-def getLocalExtensionMetadata(uuid, raiseFlag=True):
+def getLocalExtensionMetadata(uuid, raiseFlag=True):  # pylint: disable=redefined-outer-name
     for baseDir in extensionSystemWideBasePath, extensionUserWideBasePath:
         if os.path.isdir(baseDir):
             for extensionDir in os.listdir(baseDir):
@@ -272,7 +271,7 @@ def getLocalExtensionMetadata(uuid, raiseFlag=True):
         return None
 
 
-def checkLocalExtensionInstalled(uuid):
+def checkLocalExtensionInstalled(uuid):  # pylint: disable=redefined-outer-name
     if getLocalExtensionMetadata(uuid, raiseFlag=False) is None:
         return None
     else:
@@ -286,7 +285,7 @@ def checkLocalExtensionInstalled(uuid):
             return "otheruser"
 
 
-def setLocalExtensionState(module, uuid, state="enable"):
+def setLocalExtensionState(module, uuid, state="enable"):  # pylint: disable=redefined-outer-name
     if checkLocalExtensionInstalled(uuid) is None:
         if state == "disable":
             return False
@@ -332,9 +331,9 @@ def refreshGnome(method="dbus"):
 
 
 def installExtension(module, url, scope="system", version=0, force=False, token=None):
-    # TODO still handle no reinstall when already ok
-    # TODO case with different version than can be changed (upgraded/downgraded)
-    # TODO version not ok and with other privilege
+    # @TODO still handle no reinstall when already ok
+    # @TODO case with different version than can be changed (upgraded/downgraded)
+    # @TODO version not ok and with other privilege
     hasChanged = False
     if scope == "system":
         # root or sudo user => system wide install
@@ -348,18 +347,19 @@ def installExtension(module, url, scope="system", version=0, force=False, token=
     # get latest compatible
     urlSourceType = getUrlSourceType(url)
     if urlSourceType == "uuid":
-        raise AnsibleError("A gnome extension cannot be installed with an uuid: you need to provide an URL or a gitlab/github repo URL")
+        # raise AnsibleError("A gnome extension cannot be installed with an uuid: you need to provide an URL or a gitlab/github repo URL")
+        return url, False
 
     foundFlag = False
     if version == 0 and (urlSourceType == "github" or urlSourceType == "gitlab"):
         downloadUrl = ""  # just to go in the while loop
-        while(downloadUrl is not None):
+        while downloadUrl is not None:
             downloadUrl = repo2url(url, version, token)
             if downloadUrl is not None:
                 tmpPath = downloadExtension(module, downloadUrl)
                 extensionMetadataFileJson = getFileMetadata(tmpPath + "/metadata.json")
                 gsVersionCompatibilityList = extensionMetadataFileJson["shell-version"]
-                uuid = extensionMetadataFileJson["uuid"]
+                uuid = extensionMetadataFileJson["uuid"]  # pylint: disable=redefined-outer-name
                 if checkLocalExtensionInstalled(uuid) is not None:
                     if checkLocalExtensionInstalled(uuid) != scope:
                         hasChanged = uninstallExtension(module, uuid)
@@ -401,9 +401,9 @@ def installExtension(module, url, scope="system", version=0, force=False, token=
     md5contentTmp = None
     md5content = None
     if os.path.isfile(tmpPath + "/md5sum.txt") and os.path.isfile(extensionBasePath + "/md5sum/" + uuid + ".txt"):
-        with open(tmpPath + "/md5sum.txt", "r") as md5file:
+        with open(tmpPath + "/md5sum.txt", "r", encoding="UTF-8") as md5file:
             md5contentTmp = md5file.read()
-        with open(extensionBasePath + "/md5sum/" + uuid + ".txt", "r") as md5file:
+        with open(extensionBasePath + "/md5sum/" + uuid + ".txt", "r", encoding="UTF-8") as md5file:
             md5content = md5file.read()
     if md5contentTmp is not None and md5content is not None:
         if md5contentTmp == md5content:
@@ -419,7 +419,7 @@ def installExtension(module, url, scope="system", version=0, force=False, token=
     if os.path.isdir(tempfile.gettempdir() + "/gnome_extensions"):
         try:
             shutil.rmtree(tempfile.gettempdir() + "/gnome_extensions")
-        except:
+        except:  # pylint: disable=bare-except
             pass
     for root, dirs, files in os.walk(extensionBasePath + "/" + uuid):
         for item in dirs:
@@ -443,12 +443,12 @@ def downloadExtension(module, url):
     if os.path.isdir(tempfile.gettempdir() + "/gnome_extensions"):
         try:
             shutil.rmtree(tempfile.gettempdir() + "/gnome_extensions")
-        except:
+        except:  # pylint: disable=bare-except
             pass
     try:
         os.mkdir(tempfile.gettempdir() + "/gnome_extensions")
         os.chmod(tempfile.gettempdir() + "/gnome_extensions", 0o777)
-    except:
+    except:  # pylint: disable=bare-except
         pass
     tmpPath = tempfile.gettempdir() + "/gnome_extensions/" + str(uuid.uuid4())
     extensionData = open_url(url, method="GET", validate_certs=False).read()
@@ -474,7 +474,7 @@ def downloadExtension(module, url):
     zipObj.unarchive()
 
     if not os.path.isfile(tmpPath + "/metadata.json"):
-        for root, dirs, files in os.walk(tmpPath):
+        for root, dirs, files in os.walk(tmpPath):  # pylint: disable=unused-variable
             for item in files:
                 if item == "metadata.json":
                     tmpPath = os.path.join(root)
@@ -483,12 +483,12 @@ def downloadExtension(module, url):
     if not os.path.isfile(tmpPath + "/metadata.json"):
         raise AnsibleError("metadata.json file could not be found within the extension. Please ensure the extension package is correct")
 
-    with open(tmpPath + "/md5sum.txt", "w") as md5file:
+    with open(tmpPath + "/md5sum.txt", "w", encoding="UTF-8") as md5file:
         md5file.write(md5Archive)
     return tmpPath
 
 
-def uninstallExtension(module, uuid):
+def uninstallExtension(module, uuid):  # pylint: disable=redefined-outer-name
     hasChanged = False
     dconf = DconfPreference(module, module.check_mode)
     disabledExtensions = dconf.read(extensionDisabledDconfPath).strip("'][").split("', '")
@@ -539,7 +539,7 @@ def main():
     hasChanged4 = False
 
     if action == "install" or action == "enable":
-        uuid, hasChanged1 = installExtension(module, url, scope, version, force, token)
+        uuid, hasChanged1 = installExtension(module, url, scope, version, force, token)  # pylint: disable=redefined-outer-name
 
     if action == "disable" or action == "uninstall":
         uuid = url2uuid(module, url, token)
@@ -556,7 +556,7 @@ def main():
     if hasChanged1 or hasChanged2 or hasChanged3 or hasChanged4:
         hasChanged = True
 
-    # todo
+    # @todo
     # extra wrapper aroung dconf object...
 
     module.exit_json(changed=hasChanged, ansible_module_results="lol")
