@@ -1,23 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
+import os  # pylint: disable=unused-import
 import sys
-import traceback
-
-from collections import defaultdict
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native
-from pprint import pprint
-import collections
+import syslog  # pylint: disable=unused-import
+import traceback  # pylint: disable=unused-import
+from pprint import pprint  # pylint: disable=unused-import
 
 sys.path.append("/usr/lib/python3/dist-packages/ansible/modules/system")
 sys.path.append("/usr/lib/python3/dist-packages/ansible_collections/community/general/plugins/modules/system")
-# TODO to be improved
 
-from dconf import DconfPreference, DBusWrapper
-import syslog
-from ansible.module_utils.basic import AnsibleModule
+from dconf import DconfPreference, DBusWrapper  # pylint: disable=unused-import, wrong-import-position
+from ansible.module_utils.basic import AnsibleModule  # pylint: disable=wrong-import-position
+from ansible.module_utils._text import to_native  # pylint: disable=unused-import, wrong-import-position
+# @TODO to be improved
 
 DOCUMENTATION = '''
 ---
@@ -239,8 +235,6 @@ def main():
     )
     module.log(msg="some_message")
 
-    shortcut = defaultdict(dict)
-
     binding = module.params.get("binding")
     command = module.params.get("command")
     name = module.params.get("name")
@@ -275,6 +269,8 @@ def main():
             revStaticName = name
             name = name + "-static"
         old_binding_revStatic = dconf.read(prefixDconfBuiltinPath + revStaticName)
+        if old_binding_revStatic == "@as []":
+            old_binding_revStatic = None
         old_binding = dconf.read(prefixDconfBuiltinPath + name)
     else:
         cursorIndex = 1
@@ -294,8 +290,11 @@ def main():
         old_command = dconf.read(prefixDconfCustomPath + suffixDconfCustomPath + str(indexCustom) + "/command")
         try:
             customKeyBindingsList = dconf.read(prefixDconfCustomPath + suffixDconfCustomRootPath).strip("'][").split("', '")
-        except:
+        except:  # pylint: disable=bare-except
             customKeyBindingsList = []
+
+    if old_binding == "@as []":
+        old_binding = None
 
     hasChanged = False
     if builtin:
