@@ -862,6 +862,13 @@
         binding: <Primary><Alt>eacute
     # is personal, will not work for you
 
+    - name: Setting Up shortcuts (10/20)...
+      keyboard_shortcuts:
+        dynamic: true
+        name: Terminator
+        command: /usr/bin/terminator
+        binding: <Primary><alt>t
+
   become: yes
   become_user: "{{ user }}"
   vars:

@@ -247,9 +247,10 @@ def main():
             if "schema" in item:
                 builtinIndexSchema = item["schema"]
             break
-    if binding is not None:
-        if binding == "off" or binding == "disabled" or binding == "null":
-            binding = None
+    if binding == "off" or binding == "disabled" or binding == "null":
+        binding = None
+    if binding is None and builtin:
+        binding = "@as []"
 
     dconf = DconfPreference(module, module.check_mode)
 
@@ -287,31 +288,26 @@ def main():
             indexCustom = cursorIndex
             # we will create the custom shortcut entry at the end of the list
         old_binding = dconf.read(prefixDconfCustomPath + suffixDconfCustomPath + str(indexCustom) + "/binding")
+        if old_binding == "@as []":
+            old_binding = None
         old_command = dconf.read(prefixDconfCustomPath + suffixDconfCustomPath + str(indexCustom) + "/command")
         try:
             customKeyBindingsList = dconf.read(prefixDconfCustomPath + suffixDconfCustomRootPath).strip("'][").split("', '")
         except:  # pylint: disable=bare-except
             customKeyBindingsList = []
-
-    if old_binding == "@as []":
-        old_binding = None
+        if len(customKeyBindingsList) == 1 and (customKeyBindingsList[0] == "@as " or customKeyBindingsList[0] == "@as"):
+            customKeyBindingsList = []
 
     hasChanged = False
     if builtin:
-        if binding is None:
-            if old_binding is not None:
-                hasChanged = True
-                # dconf.reset(prefixDconfBuiltinPath + name)
-                dconf.write(prefixDconfBuiltinPath + name, "@as []")
-        else:
-            if old_binding_revStatic is not None:
-                # we need to remove the non static shortcut
-                hasChanged = True
-                # dconf.reset(prefixDconfBuiltinPath + revStaticName)
-                dconf.write(prefixDconfBuiltinPath + revStaticName, "@as []")
-            if old_binding != axstr(binding):
-                hasChanged = True
-                dconf.write(prefixDconfBuiltinPath + name, axstr(binding))
+        if old_binding_revStatic is not None:
+            # we need to remove the non static shortcut
+            hasChanged = True
+            # dconf.reset(prefixDconfBuiltinPath + revStaticName)
+            dconf.write(prefixDconfBuiltinPath + revStaticName, "@as []")
+        if old_binding != axstr(binding):
+            hasChanged = True
+            dconf.write(prefixDconfBuiltinPath + name, axstr(binding))
     else:
         if binding is None:
             if prefixDconfCustomPath + suffixDconfCustomPath + str(indexCustom) + "/" in customKeyBindingsList:
