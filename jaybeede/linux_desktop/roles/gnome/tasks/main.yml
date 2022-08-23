@@ -20,19 +20,21 @@
   become_user: "root"
 
 - block:
-    - name: "Installing and enabling Gnome Extensions (forcing mode)..."
-      gnome_extensions:
-        url: "{{ item }}"
-        action: enable
-        scope: system
-        force: True
-        tokenGithub: "{{ tokenGithub }}"
-      loop:
-        # - https://extensions.gnome.org/extension-data/panel-date-formatatareao.es.v5.shell-extension.zip
-        - https://github.com/oae/gnome-shell-minimize-to-tray
-        # - https://github.com/darkretailer/gnome-shell-extension_maxi
-        # - https://extensions.gnome.org/extension-data/unblanksun.wxggmail.com.v22.shell-extension.zip
-      ignore_errors: True
+    # - name: "Installing and enabling Gnome Extensions (forcing mode)..."
+    #   gnome_extensions:
+    #     url: "{{ item }}"
+    #     action: enable
+    #     scope: system
+    #     # force: True
+    #     tokenGithub: "{{ tokenGithub }}"
+    #   loop:
+    #     # - https://extensions.gnome.org/extension-data/panel-date-formatatareao.es.v5.shell-extension.zip
+    #     # - https://github.com/oae/gnome-shell-minimize-to-tray
+    #     # - https://github.com/MartinPL/Tray-Icons-Reloaded
+    #     - https://extensions.gnome.org/extension-data/trayIconsReloadedselfmade.pl.v25.shell-extension.zip
+    #     # - https://github.com/darkretailer/gnome-shell-extension_maxi
+    #     # - https://extensions.gnome.org/extension-data/unblanksun.wxggmail.com.v22.shell-extension.zip
+    #   ignore_errors: True
 
     - name: "Installing and enabling Gnome Extensions..."
       gnome_extensions:
@@ -44,6 +46,7 @@
         - https://github.com/home-sweet-gnome/dash-to-panel
         - https://github.com/kgshank/gse-sound-output-device-chooser
         - https://github.com/neffo/bing-wallpaper-gnome-extension
+        - https://extensions.gnome.org/extension-data/windowIsReady_Removernunofarrucagmail.com.v18.shell-extension.zip
         - pop-shell@system76.com
       notify: Reload gnome sleep
       ignore_errors: True
@@ -76,14 +79,17 @@
     - name: "Setting Start Screen (3/3)..."
       dconf: key="/org/gnome/login-screen/banner-message-text" value="'{{ nickname }} {{ email }}'"
 
-    - name: "Set theme color (1/2)"
-      dconf: key="/org/gnome/desktop/interface/gtk-theme" value="'Yaru-prussiangreen-dark'"
+    - name: "Set theme color (1/3)"
+      dconf: key="/org/gnome/desktop/interface/gtk-theme" value="'Adwaita-dark'"
 
-    - name: "Set theme color (2/2)"
-      dconf: key="/org/gnome/desktop/interface/icon-theme" value="'Yaru-prussiangreen'"
+    - name: "Set theme color (2/3)"
+      dconf: key="/org/gnome/desktop/interface/icon-theme" value="'Adwaita'"
+
+    - name: "Set theme color (3/3)"
+      dconf: key="/org/gnome/desktop/interface/font-hinting" value="'full'"
 
     - name: "Set dark mode"
-      dconf: key="/org/gnome/shell/extensions/user-theme/name" value="'Yaru-dark'"
+      dconf: key="/org/gnome/shell/extensions/user-theme/name" value="'Adwaita-dark'"
 
     - name: "Configuring qt dark mode (1/2)..."
       file:
@@ -411,6 +417,9 @@
     # - name: "Configuring notifications (44/44)..."
     #   dconf: key="/org/gnome/desktop/notifications/application/chromium-browser/enable" value="false"
 
+    - name: Configuring pop-shell extension...
+      dconf: key="/org/gnome/shell/extensions/pop-shell/show-title" value="true"
+
     - name: Configuring unblank extension (1/2)...
       dconf: key="/org/gnome/shell/extensions/unblank/time" value="0"
 
@@ -716,7 +725,7 @@
       dconf: key="/org/gnome/shell/extensions/dash-to-panel/window-preview-title-position" value="'TOP'"
 
     - name: Configuring dash-to-panel (50/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/panel-element-positions" value="'{"0":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":false,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":false,"position":"stackedBR"},{"element":"dateMenu","visible":false,"position":"stackedBR"},{"element":"systemMenu","visible":false,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}],"1":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}]}'"
+      dconf: key="/org/gnome/shell/extensions/dash-to-panel/panel-element-positions" value="'{"1":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":false,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":false,"position":"stackedBR"},{"element":"dateMenu","visible":false,"position":"stackedBR"},{"element":"systemMenu","visible":false,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}],"0":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}]}'"
 
     - name: Configuring sound-output-device-choose (1/12)...
       dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/cannot-activate-hidden-device" value="true"

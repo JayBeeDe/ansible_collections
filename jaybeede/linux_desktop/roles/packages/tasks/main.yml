@@ -60,10 +60,10 @@
       command: mv "/etc/apt/sources.list.d/download_opensuse_org_repositories_home_npreining_debian_ubuntu_onedrive_xUbuntu_22_04.list" "/etc/apt/sources.list.d/onedrive.list"
       when: not f3.stat.exists
 
-    - name: "install system updates for ubuntu systems"
-      apt:
-        upgrade: safe
-        cache_valid_time: 3600
+    # - name: "install system updates for ubuntu systems"
+    #   apt:
+    #     upgrade: safe
+    #     cache_valid_time: 3600
 
     - name: "Install some system tools..."
       apt:
