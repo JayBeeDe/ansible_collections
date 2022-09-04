@@ -48,6 +48,7 @@
         - https://github.com/neffo/bing-wallpaper-gnome-extension
         - https://extensions.gnome.org/extension-data/windowIsReady_Removernunofarrucagmail.com.v18.shell-extension.zip
         - pop-shell@system76.com
+        - https://extensions.gnome.org/extension-data/color-pickertuberry.v28.shell-extension.zip
       notify: Reload gnome sleep
       ignore_errors: True
 
@@ -285,136 +286,133 @@
     - name: "Setting Up Power settings (17/17)..."
       dconf: key="/org/gnome/desktop/screensaver/ubuntu-lock-on-suspend" value="false"
 
-    - name: "Configuring notifications (1/44)..."
+    - name: "Configuring notifications (1/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/apport-gtk/enable" value="false"
 
-    - name: "Configuring notifications (2/44)..."
+    - name: "Configuring notifications (2/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/brasero/enable" value="false"
 
-    - name: "Configuring notifications (3/44)..."
+    - name: "Configuring notifications (3/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/ca-desrt-dconf-editor/enable" value="false"
 
-    - name: "Configuring notifications (4/44)..."
+    - name: "Configuring notifications (4/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/code/enable" value="false"
 
-    - name: "Configuring notifications (5/44)..."
+    - name: "Configuring notifications (5/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/com-github-wwmm-easyeffects/enable" value="false"
 
-    - name: "Configuring notifications (6/44)..."
+    - name: "Configuring notifications (6/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/com-github-wwmm-pulseeffects/enable" value="false"
 
-    - name: "Configuring notifications (7/44)..."
+    - name: "Configuring notifications (7/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/firefox/enable" value="false"
 
-    - name: "Configuring notifications (8/44)..."
+    - name: "Configuring notifications (8/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/flameshot/enable" value="false"
 
-    - name: "Configuring notifications (9/44)..."
+    - name: "Configuring notifications (9/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/gnome-color-panel/enable" value="false"
 
-    - name: "Configuring notifications (10/44)..."
+    - name: "Configuring notifications (10/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/gnome-control-center/enable" value="false"
 
-    - name: "Configuring notifications (11/44)..."
+    - name: "Configuring notifications (11/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/gnome-power-panel/enable" value="false"
 
-    - name: "Configuring notifications (12/44)..."
+    - name: "Configuring notifications (12/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/gnome-printers-panel/enable" value="false"
 
-    - name: "Configuring notifications (13/44)..."
-      dconf: key="/org/gnome/desktop/notifications/application/gpick/enable" value="false"
-
-    - name: "Configuring notifications (14/44)..."
+    - name: "Configuring notifications (13/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/io-elementary-appcenter/enable" value="false"
 
-    - name: "Configuring notifications (15/44)..."
+    - name: "Configuring notifications (14/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/libreoffice-calc/enable" value="false"
 
-    - name: "Configuring notifications (16/44)..."
+    - name: "Configuring notifications (15/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/libreoffice-writer/enable" value="false"
 
-    - name: "Configuring notifications (17/44)..."
+    - name: "Configuring notifications (16/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/nemo/enable" value="false"
 
-    - name: "Configuring notifications (18/44)..."
+    - name: "Configuring notifications (17/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/nm-applet/enable" value="false"
 
-    - name: "Configuring notifications (19/44)..."
+    - name: "Configuring notifications (18/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-flameshot-flameshot/enable" value="false"
 
-    - name: "Configuring notifications (20/44)..."
+    - name: "Configuring notifications (19/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-gnome-baobab/enable" value="false"
 
-    - name: "Configuring notifications (21/44)..."
+    - name: "Configuring notifications (20/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-gnome-eog/enable" value="false"
 
-    - name: "Configuring notifications (22/44)..."
+    - name: "Configuring notifications (21/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-gnome-evince/enable" value="false"
 
-    - name: "Configuring notifications (23/44)..."
+    - name: "Configuring notifications (22/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-gnome-fileroller/enable" value="false"
 
-    - name: "Configuring notifications (24/44)..."
+    - name: "Configuring notifications (23/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-gnome-geary/enable" value="false"
 
-    - name: "Configuring notifications (25/44)..."
+    - name: "Configuring notifications (24/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-gnome-gedit/enable" value="false"
 
-    - name: "Configuring notifications (26/44)..."
+    - name: "Configuring notifications (25/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-gnome-nautilus/enable" value="false"
 
-    - name: "Configuring notifications (27/44)..."
+    - name: "Configuring notifications (26/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-gnome-seahorse-application/enable" value="false"
 
-    - name: "Configuring notifications (28/44)..."
+    - name: "Configuring notifications (29/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-gnome-totem/enable" value="false"
 
-    - name: "Configuring notifications (29/44)..."
+    - name: "Configuring notifications (28/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-gnome-tweaks/enable" value="false"
 
-    - name: "Configuring notifications (30/44)..."
+    - name: "Configuring notifications (29/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-kde-krita/enable" value="false"
 
-    - name: "Configuring notifications (31/44)..."
+    - name: "Configuring notifications (30/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-keepassxc-keepassxc/enable" value="false"
 
-    - name: "Configuring notifications (32/44)..."
+    - name: "Configuring notifications (31/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-midori-browser-midori/enable" value="false"
 
-    - name: "Configuring notifications (33/44)..."
+    - name: "Configuring notifications (32/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-pop-os-transition/enable" value="false"
 
-    - name: "Configuring notifications (34/44)..."
+    - name: "Configuring notifications (33/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/org-remmina-remmina/enable" value="false"
 
-    - name: "Configuring notifications (35/44)..."
+    - name: "Configuring notifications (34/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/p3x-onenote-p3x-onenote/enable" value="false"
 
-    - name: "Configuring notifications (36/44)..."
+    - name: "Configuring notifications (35/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/snap-store-ubuntu-software/enable" value="false"
 
-    - name: "Configuring notifications (37/44)..."
+    - name: "Configuring notifications (36/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/terminator/enable" value="false"
 
-    - name: "Configuring notifications (38/44)..."
+    - name: "Configuring notifications (37/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/timeshift-gtk/enable" value="false"
 
-    - name: "Configuring notifications (39/44)..."
+    - name: "Configuring notifications (38/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/update-manager/enable" value="false"
 
-    - name: "Configuring notifications (40/44)..."
+    - name: "Configuring notifications (39/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/vino-server/enable" value="false"
 
-    - name: "Configuring notifications (41/44)..."
+    - name: "Configuring notifications (40/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/virt-manager/enable" value="false"
 
-    - name: "Configuring notifications (42/44)..."
+    - name: "Configuring notifications (41/43)..."
       dconf: key="/org/gnome/desktop/notifications/application/vlc/enable" value="false"
 
-    # - name: "Configuring notifications (43/44)..."
+    # - name: "Configuring notifications (42/43)..."
     #   dconf: key="/org/gnome/desktop/notifications/application/chromium-chromium/enable" value="false"
 
-    # - name: "Configuring notifications (44/44)..."
+    # - name: "Configuring notifications (43/43)..."
     #   dconf: key="/org/gnome/desktop/notifications/application/chromium-browser/enable" value="false"
 
     - name: Configuring pop-shell extension...
@@ -768,6 +766,15 @@
 
     - name: Configuring maxi (2/2)...
       dconf: key="/org/gnome/shell/extensions/maxi/vertical" value="true"
+
+    - name: Configuring color-picker (1/3)...
+      dconf: key="/org/gnome/shell/extensions/color-picker/enable-shortcut" value="true"
+
+    - name: Configuring color-picker (2/3)...
+      dconf: key="/org/gnome/shell/extensions/color-picker/enable-systray" value="false"
+
+    - name: Configuring color-picker (3/3)...
+      dconf: key="/org/gnome/shell/extensions/color-picker/notify-style" value="uint32 1"
 
     - name: Disabling dock-panel...
       dconf: key="/org/gnome/shell/extensions/dash-to-dock" value="true"

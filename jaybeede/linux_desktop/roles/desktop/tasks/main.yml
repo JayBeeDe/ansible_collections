@@ -2,10 +2,10 @@
 
 - block:
     - name: "Configuring arc-menu shortcuts..."
-      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Google Chrome', 'google-chrome', 'google-chrome.desktop', 'Fichiers', 'folder', 'nemo.desktop', 'Visual Studio Code', '', 'code.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'P3X OneNote', '', 'p3x-onenote_p3x-onenote.desktop', 'Skype', '', 'skype_skypeforlinux.desktop', 'Gpick', 'gpick', 'gpick.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'PulseEffects', 'pulseeffects', 'com.github.wwmm.pulseeffects.desktop']"
+      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Google Chrome', 'google-chrome', 'google-chrome.desktop', 'Fichiers', 'folder', 'nemo.desktop', 'Visual Studio Code', '', 'code.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'P3X OneNote', '', 'p3x-onenote_p3x-onenote.desktop', 'Skype', '', 'skype_skypeforlinux.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'PulseEffects', 'pulseeffects', 'com.github.wwmm.pulseeffects.desktop']"
 
     - name: "Configuring gnome bookmarks..."
-      dconf: key="/org/gnome/shell/favorite-apps" value="['google-chrome.desktop', 'nemo.desktop', 'code.desktop', 'vlc.desktop', 'connectWindows.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'p3x-onenote_p3x-onenote.desktop', 'skype_skypeforlinux.desktop', 'gpick.desktop', 'simple-scan.desktop', 'com.github.wwmm.pulseeffects.desktop', 'pavucontrol.desktop']"
+      dconf: key="/org/gnome/shell/favorite-apps" value="['google-chrome.desktop', 'nemo.desktop', 'code.desktop', 'vlc.desktop', 'connectWindows.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'p3x-onenote_p3x-onenote.desktop', 'skype_skypeforlinux.desktop', 'simple-scan.desktop', 'com.github.wwmm.pulseeffects.desktop', 'pavucontrol.desktop']"
     - name: "Configuring evolution desktop shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/org.gnome.Evolution.desktop"
