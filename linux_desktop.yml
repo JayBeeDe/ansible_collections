@@ -6,8 +6,8 @@
     - include_role:
         name: "{{ item }}"
       loop:
-        - packages
-        - system
-        - applications
-        - desktop
+        # - packages
+        # - system
+        # - applications
+        # - desktop
         - gnome

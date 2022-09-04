@@ -1,28 +1,28 @@
 ---
 - block:
-    - name: "Setting Start Screen (1/4)..."
+    - name: Setting Start Screen...
       copy:
         src: "{{ role_path }}/files/favicon.png"
         dest: /usr/share/plymouth/custom.png
-        mode: "0644"
-        owner: "root"
-        group: "root"
+        mode: 0644
+        owner: root
+        group: root
 
-    - name: "Preparing gnome extension environment..."
+    - name: Preparing gnome extension environment...
       file:
-        path: "/usr/share/gnome-shell/extensions/"
-        mode: "0777"
-        owner: "root"
-        group: "root"
+        path: /usr/share/gnome-shell/extensions/
+        mode: 0777
+        owner: root
+        group: root
         recurse: yes
 
   become: yes
-  become_user: "root"
+  become_user: root
 
 - block:
-    # - name: "Installing and enabling Gnome Extensions (forcing mode)..."
+    # - name: Installing and enabling Gnome Extensions (forcing mode)...
     #   gnome_extensions:
-    #     url: "{{ item }}"
+    #     url: "{{ extension_item }}"
     #     action: enable
     #     scope: system
     #     # force: True
@@ -35,10 +35,12 @@
     #     # - https://github.com/darkretailer/gnome-shell-extension_maxi
     #     # - https://extensions.gnome.org/extension-data/unblanksun.wxggmail.com.v22.shell-extension.zip
     #   ignore_errors: True
+    # loop_control:
+    #   loop_var: extension_item
 
-    - name: "Installing and enabling Gnome Extensions..."
+    - name: Installing and enabling Gnome Extensions...
       gnome_extensions:
-        url: "{{ item }}"
+        url: "{{ extension_item }}"
         action: enable
         scope: system
         tokenGithub: "{{ tokenGithub }}"
@@ -51,10 +53,12 @@
         - https://extensions.gnome.org/extension-data/color-pickertuberry.v28.shell-extension.zip
       notify: Reload gnome sleep
       ignore_errors: True
+      loop_control:
+        loop_var: extension_item
 
     - meta: flush_handlers
 
-    - name: "Installing and enabling Arc-menu Extension..."
+    - name: Installing and enabling Arc-menu Extension...
       gnome_extensions:
         url: https://gitlab.com/arcmenu/ArcMenu
         action: enable
@@ -64,163 +68,149 @@
       ignore_errors: True
       register: arcMenu
 
-    - name: "Patching arc menu gnome extension..."
+    - name: Patching arc menu gnome extension...
       command: glib-compile-schemas /usr/share/gnome-shell/extensions/arcmenu@arcmenu.com/schemas/
       notify: Reload gnome
       when: arcMenu.changed
 
     - meta: flush_handlers
 
-    - name: "Setting Start Screen (1/3)..."
-      dconf: key="/org/gnome/login-screen/logo" value="'/usr/share/plymouth/custom.png'"
+    - name: Setting Start Screen...
+      dconf: key="/org/gnome/login-screen/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: logo, value: "'/usr/share/plymouth/custom.png'" }
+        - { key: banner-message-enable, value: "true" }
+        - { key: banner-message-text, value: "'{{ nickname }} {{ email }}'" }
+      loop_control:
+        loop_var: line_item
 
-    - name: "Setting Start Screen (2/3)..."
-      dconf: key="/org/gnome/login-screen/banner-message-enable" value="true"
+    - name: Setting theme color...
+      dconf: key="/org/gnome/desktop/interface/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: gtk-theme, value: "'Adwaita-dark'" }
+        - { key: icon-theme, value: "'Adwaita'" }
+        - { key: font-hinting, value: "'full'" }
+      loop_control:
+        loop_var: line_item
 
-    - name: "Setting Start Screen (3/3)..."
-      dconf: key="/org/gnome/login-screen/banner-message-text" value="'{{ nickname }} {{ email }}'"
-
-    - name: "Set theme color (1/3)"
-      dconf: key="/org/gnome/desktop/interface/gtk-theme" value="'Adwaita-dark'"
-
-    - name: "Set theme color (2/3)"
-      dconf: key="/org/gnome/desktop/interface/icon-theme" value="'Adwaita'"
-
-    - name: "Set theme color (3/3)"
-      dconf: key="/org/gnome/desktop/interface/font-hinting" value="'full'"
-
-    - name: "Set dark mode"
+    - name: Set dark mode
       dconf: key="/org/gnome/shell/extensions/user-theme/name" value="'Adwaita-dark'"
 
-    - name: "Configuring qt dark mode (1/2)..."
+    - name: Configuring qt dark mode (1/2)...
       file:
         path: "{{ home }}/.config/qt5ct/"
         state: directory
-        mode: "0755"
+        mode: 0755
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring qt dark mode (2/2)..."
+    - name: Configuring qt dark mode (2/2)...
       copy:
         src: "{{ role_path }}/files/qt5ct.ini"
         dest: "{{ home }}/.config/qt5ct/qt5ct.conf"
-        mode: "0600"
+        mode: 0600
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring gtk dark mode (1/4)..."
+    - name: Configuring gtk dark mode (1/4)...
       file:
         path: "{{ home }}/.config/gtk-3.0/"
         state: directory
-        mode: "0755"
+        mode: 0755
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring gtk dark mode (2/4)..."
+    - name: Configuring gtk dark mode (2/4)...
       file:
         path: "{{ home }}/.config/gtk-4.0/"
         state: directory
-        mode: "0755"
+        mode: 0755
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring gtk dark mode (3/4)..."
+    - name: Configuring gtk dark mode (3/4)...
       copy:
         src: "{{ role_path }}/files/gtk-3.0.ini"
         dest: "{{ home }}/.config/gtk-3.0/settings.ini"
-        mode: "0664"
+        mode: 0664
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring gtk dark mode (4/4)..."
+    - name: Configuring gtk dark mode (4/4)...
       copy:
         src: "{{ role_path }}/files/gtk-4.0.ini"
         dest: "{{ home }}/.config/gtk-4.0/settings.ini"
-        mode: "0664"
+        mode: 0664
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Setting night light (1/4)"
-      dconf: key="/org/gnome/settings-daemon/plugins/color/night-light-schedule-automatic" value="false"
+    - name: Setting night light...
+      dconf: key="/org/gnome/settings-daemon/plugins/color/night-light-{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: schedule-automatic, value: "false" }
+        - { key: temperature, value: "4000" }
+        - { key: schedule-from, value: "3.0" }
+        - { key: schedule-to, value: "3.0" }
+        - { key: enabled, value: "true" }
+      loop_control:
+        loop_var: line_item
 
-    - name: "Setting night light (2/4)"
-      dconf: key="/org/gnome/settings-daemon/plugins/color/night-light-temperature" value="4000"
-
-    - name: "Setting night light (3/4)"
-      dconf: key="/org/gnome/settings-daemon/plugins/color/night-light-schedule-from" value="3.1"
-      changed_when: false
-
-    - name: "Setting night light (4/4)"
-      dconf: key="/org/gnome/settings-daemon/plugins/color/night-light-schedule-to" value="3.0"
-
-    - name: "Activating night light"
-      dconf: key="/org/gnome/settings-daemon/plugins/color/night-light-enabled" value="true"
-
-    - name: "Configuring zoom factor"
+    - name: Configuring zoom factor
       dconf: key="/org/gnome/desktop/wm/preferences/button-layout" value="'appmenu:minimize,maximize,close'"
 
-    - name: "Configuring Terminator as default system terminal (1/2)..."
+    - name: Configuring Terminator as default system terminal (1/2)...
       dconf: key="/org/gnome/desktop/applications/terminal/exec" value="'/usr/bin/terminator'"
 
-    - name: "Configuring Terminator as default system terminal (2/2)..."
+    - name: Configuring Terminator as default system terminal (2/2)...
       dconf: key="/org/gnome/desktop/applications/terminal/exec-arg" value="'-x'"
 
-    - name: "Disabling autorun USB..."
+    - name: Disabling autorun USB...
       dconf: key="/org/gnome/desktop/media-handling/autorun-never" value="true"
 
-    - name: "Setting Up Evince PDF (1/5)..."
-      dconf: key="/org/gnome/evince/page-cache-size" value="uint32 1024"
+    - name: Setting Up Evince PDF...
+      dconf: key="/org/gnome/evince/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: page-cache-size, value: "uint32 1024" }
+        - { key: default/continuous, value: "true" }
+        - { key: default/dual-page, value: "true" }
+        - { key: default/sizing-mode, value: "'fit-width'" }
+        - { key: default/show-sidebar, value: "false" }
+      loop_control:
+        loop_var: line_item
 
-    - name: "Setting Up Evince PDF (2/5)..."
-      dconf: key="/org/gnome/evince/default/continuous" value="true"
-
-    - name: "Setting Up Evince PDF (3/5)..."
-      dconf: key="/org/gnome/evince/default/dual-page" value="true"
-
-    - name: "Setting Up Evince PDF (4/5)..."
-      dconf: key="/org/gnome/evince/default/sizing-mode" value="'fit-width'"
-
-    - name: "Setting Up Evince PDF (4/5)..."
-      dconf: key="/org/gnome/evince/default/show-sidebar" value="false"
-
-    - name: "Setting nemo as default file manager (1/3)..."
+    - name: Setting nemo as default file manager (1/2)...
       command: xdg-mime default nemo.desktop inode/directory application/x-gnome-saved-search
       changed_when: false
 
-    - name: "Setting nemo as default file manager (2/3)..."
+    - name: Setting nemo as default file manager (2/2)...
       dconf: key="/org/gnome/desktop/background/show-desktop-icons" value="false"
 
-    - name: "Setting nemo as default file manager (3/3)..."
-      dconf: key="/org/nemo/desktop/show-desktop-icons" value="true"
+    - name: Setting up nemo...
+      dconf: key="/org/nemo/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: desktop/show-desktop-icons, value: "true" }
+        - { key: preferences/default-folder-viewer, value: "'compact-view'" }
+        - { key: preferences/date-format, value: "'iso'" }
+        - { key: preferences/show-computer-icon-toolbar, value: "true" }
+        - { key: preferences/show-new-folder-icon-toolbar, value: "true" }
+        - { key: preferences/show-reload-icon-toolbar, value: "true" }
+        - {
+            key: plugins/disabled-actions,
+            value: "['set-as-background.nemo_action', 'change-background.nemo_action', 'add-desklets.nemo_action', 'send-by-mail.nemo_action']",
+          }
+      loop_control:
+        loop_var: line_item
 
-    - name: "Setting up nemo (1/6)..."
-      dconf: key="/org/nemo/preferences/default-folder-viewer" value="'compact-view'"
-
-    - name: "Setting up nemo (2/6)..."
-      dconf: key="/org/nemo/preferences/date-format" value="'iso'"
-
-    - name: "Setting up nemo (3/6)..."
-      dconf: key="/org/nemo/preferences/show-computer-icon-toolbar" value="true"
-
-    - name: "Setting up nemo (4/6)..."
-      dconf: key="/org/nemo/preferences/show-new-folder-icon-toolbar" value="true"
-
-    - name: "Setting up nemo (5/6)..."
-      dconf: key="/org/nemo/preferences/show-reload-icon-toolbar" value="true"
-
-    - name: "Setting up nemo (6/6)..."
-      dconf: key="/org/nemo/plugins/disabled-actions" value="['set-as-background.nemo_action', 'change-background.nemo_action', 'add-desklets.nemo_action', 'send-by-mail.nemo_action']"
-
-    - name: "Configuring V & H scrollbars width (1/2)..."
+    - name: Configuring V & H scrollbars width (1/2)...
       file:
         path: "{{ home }}/.config/gtk-3.0/gtk.css"
         state: touch
-        mode: "0755"
+        mode: 0755
         owner: "{{ user }}"
         group: "{{ user }}"
       changed_when: false
 
-    - name: "Configuring V & H scrollbars width (2/2)..."
+    - name: Configuring V & H scrollbars width (2/2)...
       blockinfile:
         path: "{{ home }}/.config/gtk-3.0/gtk.css"
         marker: "/* {mark} ANSIBLE MANAGED BLOCK*/"
@@ -235,546 +225,280 @@
           min-height: 15px;
           }
 
-    - name: "Setting Up Power settings (1/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/button-hibernate" value="'nothing'"
+    - name: Setting Up Power settings
+      dconf: key="/org/gnome/settings-daemon/plugins/power/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: button-hibernate, value: "'nothing'" }
+        - { key: button-power, value: "'shutdown'" }
+        - { key: button-sleep, value: "'suspend'" }
+        - { key: button-suspend, value: "'suspend'" }
+        - { key: idle-dim, value: "false" }
+        - { key: lid-close-ac-action, value: "'nothing'" }
+        - { key: lid-close-battery-action, value: "'nothing'" }
+        - { key: power-button-action, value: "'nothing'" }
+        - { key: sleep-inactive-ac-timeout, value: "300" }
+        - { key: sleep-inactive-ac-type, value: "'nothing'" }
+        - { key: sleep-inactive-battery-timeout, value: "300" }
+        - { key: sleep-inactive-battery-type, value: "'suspend'" }
+      loop_control:
+        loop_var: line_item
 
-    - name: "Setting Up Power settings (2/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/button-power" value="'shutdown'"
-
-    - name: "Setting Up Power settings (3/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/button-sleep" value="'suspend'"
-
-    - name: "Setting Up Power settings (4/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/button-suspend" value="'suspend'"
-
-    - name: "Setting Up Power settings (5/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/idle-dim" value="false"
-
-    - name: "Setting Up Power settings (6/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/lid-close-ac-action" value="'nothing'"
-
-    - name: "Setting Up Power settings (7/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/lid-close-battery-action" value="'nothing'"
-
-    - name: "Setting Up Power settings (8/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/power-button-action" value="'nothing'"
-
-    - name: "Setting Up Power settings (9/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-timeout" value="300"
-
-    - name: "Setting Up Power settings (10/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type" value="'nothing'"
-
-    - name: "Setting Up Power settings (11/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/sleep-inactive-battery-timeout" value="300"
-
-    - name: "Setting Up Power settings (12/17)..."
-      dconf: key="/org/gnome/settings-daemon/plugins/power/sleep-inactive-battery-type" value="'suspend'"
-
-    - name: "Setting Up Power settings (13/17)..."
+    - name: Setting Up Session settings...
       dconf: key="/org/gnome/desktop/session/idle-delay" value="uint32 0"
 
-    - name: "Setting Up Power settings (14/17)..."
-      dconf: key="/org/gnome/desktop/screensaver/lock-delay" value="uint32 0"
+    - name: Setting Up Screensaver settings
+      dconf: key="/org/gnome/desktop/screensaver/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: lock-delay, value: "uint32 0" }
+        - { key: lock-enabled, value: "false" }
+        - { key: logout-enabled, value: "false" }
+        - { key: ubuntu-lock-on-suspend, value: "false" }
+      loop_control:
+        loop_var: line_item
 
-    - name: "Setting Up Power settings (15/17)..."
-      dconf: key="/org/gnome/desktop/screensaver/lock-enabled" value="false"
-
-    - name: "Setting Up Power settings (16/17)..."
-      dconf: key="/org/gnome/desktop/screensaver/logout-enabled" value="false"
-
-    - name: "Setting Up Power settings (17/17)..."
-      dconf: key="/org/gnome/desktop/screensaver/ubuntu-lock-on-suspend" value="false"
-
-    - name: "Configuring notifications (1/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/apport-gtk/enable" value="false"
-
-    - name: "Configuring notifications (2/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/brasero/enable" value="false"
-
-    - name: "Configuring notifications (3/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/ca-desrt-dconf-editor/enable" value="false"
-
-    - name: "Configuring notifications (4/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/code/enable" value="false"
-
-    - name: "Configuring notifications (5/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/com-github-wwmm-easyeffects/enable" value="false"
-
-    - name: "Configuring notifications (6/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/com-github-wwmm-pulseeffects/enable" value="false"
-
-    - name: "Configuring notifications (7/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/firefox/enable" value="false"
-
-    - name: "Configuring notifications (8/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/flameshot/enable" value="false"
-
-    - name: "Configuring notifications (9/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/gnome-color-panel/enable" value="false"
-
-    - name: "Configuring notifications (10/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/gnome-control-center/enable" value="false"
-
-    - name: "Configuring notifications (11/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/gnome-power-panel/enable" value="false"
-
-    - name: "Configuring notifications (12/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/gnome-printers-panel/enable" value="false"
-
-    - name: "Configuring notifications (13/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/io-elementary-appcenter/enable" value="false"
-
-    - name: "Configuring notifications (14/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/libreoffice-calc/enable" value="false"
-
-    - name: "Configuring notifications (15/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/libreoffice-writer/enable" value="false"
-
-    - name: "Configuring notifications (16/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/nemo/enable" value="false"
-
-    - name: "Configuring notifications (17/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/nm-applet/enable" value="false"
-
-    - name: "Configuring notifications (18/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-flameshot-flameshot/enable" value="false"
-
-    - name: "Configuring notifications (19/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-gnome-baobab/enable" value="false"
-
-    - name: "Configuring notifications (20/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-gnome-eog/enable" value="false"
-
-    - name: "Configuring notifications (21/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-gnome-evince/enable" value="false"
-
-    - name: "Configuring notifications (22/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-gnome-fileroller/enable" value="false"
-
-    - name: "Configuring notifications (23/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-gnome-geary/enable" value="false"
-
-    - name: "Configuring notifications (24/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-gnome-gedit/enable" value="false"
-
-    - name: "Configuring notifications (25/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-gnome-nautilus/enable" value="false"
-
-    - name: "Configuring notifications (26/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-gnome-seahorse-application/enable" value="false"
-
-    - name: "Configuring notifications (29/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-gnome-totem/enable" value="false"
-
-    - name: "Configuring notifications (28/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-gnome-tweaks/enable" value="false"
-
-    - name: "Configuring notifications (29/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-kde-krita/enable" value="false"
-
-    - name: "Configuring notifications (30/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-keepassxc-keepassxc/enable" value="false"
-
-    - name: "Configuring notifications (31/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-midori-browser-midori/enable" value="false"
-
-    - name: "Configuring notifications (32/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-pop-os-transition/enable" value="false"
-
-    - name: "Configuring notifications (33/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/org-remmina-remmina/enable" value="false"
-
-    - name: "Configuring notifications (34/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/p3x-onenote-p3x-onenote/enable" value="false"
-
-    - name: "Configuring notifications (35/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/snap-store-ubuntu-software/enable" value="false"
-
-    - name: "Configuring notifications (36/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/terminator/enable" value="false"
-
-    - name: "Configuring notifications (37/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/timeshift-gtk/enable" value="false"
-
-    - name: "Configuring notifications (38/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/update-manager/enable" value="false"
-
-    - name: "Configuring notifications (39/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/vino-server/enable" value="false"
-
-    - name: "Configuring notifications (40/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/virt-manager/enable" value="false"
-
-    - name: "Configuring notifications (41/43)..."
-      dconf: key="/org/gnome/desktop/notifications/application/vlc/enable" value="false"
-
-    # - name: "Configuring notifications (42/43)..."
-    #   dconf: key="/org/gnome/desktop/notifications/application/chromium-chromium/enable" value="false"
-
-    # - name: "Configuring notifications (43/43)..."
-    #   dconf: key="/org/gnome/desktop/notifications/application/chromium-browser/enable" value="false"
+    - name: Configuring notifications...
+      dconf: key="/org/gnome/desktop/notifications/application/{{ notification_item }}/enable" value="false"
+      loop:
+        - apport-gtk
+        - brasero
+        - ca-desrt-dconf-editor
+        - code
+        - com-github-wwmm-easyeffects
+        - com-github-wwmm-pulseeffects
+        - firefox
+        - flameshot
+        - gnome-color-panel
+        - gnome-control-center
+        - gnome-power-panel
+        - gnome-printers-panel
+        - io-elementary-appcenter
+        - libreoffice-calc
+        - libreoffice-writer
+        - nemo
+        - nm-applet
+        - org-flameshot-flameshot
+        - org-gnome-baobab
+        - org-gnome-eog
+        - org-gnome-evince
+        - org-gnome-fileroller
+        - org-gnome-geary
+        - org-gnome-gedit
+        - org-gnome-nautilus
+        - org-gnome-seahorse-application
+        - org-gnome-totem
+        - org-gnome-tweaks
+        - org-kde-krita
+        - org-keepassxc-keepassxc
+        - org-midori-browser-midori
+        - org-pop-os-transition
+        - org-remmina-remmina
+        - p3x-onenote-p3x-onenote
+        - snap-store-ubuntu-software
+        - terminator
+        - timeshift-gtk
+        - update-manager
+        - vino-server
+        - virt-manager
+        - vlc
+        # - chromium-chromium
+        # - chromium-browser
+      loop_control:
+        loop_var: notification_item
 
     - name: Configuring pop-shell extension...
       dconf: key="/org/gnome/shell/extensions/pop-shell/show-title" value="true"
 
-    - name: Configuring unblank extension (1/2)...
-      dconf: key="/org/gnome/shell/extensions/unblank/time" value="0"
-
-    - name: Configuring unblank extension (2/2)...
-      dconf: key="/org/gnome/shell/extensions/unblank/power" value="false"
+    - name: Configuring unblank extension...
+      dconf: key="/org/gnome/shell/extensions/unblank/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: time, value: "0" }
+        - { key: power, value: "false" }
+      loop_control:
+        loop_var: line_item
 
     - name: Configuring Panel Date Format extension...
       dconf: key="/org/gnome/shell/extensions/panel-date-format/format" value="'%Y-%m-%d %H:%M:%S'"
 
-    - name: "Configuring minimize-to-tray extension..."
+    - name: Configuring minimize-to-tray extension...
       dconf: key="/org/gnome/shell/extensions/minimize-to-tray/mtt-data" value="{{ mttdata }}"
 
-    - name: Configuring bingwallpaper (1/7)...
-      dconf: key="/org/gnome/shell/extensions/bingwallpaper/resolution" value="'1920x1080'"
+    - name: Configuring bingwallpaper...
+      dconf: key="/org/gnome/shell/extensions/bingwallpaper/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: time, value: "0" }
+        - { key: resolution, value: "'1920x1080'" }
+        - { key: set-lock-screen, value: "true" }
+        - { key: set-background, value: "true" }
+        - { key: market, value: "'fr-FR'" }
+        - { key: hide, value: "true" }
+        - { key: previous-days, value: "1" }
+        - { key: delete-previous, value: "false" }
+      loop_control:
+        loop_var: line_item
 
-    - name: Configuring bingwallpaper (2/7)...
-      dconf: key="/org/gnome/shell/extensions/bingwallpaper/set-lock-screen" value="true"
-
-    - name: Configuring bingwallpaper (3/7)...
-      dconf: key="/org/gnome/shell/extensions/bingwallpaper/set-background" value="true"
-
-    - name: Configuring bingwallpaper (4/7)...
-      dconf: key="/org/gnome/shell/extensions/bingwallpaper/market" value="'fr-FR'"
-
-    - name: Configuring bingwallpaper (5/7)...
-      dconf: key="/org/gnome/shell/extensions/bingwallpaper/hide" value="true"
-
-    - name: Configuring bingwallpaper (6/7)...
-      dconf: key="/org/gnome/shell/extensions/bingwallpaper/previous-days" value="1"
-
-    - name: Configuring bingwallpaper (7/7)...
-      dconf: key="/org/gnome/shell/extensions/bingwallpaper/delete-previous" value="false"
-
-    - name: Configuring arc-menu (1/38)...
+    - name: Configuring arc-menu (1/2)...
       copy:
-        src: "{{ role_path }}/files/favicon.png"
-        dest: "{{ home }}/.local/share/icons/favicon.png"
-        mode: "0755"
+        src: "{{ role_path }}/files/{{ png_item }}.png"
+        dest: "{{ home }}/.local/share/icons/{{ png_item }}.png"
+        mode: 0755
         owner: "{{ user }}"
         group: "{{ user }}"
-
-    - name: Configuring arc-menu (2/38)...
-      copy:
-        src: "{{ role_path }}/files/onedrive.png"
-        dest: "{{ home }}/.local/share/icons/onedrive.png"
-        mode: "0755"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-
-    - name: Configuring arc-menu (3/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/arc-menu-placement" value="'DTP'"
-
-    - name: Configuring arc-menu (4/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/avatar-style" value="'Square'"
-
-    - name: Configuring arc-menu (5/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/border-color" value="'rgb(46,52,54)'"
-
-    - name: Configuring arc-menu (6/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/custom-menu-button-icon" value="'{{ home }}/.local/share/icons/favicon.png'"
-
-    - name: Configuring arc-menu (7/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/default-menu-view" value="'Pinned_Apps'"
-
-    - name: Configuring arc-menu (8/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/directory-shortcuts-list" value="[['Documents', 'ArcMenu_Documents', 'ArcMenu_Documents'], ['Downloads', 'ArcMenu_Downloads', 'ArcMenu_Downloads'], ['Pictures', 'ArcMenu_Pictures', 'ArcMenu_Pictures'], ['OneDrive', '{{ home }}/.local/share/icons/onedrive.png', '{{ home }}/OneDrive']]"
-
-    - name: Configuring arc-menu (9/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/disable-recently-installed-apps" value="true"
-
-    - name: Configuring arc-menu (10/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/disable-tooltips" value="true"
-
-    - name: Configuring arc-menu (11/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/disable-user-avatar" value="false"
-
-    - name: Configuring arc-menu (12/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/enable-custom-arc-menu" value="true"
-
-    - name: Configuring arc-menu (13/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/enable-horizontal-flip" value="false"
-
-    - name: Configuring arc-menu (14/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/enable-large-icons" value="true"
-
-    - name: Configuring arc-menu (15/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/enable-sub-menus" value="false"
-
-    - name: Configuring arc-menu (16/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/highlight-color" value="'rgb(41,50,55)'"
-
-    - name: Configuring arc-menu (17/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/highlight-foreground-color" value="'rgba(189,230,251,1)'"
-
-    - name: Configuring arc-menu (18/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/hot-corners" value="'Disabled'"
-
-    - name: Configuring arc-menu (19/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-arrow-size" value="12"
-
-    - name: Configuring arc-menu (20/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-border-size" value="1"
-
-    - name: Configuring arc-menu (21/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-button-icon" value="'Custom_Icon'"
-
-    - name: Configuring arc-menu (22/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-color" value="'rgb(48,48,48)'"
-
-    - name: Configuring arc-menu (23/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-corner-radius" value="5"
-
-    - name: Configuring arc-menu (24/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-font-size" value="11"
-
-    - name: Configuring arc-menu (25/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-foreground-color" value="'rgb(255,255,255)'"
-
-    - name: Configuring arc-menu (26/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-height" value="600"
-
-    - name: Configuring arc-menu (27/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-hotkey" value="'Super_L'"
-
-    - name: Configuring arc-menu (28/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-layout" value="'Default'"
-
-    - name: Configuring arc-menu (29/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-margin" value="24"
-
-    - name: Configuring arc-menu (30/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/menu-width" value="290"
-
-    - name: Configuring arc-menu (31/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/multi-monitor" value="true"
-
-    - name: Configuring arc-menu (32/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/override-hot-corners" value="true"
-
-    - name: Configuring arc-menu (33/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/right-panel-width" value="205"
-
-    - name: Configuring arc-menu (34/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/separator-color" value="'rgb(63,62,64)'"
-
-    - name: Configuring arc-menu (35/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/show-lock-button" value="true"
-
-    - name: Configuring arc-menu (36/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/show-logout-button" value="false"
-
-    - name: Configuring arc-menu (37/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/show-restart-button" value="false"
-
-    - name: Configuring arc-menu (38/38)...
-      dconf: key="/org/gnome/shell/extensions/arcmenu/show-suspend-button" value="true"
-
-    - name: Configuring dash-to-panel (1/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-app-switch" value="true"
-
-    - name: Configuring dash-to-panel (2/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover" value="false"
-
-    - name: Configuring dash-to-panel (3/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-convexity" value="{'RIPPLE':2.0,'PLANK':1.0,'SIMPLE':0.0}"
-
-    - name: Configuring dash-to-panel (4/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-extent" value="{'RIPPLE':4,'PLANK':4,'SIMPLE':1}"
-
-    - name: Configuring dash-to-panel (5/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-type" value="'SIMPLE'"
-
-    - name: Configuring dash-to-panel (6/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/animate-appicon-hover-animation-zoom" value="{'SIMPLE':1.0,'RIPPLE':1.25,'PLANK':1.05}"
-
-    - name: Configuring dash-to-panel (7/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/appicon-margin" value="0"
-
-    - name: Configuring dash-to-panel (8/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/appicon-padding" value="0"
-
-    - name: Configuring dash-to-panel (9/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/available-monitors" value="[0, 1]"
-
-    - name: Configuring dash-to-panel (10/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/hide-overview-on-startup" value="true"
-
-    - name: Configuring dash-to-panel (11/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/dot-color-dominant" value="false"
-
-    - name: Configuring dash-to-panel (12/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/dot-color-override" value="false"
-
-    - name: Configuring dash-to-panel (13/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/dot-position" value="'TOP'"
-
-    - name: Configuring dash-to-panel (14/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/dot-size" value="2"
-
-    - name: Configuring dash-to-panel (15/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/dot-style-focused" value="'METRO'"
-
-    - name: Configuring dash-to-panel (16/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/dot-style-unfocused" value="'METRO'"
-
-    - name: Configuring dash-to-panel (17/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/focus-highlight" value="true"
-
-    - name: Configuring dash-to-panel (18/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/focus-highlight-dominant" value="true"
-
-    - name: Configuring dash-to-panel (19/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/focus-highlight-opacity" value="20"
-
-    - name: Configuring dash-to-panel (20/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/group-apps" value="false"
-
-    - name: Configuring dash-to-panel (21/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/group-apps-underline-unfocused" value="false"
-
-    - name: Configuring dash-to-panel (22/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/group-apps-use-fixed-width" value="true"
-
-    - name: Configuring dash-to-panel (23/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/group-apps-use-launchers" value="true"
-
-    - name: Configuring dash-to-panel (24/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/hot-keys" value="false"
-
-    - name: Configuring dash-to-panel (25/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/hotkeys-overlay-combo" value="'TEMPORARILY'"
-
-    - name: Configuring dash-to-panel (26/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/isolate-monitors" value="true"
-
-    - name: Configuring dash-to-panel (27/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/isolate-workspaces" value="true"
-
-    - name: Configuring dash-to-panel (28/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/leftbox-padding" value="-1"
-
-    - name: Configuring dash-to-panel (29/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/leftbox-size" value="0"
-
-    - name: Configuring dash-to-panel (30/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/middle-click-action" value="'LAUNCH'"
-
-    - name: Configuring dash-to-panel (31/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/multi-monitors" value="true"
-
-    - name: Configuring dash-to-panel (32/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/panel-anchors" value="'{"0":"MIDDLE","1":"MIDDLE"}'"
-
-    - name: Configuring dash-to-panel (33/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/panel-element-positions-monitors-sync" value="false"
-
-    - name: Configuring dash-to-panel (34/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/panel-lengths" value="'{"0":100,"1":100}'"
-
-    - name: Configuring dash-to-panel (35/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/panel-positions" value="'{"0":"TOP","1":"TOP"}'"
-
-    - name: Configuring dash-to-panel (36/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/panel-sizes" value="'{"0":32,"1":32}'"
-
-    - name: Configuring dash-to-panel (37/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/shift-click-action" value="'MINIMIZE'"
-
-    - name: Configuring dash-to-panel (38/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/shift-middle-click-action" value="'LAUNCH'"
-
-    - name: Configuring dash-to-panel (39/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/shortcut-previews" value="false"
-
-    - name: Configuring dash-to-panel (40/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/show-appmenu" value="false"
-
-    - name: Configuring dash-to-panel (41/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/show-apps-icon-file" value="''"
-
-    - name: Configuring dash-to-panel (42/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/show-favorites-all-monitors" value="true"
-
-    - name: Configuring dash-to-panel (43/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/status-icon-padding" value="-1"
-
-    - name: Configuring dash-to-panel (44/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/stockgs-keep-dash" value="false"
-
-    - name: Configuring dash-to-panel (45/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/trans-use-custom-bg" value="false"
-
-    - name: Configuring dash-to-panel (46/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/trans-use-custom-gradient" value="false"
-
-    - name: Configuring dash-to-panel (47/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/tray-padding" value="-1"
-
-    - name: Configuring dash-to-panel (48/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/tray-size" value="16"
-
-    - name: Configuring dash-to-panel (49/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/window-preview-title-position" value="'TOP'"
-
-    - name: Configuring dash-to-panel (50/50)...
-      dconf: key="/org/gnome/shell/extensions/dash-to-panel/panel-element-positions" value="'{"1":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":false,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":false,"position":"stackedBR"},{"element":"dateMenu","visible":false,"position":"stackedBR"},{"element":"systemMenu","visible":false,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}],"0":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}]}'"
-
-    - name: Configuring sound-output-device-choose (1/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/cannot-activate-hidden-device" value="true"
-
-    - name: Configuring sound-output-device-choose (2/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/expand-volume-menu" value="true"
-
-    - name: Configuring sound-output-device-choose (3/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/hide-menu-icons" value="false"
-
-    - name: Configuring sound-output-device-choose (4/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/hide-on-single-device" value="false"
-
-    - name: Configuring sound-output-device-choose (5/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/icon-theme" value="'monochrome'"
-
-    - name: Configuring sound-output-device-choose (6/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/new-profile-identification" value="false"
-
-    - name: Configuring sound-output-device-choose (7/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/omit-device-origins" value="false"
-
-    - name: Configuring sound-output-device-choose (8/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/show-input-devices" value="true"
-
-    - name: Configuring sound-output-device-choose (9/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/show-input-slider" value="true"
-
-    - name: Configuring sound-output-device-choose (10/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/show-output-devices" value="true"
-
-    - name: Configuring sound-output-device-choose (11/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/show-profiles" value="false"
-
-    - name: Configuring sound-output-device-choose (12/12)...
-      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/enable-log" value="false"
-
-    - name: Configuring maxi (1/2)...
-      dconf: key="/org/gnome/shell/extensions/maxi/horizontal" value="true"
-
-    - name: Configuring maxi (2/2)...
-      dconf: key="/org/gnome/shell/extensions/maxi/vertical" value="true"
-
-    - name: Configuring color-picker (1/3)...
-      dconf: key="/org/gnome/shell/extensions/color-picker/enable-shortcut" value="true"
-
-    - name: Configuring color-picker (2/3)...
-      dconf: key="/org/gnome/shell/extensions/color-picker/enable-systray" value="false"
-
-    - name: Configuring color-picker (3/3)...
-      dconf: key="/org/gnome/shell/extensions/color-picker/notify-style" value="uint32 1"
+      loop:
+        - favicon
+        - onedrive
+      loop_control:
+        loop_var: png_item
+
+    - name: Configuring arc-menu (2/2)...
+      dconf: key="/org/gnome/shell/extensions/arcmenu/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: arc-menu-placement, value: "'DTP'" }
+        - { key: avatar-style, value: "'Square'" }
+        - { key: border-color, value: "'rgb(46,52,54)'" }
+        - {
+            key: custom-menu-button-icon,
+            value: "'{{ home }}/.local/share/icons/favicon.png'",
+          }
+        - { key: default-menu-view, value: "'Pinned_Apps'" }
+        - {
+            key: directory-shortcuts-list,
+            value: "[['Documents', 'ArcMenu_Documents', 'ArcMenu_Documents'], ['Downloads', 'ArcMenu_Downloads', 'ArcMenu_Downloads'], ['Pictures', 'ArcMenu_Pictures', 'ArcMenu_Pictures'], ['OneDrive', '{{ home }}/.local/share/icons/onedrive.png', '{{ home }}/OneDrive']]",
+          }
+        - { key: disable-recently-installed-apps, value: "true" }
+        - { key: disable-tooltips, value: "true" }
+        - { key: disable-user-avatar, value: "false" }
+        - { key: enable-custom-arc-menu, value: "true" }
+        - { key: enable-horizontal-flip, value: "false" }
+        - { key: enable-large-icons, value: "true" }
+        - { key: enable-sub-menus, value: "false" }
+        - { key: highlight-color, value: "'rgb(41,50,55)'" }
+        - { key: highlight-foreground-color, value: "'rgba(189,230,251,1)'" }
+        - { key: hot-corners, value: "'Disabled'" }
+        - { key: menu-arrow-size, value: "12" }
+        - { key: menu-border-size, value: "1" }
+        - { key: menu-button-icon, value: "'Custom_Icon'" }
+        - { key: menu-color, value: "'rgb(48,48,48)'" }
+        - { key: menu-corner-radius, value: "5" }
+        - { key: menu-font-size, value: "11" }
+        - { key: menu-foreground-color, value: "'rgb(255,255,255)'" }
+        - { key: menu-height, value: "600" }
+        - { key: menu-hotkey, value: "'Super_L'" }
+        - { key: menu-layout, value: "'Default'" }
+        - { key: menu-margin, value: "24" }
+        - { key: menu-width, value: "290" }
+        - { key: multi-monitor, value: "true" }
+        - { key: override-hot-corners, value: "true" }
+        - { key: right-panel-width, value: "205" }
+        - { key: separator-color, value: "'rgb(63,62,64)'" }
+        - { key: show-lock-button, value: "true" }
+        - { key: show-logout-button, value: "false" }
+        - { key: show-restart-button, value: "false" }
+        - { key: show-suspend-button, value: "true" }
+      loop_control:
+        loop_var: line_item
+
+    - name: Configuring dash-to-panel...
+      dconf: key="/org/gnome/shell/extensions/dash-to-panel/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: animate-app-switch, value: "true" }
+        - { key: animate-appicon-hover, value: "false" }
+        - {
+            key: animate-appicon-hover-animation-convexity,
+            value: "{'RIPPLE':2.0,'PLANK':1.0,'SIMPLE':0.0}",
+          }
+        - {
+            key: animate-appicon-hover-animation-extent,
+            value: "{'RIPPLE':4,'PLANK':4,'SIMPLE':1}",
+          }
+        - { key: animate-appicon-hover-animation-type, value: "'SIMPLE'" }
+        - {
+            key: animate-appicon-hover-animation-zoom,
+            value: "{'SIMPLE':1.0,'RIPPLE':1.25,'PLANK':1.05}",
+          }
+        - { key: appicon-margin, value: "0" }
+        - { key: appicon-padding, value: "0" }
+        - { key: available-monitors, value: "[0, 1]" }
+        - { key: hide-overview-on-startup, value: "true" }
+        - { key: dot-color-dominant, value: "false" }
+        - { key: dot-color-override, value: "false" }
+        - { key: dot-position, value: "'TOP'" }
+        - { key: dot-size, value: "2" }
+        - { key: dot-style-focused, value: "'METRO'" }
+        - { key: dot-style-unfocused, value: "'METRO'" }
+        - { key: focus-highlight, value: "true" }
+        - { key: focus-highlight-dominant, value: "true" }
+        - { key: focus-highlight-opacity, value: "20" }
+        - { key: group-apps, value: "false" }
+        - { key: group-apps-underline-unfocused, value: "false" }
+        - { key: group-apps-use-fixed-width, value: "true" }
+        - { key: group-apps-use-launchers, value: "true" }
+        - { key: hot-keys, value: "false" }
+        - { key: hotkeys-overlay-combo, value: "'TEMPORARILY'" }
+        - { key: isolate-monitors, value: "true" }
+        - { key: isolate-workspaces, value: "true" }
+        - { key: leftbox-padding, value: "-1" }
+        - { key: leftbox-size, value: "0" }
+        - { key: middle-click-action, value: "'LAUNCH'" }
+        - { key: multi-monitors, value: "true" }
+        - { key: panel-anchors, value: '''{"0":"MIDDLE","1":"MIDDLE"}''' }
+        - { key: panel-element-positions-monitors-sync, value: "false" }
+        - { key: panel-lengths, value: '''{"0":100,"1":100}''' }
+        - { key: panel-positions, value: '''{"0":"TOP","1":"TOP"}''' }
+        - { key: panel-sizes, value: '''{"0":32,"1":32}''' }
+        - { key: shift-click-action, value: "'MINIMIZE'" }
+        - { key: shift-middle-click-action, value: "'LAUNCH'" }
+        - { key: shortcut-previews, value: "false" }
+        - { key: show-appmenu, value: "false" }
+        - { key: show-apps-icon-file, value: "''" }
+        - { key: show-favorites-all-monitors, value: "true" }
+        - { key: status-icon-padding, value: "-1" }
+        - { key: stockgs-keep-dash, value: "false" }
+        - { key: trans-use-custom-bg, value: "false" }
+        - { key: trans-use-custom-gradient, value: "false" }
+        - { key: tray-padding, value: "-1" }
+        - { key: tray-size, value: "16" }
+        - { key: window-preview-title-position, value: "'TOP'" }
+        - {
+            key: panel-element-positions,
+            value: '''{"1":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":false,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":false,"position":"stackedBR"},{"element":"dateMenu","visible":false,"position":"stackedBR"},{"element":"systemMenu","visible":false,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}],"0":[{"element":"showAppsButton","visible":false,"position":"stackedTL"},{"element":"activitiesButton","visible":false,"position":"stackedTL"},{"element":"leftBox","visible":true,"position":"stackedTL"},{"element":"taskbar","visible":true,"position":"stackedTL"},{"element":"centerBox","visible":false,"position":"stackedBR"},{"element":"rightBox","visible":true,"position":"stackedBR"},{"element":"dateMenu","visible":true,"position":"stackedBR"},{"element":"systemMenu","visible":true,"position":"stackedBR"},{"element":"desktopButton","visible":true,"position":"stackedBR"}]}''',
+          }
+      loop_control:
+        loop_var: line_item
+
+    - name: Configuring sound-output-device-choose...
+      dconf: key="/org/gnome/shell/extensions/sound-output-device-chooser/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: cannot-activate-hidden-device, value: "true" }
+        - { key: expand-volume-menu, value: "true" }
+        - { key: hide-menu-icons, value: "false" }
+        - { key: hide-on-single-device, value: "false" }
+        - { key: icon-theme, value: "'monochrome'" }
+        - { key: new-profile-identification, value: "false" }
+        - { key: omit-device-origins, value: "false" }
+        - { key: show-input-devices, value: "true" }
+        - { key: show-input-slider, value: "true" }
+        - { key: show-output-devices, value: "true" }
+        - { key: show-profiles, value: "false" }
+        - { key: enable-log, value: "false" }
+      loop_control:
+        loop_var: line_item
+
+    - name: Configuring maxi...
+      dconf: key="/org/gnome/shell/extensions/maxi/{{ position_item }}" value="true"
+      loop:
+        - horizontal
+        - vertical
+      loop_control:
+        loop_var: position_item
+
+    - name: Configuring color-picker...
+      dconf: key="/org/gnome/shell/extensions/color-picker/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: enable-shortcut, value: "true" }
+        - { key: enable-systray, value: "false" }
+        - { key: notify-style, value: "uint32 1" }
+      loop_control:
+        loop_var: line_item
 
     - name: Disabling dock-panel...
       dconf: key="/org/gnome/shell/extensions/dash-to-dock" value="true"
@@ -785,7 +509,7 @@
     - name: Disabling useless builtin keyboard shortcuts...
       keyboard_shortcuts:
         dynamic: true
-        name: "{{ item }}"
+        name: "{{ ks_item }}"
       loop:
         - activate-launcher
         - begin-move
@@ -870,6 +594,8 @@
         - volume-mute
         - volume-up
         - www
+      loop_control:
+        loop_var: ks_item
 
     - name: Setting Up shortcuts (1/19)...
       keyboard_shortcuts:
@@ -992,10 +718,12 @@
     - name: Re-Disabling useless builtin keyboard shortcuts...
       keyboard_shortcuts:
         dynamic: true
-        name: "{{ item }}"
+        name: "{{ ks_item }}"
       loop:
         - focus-left
         - focus-right
+      loop_control:
+        loop_var: ks_item
 
   become: yes
   become_user: "{{ user }}"
