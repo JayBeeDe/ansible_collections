@@ -153,13 +153,12 @@
           # - gir1.2-ebookcontacts
           # - gir1.2-edataserver
 
-    # - name: "Install motionbox related packages..."
-    #   apt:
-    #     pkg:
-    #     - libtorrent-dev
-    #     - libboost-all-dev
-    #     - libdvd-pkg to check interactifve !!!!!! dpkg-reconfigure libdvd-pkg interactive too
-    #     - ubuntu-restricted-extras interactifve
+    - name: "Install motionbox related packages..."
+      apt:
+        pkg:
+        - libtorrent-dev
+        - libdvd-pkg
+        - ubuntu-restricted-extras
 
     - name: "Install Desktop Applications (2/3)..."
       snap:
@@ -194,6 +193,36 @@
           - "libreoffice-l10n-{{ language }}"
           - "hyphen-{{ language }}"
           - "mythes-{{ language }}"
+
+    - name: "Logical evaluation..."
+      stat:
+        path: /opt/MotionBox/MotionBox
+      register: f
+
+    - name: Installing MotionBox (1/4)...
+      ansible.builtin.get_url:
+        url: https://s3-eu-west-1.amazonaws.com/omega.gg/get/MotionBox/MotionBox-1.8.0-0-linux64.tar.gz
+        dest: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
+        mode: 777
+      when: not f.stat.exists
+
+    - name: Extracting MotionBox (2/4)...
+      ansible.builtin.unarchive:
+        src: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
+        dest: /opt
+        mode: 775
+      when: not f.stat.exists
+
+    - name: Preparing MotionBox (3/4)...
+      ansible.builtin.file:
+        dest: /opt/MotionBox
+        src: /opt/MotionBox-1.8.0-0
+        state: link
+
+    - name: Removing MotionBox artefacts (4/4)...
+      ansible.builtin.file:
+        path: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
+        state: absent
 
     - name: "Removing some default Desktop Applications..."
       apt:

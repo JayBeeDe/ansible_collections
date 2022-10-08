@@ -73,6 +73,14 @@
         owner: "{{ user }}"
         group: "{{ user }}"
 
+    - name: "Configuring MotionBox..."
+      copy:
+        src: "{{ role_path }}/files/motionbox.png"
+        dest: "{{ home }}/.local/share/icons/motionbox.png"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
     - name: "Configuring conky (1/5)..."
       file:
         path: "{{ home }}/.conky/default/"
