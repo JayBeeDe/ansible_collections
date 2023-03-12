@@ -98,6 +98,7 @@ vault_tokenGitlab: "my vault_tokenGitlab"
 
 Node must be running ubuntu desktop and user variable must be correctly defined (in vault).<br />
 Target machine must be reachable over SSH or not if local machine.<br />
+Current user must already be configured<br />
 Partitioning is **NOT** configured by the collection.<br />
 
 Warning: All roles dependencies must be met:<br />
