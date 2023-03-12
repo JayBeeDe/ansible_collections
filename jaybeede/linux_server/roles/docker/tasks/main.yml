@@ -1,39 +1,58 @@
 ---
 - block:
-    # - name: Pulling docker images
-    #   community.docker.docker_image:
-    #     source: pull
-    #     name: "{{ item }}"
-    #   loop:
-    #     - wordpress
-    #     - etherpad/etherpad
-    #     - kanboard/kanboard
-    #     - jbd92/limesurvey:stable
-    #     - jbd92/racktables
-    #     - alpine:3.7
-    #     - guacamole/guacamole
-    #     - guacamole/guacd
-    #     - mysql:5.7
-
-    - name: Pulling docker images tmp
-      community.docker.docker_image:
-        source: pull
-        name: "jbd92/jawanndenn:2"
-        force_source: yes
+    - name: "Create mounts dir"
+      ansible.builtin.file:
+        path: "{{ mnt_path }}/{{ item }}"
+        state: directory
+        recurse: yes
+        mode: "0755"
+      loop:
+        - etherpad-db-init-mnt
+        - etherpad-ui-mnt
+        - web-proxy-mnt
 
     - name: Create a volume
       community.docker.docker_volume:
         name: "{{ item }}"
       loop:
-        - jawanndennui-vol
-        - web-proxyconf-vol
-        - web-proxydata-vol
+        - etherpad-db-vol
+        - jawanndenn-ui-vol
+
+    # related to db init <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    - name: "Logical evaluation..."
+      set_fact:
+        init_mnts:
+          - etherpad-db
+
+    - name: "Resetting all init mnt..."
+      shell: rm -fr "{{ mnt_path }}/{{ item }}-init-mnt/"*
+      with_items:
+        - "{{ init_mnts }}"
+
+    - name: Resetting init mnt (1/2)...
+      find:
+        paths: "{{ ini_path }}/{{ item }}/"
+      register: "output"
+      with_items:
+        - "{{ init_mnts }}"
+
+    - name: Resetting init mnt (2/2)...
+      when: "{{ item.files }}"
+      copy:
+        remote_src: yes
+        src: "{{ item.files[0].path }}"
+        dest: "{{ mnt_path }}/{{ item.item }}-init-mnt/init.sql"
+      with_items:
+        - "{{ output.results }}"
+
+    # related to volume init >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     - name: Running jawanndenn-ui
       community.docker.docker_container:
         detach: yes
         hostname: jawanndenn-ui
-        image: jbd92/jawanndenn:2
+        image: jbd92/jawanndenn:latest
         interactive: yes
         name: jawanndenn-ui
         recreate: yes # to check
@@ -42,19 +61,104 @@
         state: started
         tty: yes
         volumes:
-          - jawanndennui-vol:/data
+          - jawanndenn-ui-vol:/data
         env:
           urlPrefix: jawanndenn
 
-    - name: Get infos on volume
-      community.docker.docker_volume_info:
-        name: web-proxyconf-vol
-      register: webproxyconfvolpath
+    - name: Running etherpad-db
+      community.docker.docker_container:
+        detach: yes
+        hostname: etherpad-db
+        image: mysql:5.7
+        interactive: yes
+        name: etherpad-db
+        recreate: yes # to check
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        volumes:
+          - "{{ mnt_path }}/etherpad-db-init-mnt:/docker-entrypoint-initdb.d"
+          - etherpad-db-vol:/var/lib/mysql
+        env:
+          MYSQL_DATABASE: etherpaddb
+          MYSQL_USER: etherpad_user
+          MYSQL_PASSWORD: "{{ etherpaddb_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ etherpaddb_password }}"
+
+    - name: Pre-Configuring Etherpad...
+      copy:
+        src: "{{ role_path }}/files/etherpad-ui/settings.jsonc"
+        dest: "{{ mnt_path }}/etherpad-ui-mnt/settings.json"
+        mode: "0755"
+        force: no
+
+    - name: Running etherpad-ui
+      community.docker.docker_container:
+        detach: yes
+        hostname: etherpad-ui
+        image: etherpad/etherpad
+        interactive: yes
+        name: etherpad-ui
+        recreate: yes # to check
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - etherpad-db:mysql
+        volumes:
+          - "{{ mnt_path }}/etherpad-ui-mnt/settings.json:/opt/etherpad-lite/settings.json"
+        env:
+          DB_TYPE: mysql
+          DB_HOST: etherpad-db
+          DB_PORT: "3306"
+          DB_NAME: etherpaddb
+          DB_USER: etherpad_user
+          DB_PASS: "{{ etherpaddb_password }}"
+          DB_CHARSET: utf8mb4
+          TITLE: JayBeeDe
+          SKIN_VARIANTS: "super-dark-toolbar super-dark-background dark-editor"
+          FAVICON: "https://{{ server_domain }}/wp-content/uploads/2017/01/favicon.png"
+          DEFAULT_PAD_TEXT: ""
+          PORT: "9001"
+          ADMIN_PASSWORD: "{{ etherpadui_password }}"
+
+    - name: Pre-Installing Etherpad Plugins...
+      community.docker.docker_container_exec:
+        container: etherpad-ui
+        command: /bin/bash -c "/usr/local/bin/npm update"
+
+    # - name: Installing Etherpad Plugins...
+    #   community.docker.docker_container_exec:
+    #     container: etherpad-ui
+    #     command: /bin/bash -c "/usr/local/bin/npm install {{ item }}"
+    #   loop:
+    #     - ep_embedded_hyperlinks2
+    #     - ep_align
+    #     - ep_tables4
+    #     - ep_copy_paste_images
+    #     - ep_code_formatting
+    #     - ep_comments_page
+    #     - ep_spellcheck
+    #     - ep_mathjax
+    #     - ep_markdown
+    #     - ep_adminpads2
+    #   register: result
+
+    - name: Print stderr lines
+      debug:
+        var: result
+
+    - name: Restarting Etherpad...
+      community.docker.docker_container:
+        name: etherpad-ui
+        restart: true
 
     - name: "Configuring web-proxy..."
-      copy:
-        src: "{{ role_path }}/files/service-web-proxy-http.cfg"
-        dest: "{{ webproxyconfvolpath.volume.Mountpoint }}/nginx.conf"
+      template:
+        src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
+        dest: "{{ mnt_path }}/web-proxy-mnt/nginx.conf"
         mode: "0755"
         owner: "root"
         group: "root"
@@ -74,11 +178,11 @@
         tty: yes
         links:
           - "jawanndenn-ui:jawanndenn-ui"
-        exposed_ports:
+          - "etherpad-ui:etherpad-ui"
+        ports:
           - 80:80
         volumes:
-          - web-proxyconf-vol:/etc/nginx/
-          - web-proxydata-vol:/var/www/
+          - "{{ mnt_path }}/web-proxy-mnt/nginx.conf:/etc/nginx/nginx.conf"
         env:
           urlPrefix: jawanndenn
 

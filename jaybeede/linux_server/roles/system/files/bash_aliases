@@ -39,5 +39,40 @@ export -f log
 function logc { cat $1 | grep -v "end]" | grep -v "<ending>" | sed -r "s/\[<([0-9]+)\:.*>\]/[\1:]/g" | sed -r "s:((\[.*\].){2})(\[.*\].):\1:g" | sed -r "s:([A-Za-z]{3})\s([A-Za-z]{3})\s([0-9]+)\s([0-9]{2}\:)([0-9]{2}\:)([0-9]{2})\s([0-9]{4}):\7-\2-\3 \4\5\6 UTC:g" | sed -r "s:-Jan-:-01-:g" | sed -r "s:-Feb-:-02-:g" | sed -r "s:-Mar-:-03-:g" | sed -r "s:-Apr-:-04-:g" | sed -r "s:-May-:-05-:g" | sed -r "s:-Jun-:-06-:g" | sed -r "s:-Jul-:-07-:g" | sed -r "s:-Aug-:-08-:g" | sed -r "s:-Sep-:-09-:g" | sed -r "s:-Oct-:-10-:g" | sed -r "s:-Nov-:-11-:g" | sed -r "s:-Dec-:-12-:g" | ccze -m ansi; }
 export -f logc
 
+function dk_getTarget() {
+    target=$1
+    res1=$(docker ps -a --format "{{.Names}}" | grep "$target" | head -n1)
+    if [ "$res1" != "" ]; then
+        trgt=$res1
+    else
+        res2=$(docker ps -a --format "{{.Names}}\t{{.Image}}" | grep "$target" | head -n1)
+        trgt=$(echo "$res2" | awk '{print $1}')
+    fi
+    echo "$trgt"
+}
+
+function dk_getStatus {
+    echo "===Volumes STATUS==="
+    docker volume ls --format "{{.Name}}"
+    echo "===Images STATUS==="
+    docker image ls --format "{{.Size}}\t{{.Tag}}\t{{.Repository}}"
+    echo "===Containers STATUS==="
+    docker ps -a --format "{{.Status}}\t{{.Names}}\t{{.Image}}\t{{.Ports}}"
+}
+
+function dk_bash {
+    target=$1
+    trgt=$(dk_getTarget "$target")
+    echo "===Starting SHELL ON $trgt==="
+    docker exec -it "$trgt" bash || docker exec -it "$trgt" sh
+}
+
+function dk_logs {
+    target=$1
+    trgt=$(dk_getTarget "$target")
+    echo "===Starting LOGS ON $trgt==="
+    docker logs "$trgt"
+}
+
 export HISTTIMEFORMAT="%F %T  "
 export EDITOR=nano

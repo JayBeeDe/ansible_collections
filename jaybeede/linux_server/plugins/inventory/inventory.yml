@@ -12,8 +12,15 @@ all:
     network_dns: "8.8.8.8"
     ssh_port: "{{ vault_ssh_port }}"
     allowed_ip: "{{ hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[0] }}"
+    ini_path: "/opt/IniBackups"
+    mnt_path: "/var/lib/docker/mounts"
+    vol_path: "/var/lib/docker/volumes"
+    server_domain: "{{ vault_domain }}"
+    etherpadui_password: "{{ vault_etherpadui_password }}"
+    etherpaddb_password: "{{ vault_etherpaddb_password }}"
   hosts:
     server:
       ansible_host: "{{ vault_ssh_host1 }}"
       ansible_port: "{{ ssh_port }}"
-      ansible_user: "debian" # is changed to {{ user }} once {{ user }} created, note that debian user is not removed
+      ansible_user: "{{ user }}"
+      ansible_become_pass: "{{ vault_become_pass }}"

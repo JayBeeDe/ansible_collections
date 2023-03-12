@@ -11,22 +11,23 @@
     - name: "Install some system tools..."
       apt:
         pkg:
-          - tree
-          - curl
-          - net-tools
-          - refind
-          - git
-          - firewalld
-          - jq
-          - network-manager
-          - units
-          - nmap
-          - initramfs-tools
-          - pip
           - ansible # needed by gnome_extensions module
+          - curl
+          - firewalld
+          - git
           - gnupg
+          - initramfs-tools
+          - jq
           - lsb-release
+          - net-tools
+          - network-manager
+          - nmap
+          - pip
           - python3-docker
+          - refind
+          - rsync
+          - tree
+          - units
 
     - name: "Logical evaluation..."
       stat:

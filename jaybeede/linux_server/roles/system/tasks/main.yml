@@ -22,7 +22,7 @@
         autoconnect: yes
         state: present
 
-    - name: "Configuring sshd (1/5)..."
+    - name: "Configuring sshd (1/8)..."
       replace:
         path: /etc/ssh/sshd_config
         regexp: "^#?Port [0-9]+$"
@@ -30,7 +30,7 @@
         backup: no
       notify: Restart sshd
 
-    - name: "Configuring sshd (2/5)..."
+    - name: "Configuring sshd (2/8)..."
       replace:
         path: /etc/ssh/sshd_config
         regexp: "^#?UseDNS .+$"
@@ -38,7 +38,7 @@
         backup: no
       notify: Restart sshd
 
-    - name: "Configuring sshd (3/5)..."
+    - name: "Configuring sshd (3/8)..."
       replace:
         path: /etc/ssh/sshd_config
         regexp: "^#?PermitRootLogin .+$"
@@ -46,7 +46,7 @@
         backup: no
       notify: Restart sshd
 
-    - name: "Configuring sshd (4/5)..."
+    - name: "Configuring sshd (4/8)..."
       replace:
         path: /etc/ssh/sshd_config
         regexp: "^#?PermitEmptyPasswords .+$"
@@ -54,67 +54,31 @@
         backup: no
       notify: Restart sshd
 
-    - name: "Check if {{ user }} exists"
-      getent:
-        database: passwd
-        key: "{{ user }}"
-        fail_key: False
-      register: userExists
+    - name: "Configuring sshd (5/8)..."
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?PasswordAuthentication .+$"
+        replace: "PasswordAuthentication no"
+        backup: no
+      notify: Restart sshd
 
-    - name: "Getting {{ user }} secondary groups (1/2)..."
-      getent:
-        database: group
-        split: ":"
-        fail_key: False
-      register: sourceUserGroups
+    - name: "Configuring sshd (6/8)..."
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?UsePAM .+$"
+        replace: "UsePAM no"
+        backup: no
+      notify: Restart sshd
 
-    - name: "Getting {{ user }} secondary groups (2/2)..."
-      set_fact:
-        targetUserGroups: "{{ sourceUserGroups.ansible_facts.getent_group | dict2items | jaybeede.linux_server.groups2str(user='debian') }},sudo"
+    - name: "Configuring sshd (7/8)..."
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?PrintMotd .+$"
+        replace: "PrintMotd yes"
+        backup: no
+      notify: Restart sshd
 
-    - name: "Check if {{ user }} has ssh key"
-      stat:
-        path: "{{ home }}/.ssh/id_rsa"
-      register: userHasSshKey
-
-    - name: "Creating {{ user }} user with SSH key..."
-      user:
-        name: "{{ user }}"
-        comment: "{{ user }}"
-        group: "{{ user }}"
-        groups: "{{ targetUserGroups }}"
-        shell: /bin/bash
-        createhome: yes # create_home since Ansible 2.5
-        password: "{{ password | password_hash('sha512') }}"
-        generate_ssh_key: yes
-        ssh_key_file: "{{ home }}/.ssh/id_rsa"
-        ssh_key_bits: 4096
-        ssh_key_type: rsa
-      # when: user not in userExists.ansible_facts.getent_passwd or not userHasSshKey.stat.exists
-
-    - name: "Configuring passwordless sudo for user {{ user }}"
-      lineinfile:
-        dest: /etc/sudoers
-        state: present
-        regexp: "^%sudo"
-        line: "%sudo ALL=(ALL) NOPASSWD: ALL"
-        validate: visudo -cf %s
-
-    - name: "{{ user }} user will be used as a replacement of {{ ansible_user }} user (1/2)"
-      set_fact:
-        oldUser: "{{ ansible_user }}"
-
-    - name: "{{ user }} user will be used as a replacement of {{ ansible_user }} user (1/2)"
-      set_fact:
-        ansible_user: "{{ user }}" # note that we are not impotent because if we remove debian user then we cannot play it again
-
-    # - name: "Removing {{ oldUser }} user..."
-    #   user:
-    #     name: "{{ oldUser }}"
-    #     remove: yes
-    #     state: absent
-
-    - name: "Configuring sshd (5/5)..."
+    - name: "Configuring sshd (8/8)..."
       lineinfile:
         path: /etc/ssh/sshd_config
         state: present
@@ -149,56 +113,6 @@
         backup: no
       notify: Restart firewalld
 
-    - name: "Configuring fs.inotify.max_user_watches for vscode..."
-      lineinfile:
-        path: /etc/sysctl.conf
-        state: present
-        regexp: ^fs.inotify.max_user_watches.*$
-        line: "fs.inotify.max_user_watches = 524288"
-        backup: no
-      notify: Kernel attributes update
-
-    - name: "Configuring grub (1/2)..."
-      lineinfile:
-        path: /etc/default/grub
-        state: present
-        regexp: "^(GRUB_TIMEOUT=)([0-9]+)?$"
-        line: "GRUB_TIMEOUT=0"
-        backup: no
-      notify: Update grub
-
-    - name: "Configuring grub (2/2)..."
-      lineinfile:
-        path: /etc/default/grub
-        state: present
-        regexp: "^(GRUB_RECORDFAIL_TIMEOUT=)([0-9]+)?$"
-        line: "GRUB_RECORDFAIL_TIMEOUT=0"
-        backup: no
-      notify: Update grub
-
-    - name: "Logical evaluation..."
-      stat:
-        path: "/boot/efi/EFI/refind/refind.conf"
-      register: f
-
-    - name: "Logical evaluation..."
-      set_fact:
-        refindConfPath: "/boot/efi/EFI/BOOT/refind.conf"
-      when: not f.stat.exists
-
-    - name: "Logical evaluation..."
-      set_fact:
-        refindConfPath: "/boot/efi/EFI/refind/refind.conf"
-      when: f.stat.exists
-
-    - name: "Configuring Refind..."
-      replace:
-        path: "{{ refindConfPath }}"
-        regexp: "^(timeout )([0-9]+)?$"
-        replace: '\g<1>2'
-        backup: no
-      notify: Update grub
-
     - name: "Masking ctrl-alt-del.target..."
       systemd:
         name: "ctrl-alt-del.target"
@@ -213,36 +127,6 @@
         mode: "0755"
         owner: "root"
         group: "root"
-
-    - name: "Preparing SSH for root user..."
-      file:
-        path: /root/.ssh/
-        state: directory
-        mode: "0755"
-        owner: "root"
-        group: "root"
-
-    - name: "Generating SSH key pair for root user..."
-      openssh_keypair:
-        path: /root/.ssh/id_rsa
-        size: 4096
-        type: rsa
-
-    # - name: "Set authorized key for user root..."
-    #   authorized_key:
-    #     user: root
-    #     state: present
-    #     key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
-    #     ## suspected to be run locally...
-
-    - name: "Checking known_hosts..."
-      stat:
-        path: "/root/.ssh/known_hosts"
-      register: p
-
-    - name: "Set known_hosts for user root..."
-      shell: ssh-keyscan -p "{{ ssh_port }}" -H localhost >> "/root/.ssh/known_hosts"
-      when: p.stat.exists == False
 
     - name: "Configuring aliases for root user (1/2)..."
       copy:
@@ -290,44 +174,6 @@
   environment:
     PWD: ""
 - block:
-    - name: "Fix owner of the generated pub key"
-      file:
-        path: "{{ home }}/.ssh/id_rsa.pub"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-        mode: "0777"
-      changed_when: false # to be checked
-
-    - name: "Fix owner of the generated priv key"
-      file:
-        path: "{{ home }}/.ssh/id_rsa"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-
-    # - name: "Set authorized key for user {{ user }}..."
-    #   authorized_key:
-    #     user: "{{ user }}"
-    #     state: present
-    #     key: "{{ lookup('file', '{{ home }}/.ssh/id_rsa.pub') }}"
-    #     ## suspected to be run locally...
-
-    - name: "Fix owner of the generated pub key 2"
-      file:
-        path: "{{ home }}/.ssh/id_rsa.pub"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-        mode: "0644"
-      changed_when: false # to be checked
-
-    - name: "Checking known_hosts..."
-      stat:
-        path: "{{ home }}/.ssh/known_hosts"
-      register: p
-
-    - name: "Set known_hosts for user {{ user }}..."
-      shell: ssh-keyscan -p "{{ ssh_port }}" -H localhost >> "{{ home }}/.ssh/known_hosts"
-      when: p.stat.exists == False
-
     - name: "Configuring aliases for {{ user }} user (1/2)..."
       copy:
         src: "{{ role_path }}/files/bash_aliases"
