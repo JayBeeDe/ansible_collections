@@ -225,7 +225,7 @@ def main():
         target = re.sub(r"\/*$", "", target)
         newName = re.sub(r"\.", " ", re.sub(r"\.\S+$", "", target.split("/")[-1])).title()
     else:
-        if re.search(r"^\/.*", target):
+        if re.search(r"^((\/\S*)+) .*$", target):
             # "/usr/bin/vlc --started-from-file %U"s
             newName = os.path.basename(re.compile(r"^((\/\S*)+) .*$").match(target).groups()[0])
         elif re.search(r"^(\S+) .*$", target):
@@ -297,7 +297,7 @@ def main():
             desktop["Icon"] = desktop["Name"]
 
     if desktop["Type"] == "Application":
-        if re.search(r"^\/.*", target):
+        if re.search(r"^((\/\S*)+) .*$", target):
             newDir = os.path.dirname(re.compile(r"^((\/\S*)+) .*$").match(target).groups()[0])
         if newDir is not None:
             newPath = newDir + "/" + desktop["Name"].lower()

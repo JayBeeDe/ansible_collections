@@ -73,6 +73,14 @@
         owner: "{{ user }}"
         group: "{{ user }}"
 
+    - name: "Configuring Telegram..."
+      copy:
+        src: "{{ role_path }}/files/telegram.png"
+        dest: "{{ home }}/.local/share/icons/telegram.png"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
     - name: "Configuring MotionBox..."
       copy:
         src: "{{ role_path }}/files/motionbox.png"

@@ -141,7 +141,6 @@
           - nemo
           - keepassxc
           - xsel
-          - telegram-desktop
           - conky
           - openssh-server
           - audacity
@@ -196,30 +195,78 @@
 
     - name: "Logical evaluation..."
       stat:
-        path: /opt/MotionBox/MotionBox
+        path: /opt/Telegram/Telegram
       register: f
 
-    - name: Installing MotionBox (1/4)...
+    - name: Installing Telegram (1/4)...
       ansible.builtin.get_url:
-        url: https://s3-eu-west-1.amazonaws.com/omega.gg/get/MotionBox/MotionBox-1.8.0-0-linux64.tar.gz
-        dest: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
+        url: https://telegram.org/dl/desktop/linux
+        dest: /tmp/Telegram.tar.xz
+        owner: "{{ user }}"
+        group: "{{ user }}"
         mode: 777
       when: not f.stat.exists
 
-    - name: Extracting MotionBox (2/4)...
+    - name: Extracting Telegram (2/4)...
       ansible.builtin.unarchive:
-        src: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
+        src: /tmp/Telegram.tar.xz
         dest: /opt
+        owner: "{{ user }}"
+        group: "{{ user }}"
         mode: 775
       when: not f.stat.exists
 
-    - name: Preparing MotionBox (3/4)...
+    - name: "Setting correct permissions to /opt/Telegram (3/4)..."
+      file:
+        path: "/opt/Telegram"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        recurse: yes
+
+    - name: Removing Telegram artefacts {{ user }} (4/4)...
+      ansible.builtin.file:
+        path: /tmp/Telegram.tar.xz
+        state: absent
+
+    - name: "Logical evaluation..."
+      stat:
+        path: /opt/MotionBox/MotionBox
+      register: f
+
+    - name: Installing MotionBox (1/5)...
+      ansible.builtin.get_url:
+        url: https://s3-eu-west-1.amazonaws.com/omega.gg/get/MotionBox/MotionBox-1.8.0-0-linux64.tar.gz
+        dest: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 777
+      when: not f.stat.exists
+
+    - name: Extracting MotionBox (2/5)...
+      ansible.builtin.unarchive:
+        src: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
+        dest: /opt
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 775
+      when: not f.stat.exists
+
+    - name: Preparing MotionBox (3/5)...
       ansible.builtin.file:
         dest: /opt/MotionBox
         src: /opt/MotionBox-1.8.0-0
         state: link
 
-    - name: Removing MotionBox artefacts (4/4)...
+    - name: "Setting correct permissions to /opt/Telegram (4/5)..."
+      file:
+        path: "/opt/Telegram"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        recurse: yes
+
+    - name: Removing MotionBox artefacts (5/5)...
       ansible.builtin.file:
         path: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
         state: absent
