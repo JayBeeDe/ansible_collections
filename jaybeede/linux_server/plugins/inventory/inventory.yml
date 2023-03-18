@@ -16,6 +16,9 @@ all:
     mnt_path: "/var/lib/docker/mounts"
     vol_path: "/var/lib/docker/volumes"
     server_domain: "{{ vault_domain }}"
+    virtualdesktopdb_password: "{{ vault_virtualdesktopdb_password }}"
+    limesurveyui_password: "{{ vault_limesurveyui_password }}"
+    limesurveydb_password: "{{ vault_limesurveydb_password }}"
     etherpadui_password: "{{ vault_etherpadui_password }}"
     etherpaddb_password: "{{ vault_etherpaddb_password }}"
   hosts:

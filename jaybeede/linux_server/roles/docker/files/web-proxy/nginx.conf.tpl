@@ -9,15 +9,15 @@ http {
 	upstream service-etherpad {
 		server etherpad-ui:9001;
 	}
-	# upstream service-virtual-desktop {
-	# 	server virtual-desktop-ui:8080;
-	# }
+	upstream service-virtual-desktop {
+		server virtual-desktop-ui:8080;
+	}
 	# upstream service-blog {
 	# 	server blog-ui:80;
 	# }
-	# upstream service-limesurvey {
-	# 	server limesurvey-ui:80;
-	# }
+	upstream service-limesurvey {
+		server limesurvey-ui:80;
+	}
 	server {
 		listen 80;
 		listen [::]:80;
@@ -36,10 +36,10 @@ http {
 		# 	add_header X-XSS-Protection "1; mode=block";
 		# 	#add_header Strict-Transport-Security $hsts_header;
 		# }
-		# location /virtual-desktop {
-		# 	proxy_buffering off;
-		# 	proxy_pass http://service-virtual-desktop;
-		# }
+		location /virtual-desktop {
+			proxy_buffering off;
+			proxy_pass http://service-virtual-desktop;
+		}
 		location /jawanndenn {
 		 	rewrite ^(jawanndenn)$ $1/ permanent;
 			proxy_pass http://service-jawanndenn;
@@ -52,11 +52,10 @@ http {
 			proxy_set_header Host $host;
 			proxy_http_version 1.1;
 		}
-		# location /limesurvey/ {
-		# 	proxy_pass http://service-limesurvey/;
-		# 	#proxy_redirect http://$host/ /limesurvey/;
-		# 	proxy_set_header Host $host;
-		# }
+		location /limesurvey/ {
+			proxy_pass http://service-limesurvey/;
+			proxy_set_header Host $host;
+		}
 		# location /.well-known/acme-challenge {
 		# 	root /var/www;
 		# }

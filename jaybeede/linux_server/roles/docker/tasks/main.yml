@@ -7,6 +7,8 @@
         recurse: yes
         mode: "0755"
       loop:
+        - virtual-desktop-db-init-mnt
+        - limesurvey-db-init-mnt
         - etherpad-db-init-mnt
         - etherpad-ui-mnt
         - web-proxy-mnt
@@ -15,6 +17,8 @@
       community.docker.docker_volume:
         name: "{{ item }}"
       loop:
+        - virtual-desktop-db-vol
+        - limesurvey-db-vol
         - etherpad-db-vol
         - jawanndenn-ui-vol
 
@@ -23,6 +27,8 @@
     - name: "Logical evaluation..."
       set_fact:
         init_mnts:
+          - virtual-desktop-db
+          - limesurvey-db
           - etherpad-db
 
     - name: "Resetting all init mnt..."
@@ -47,6 +53,114 @@
         - "{{ output.results }}"
 
     # related to volume init >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    - name: Running virtual-desktop-db
+      community.docker.docker_container:
+        detach: yes
+        hostname: virtual-desktop-db
+        image: mysql:5.7
+        interactive: yes
+        name: virtual-desktop-db
+        recreate: yes # to check
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        volumes:
+          - "{{ mnt_path }}/virtual-desktop-db-init-mnt:/docker-entrypoint-initdb.d"
+          - virtual-desktop-db-vol:/var/lib/mysql
+        env:
+          MYSQL_DATABASE: guacamole_db
+          MYSQL_USER: guacamole_user
+          MYSQL_PASSWORD: "{{ virtualdesktopdb_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ virtualdesktopdb_password }}"
+
+    - name: Running virtual-desktop-gtw
+      community.docker.docker_container:
+        detach: yes
+        hostname: virtual-desktop-gtw
+        image: guacamole/guacd
+        interactive: yes
+        name: virtual-desktop-gtw
+        recreate: yes # to check
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+
+    - name: Running virtual-desktop-ui
+      community.docker.docker_container:
+        detach: yes
+        hostname: virtual-desktop-ui
+        image: guacamole/guacamole
+        interactive: yes
+        name: virtual-desktop-ui
+        recreate: yes # to check
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - virtual-desktop-db:mysql
+          - virtual-desktop-gtw:guacd
+        env:
+          MYSQL_DATABASE: guacamole_db
+          MYSQL_USER: guacamole_user
+          MYSQL_PASSWORD: "{{ virtualdesktopdb_password }}"
+          MYSQL_SSL_MODE: disabled
+
+    - name: Preparing virtual-desktop-ui...
+      community.docker.docker_container_exec:
+        user: root
+        container: virtual-desktop-ui
+        command: /bin/sh -c "rm -fr /home/guacamole/tomcat/webapps/ROOT/ && ln -s /home/guacamole/tomcat/webapps/guacamole.war /home/guacamole/tomcat/webapps/virtual-desktop.war && ln -s /home/guacamole/tomcat/webapps/guacamole.war /home/guacamole/tomcat/webapps/ROOT.war"
+
+    - name: Running limesurvey-db
+      community.docker.docker_container:
+        detach: yes
+        hostname: limesurvey-db
+        image: mysql:5.7
+        interactive: yes
+        name: limesurvey-db
+        recreate: yes # to check
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        volumes:
+          - "{{ mnt_path }}/limesurvey-db-init-mnt:/docker-entrypoint-initdb.d"
+          - limesurvey-db-vol:/var/lib/mysql
+        env:
+          MYSQL_DATABASE: limesurveydb
+          MYSQL_USER: limesurvey_user
+          MYSQL_PASSWORD: "{{ limesurveydb_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ limesurveydb_password }}"
+
+    - name: Running limesurvey-ui
+      community.docker.docker_container:
+        detach: yes
+        hostname: limesurvey-ui
+        image: jbd92/limesurvey:stable
+        interactive: yes
+        name: limesurvey-ui
+        recreate: yes # to check
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - limesurvey-db:mysql
+        volumes:
+          - "{{ mnt_path }}/limesurvey-ui-mnt/settings.json:/opt/limesurvey-lite/settings.json"
+        env:
+          dbHost: limesurvey-db
+          dbName: limesurveydb
+          dbUser: limesurvey_user
+          dbPass: "{{ limesurveydb_password }}"
+          backOfficeUser: "{{ user }}"
+          backOfficePassword: "{{ limesurveyui_password }}"
+          backOfficeLanguage: fr
+          urlPrefix: /limesurvey/
 
     - name: Running jawanndenn-ui
       community.docker.docker_container:
@@ -129,22 +243,22 @@
         container: etherpad-ui
         command: /bin/bash -c "/usr/local/bin/npm update"
 
-    # - name: Installing Etherpad Plugins...
-    #   community.docker.docker_container_exec:
-    #     container: etherpad-ui
-    #     command: /bin/bash -c "/usr/local/bin/npm install {{ item }}"
-    #   loop:
-    #     - ep_embedded_hyperlinks2
-    #     - ep_align
-    #     - ep_tables4
-    #     - ep_copy_paste_images
-    #     - ep_code_formatting
-    #     - ep_comments_page
-    #     - ep_spellcheck
-    #     - ep_mathjax
-    #     - ep_markdown
-    #     - ep_adminpads2
-    #   register: result
+    - name: Installing Etherpad Plugins...
+      community.docker.docker_container_exec:
+        container: etherpad-ui
+        command: /bin/bash -c "/usr/local/bin/npm install {{ item }}"
+      loop:
+        - ep_embedded_hyperlinks2
+        - ep_align
+        - ep_tables4
+        - ep_copy_paste_images
+        - ep_code_formatting
+        - ep_comments_page
+        - ep_spellcheck
+        - ep_mathjax
+        - ep_markdown
+        - ep_adminpads2
+      register: result
 
     - name: Print stderr lines
       debug:
@@ -162,7 +276,7 @@
         mode: "0755"
         owner: "root"
         group: "root"
-        force: no
+        force: yes
 
     - name: Running web-proxy
       community.docker.docker_container:
@@ -177,6 +291,8 @@
         state: started
         tty: yes
         links:
+          - "virtual-desktop-ui:virtual-desktop-ui"
+          - "limesurvey-ui:limesurvey-ui"
           - "jawanndenn-ui:jawanndenn-ui"
           - "etherpad-ui:etherpad-ui"
         ports:
