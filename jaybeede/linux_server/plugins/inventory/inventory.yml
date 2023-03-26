@@ -10,12 +10,15 @@ all:
     git_rootrepo: "{{ home }}/Documents/Projets-Perso"
     locale: en_US
     network_dns: "8.8.8.8"
+    network_dns2: "8.8.4.4"
     ssh_port: "{{ vault_ssh_port }}"
     allowed_ip: "{{ hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[0] }}"
     ini_path: "/opt/IniBackups"
     mnt_path: "/var/lib/docker/mounts"
     vol_path: "/var/lib/docker/volumes"
     server_domain: "{{ vault_domain }}"
+    https_flag: 1
+    acmechallenge_flag: 0
     blogdb_password: "{{ vault_blogdb_password }}"
     virtualdesktopdb_password: "{{ vault_virtualdesktopdb_password }}"
     limesurveyui_password: "{{ vault_limesurveyui_password }}"

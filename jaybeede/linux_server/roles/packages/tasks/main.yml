@@ -12,6 +12,7 @@
       apt:
         pkg:
           - ansible # needed by gnome_extensions module
+          - certbot
           - curl
           - firewalld
           - git

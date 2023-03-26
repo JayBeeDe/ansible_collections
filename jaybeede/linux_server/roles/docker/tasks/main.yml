@@ -12,7 +12,6 @@
         - limesurvey-db-init-mnt
         - etherpad-db-init-mnt
         - etherpad-ui-mnt
-        - web-proxy-mnt
 
     - name: Create a volume
       community.docker.docker_volume:
@@ -24,6 +23,8 @@
         - limesurvey-db-vol
         - etherpad-db-vol
         - jawanndenn-ui-vol
+        - web-proxy-conf-vol
+        - web-proxy-vol
 
     # related to db init <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -134,7 +135,7 @@
       community.docker.docker_container_exec:
         user: www-data
         container: blog-ui
-        command: /bin/sh -c "wp --path='/var/www/html' theme install https://github.com/JayBeeDe/wp-theme_blog-perso/releases/download/0.2/wp-theme_blog-perso_0.2.zip; mkdir -p /var/www/html/wp-content/themes/blogperso/templates_c; chmod 775 -R /var/www/html/wp-content/themes/blogperso/templates_c; wp --path='/var/www/html' theme activate blogperso"
+        command: /bin/sh -c "wp --path='/var/www/html' theme install https://github.com/JayBeeDe/wp-theme_blog-perso/releases/download/0.1/wp-theme_blog-perso_0.1.zip; mkdir -p /var/www/html/wp-content/themes/blogperso/templates_c; chmod 775 -R /var/www/html/wp-content/themes/blogperso/templates_c; wp --path='/var/www/html' theme activate blogperso"
 
     - name: Removing some default wordpress themes...
       community.docker.docker_container_exec:
@@ -374,10 +375,14 @@
         name: etherpad-ui
         restart: true
 
+    - name: "Configuring SSL for web-proxy..."
+      shell: "rsync -avr --copy-unsafe-links /etc/letsencrypt/live {{ vol_path }}/web-proxy-conf-vol/_data/ssl"
+      when: https_flag == 1
+
     - name: "Configuring web-proxy..."
       template:
         src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
-        dest: "{{ mnt_path }}/web-proxy-mnt/nginx.conf"
+        dest: "{{ vol_path }}/web-proxy-conf-vol/_data/nginx.conf"
         mode: "0755"
         owner: "root"
         group: "root"
@@ -403,8 +408,10 @@
           - "etherpad-ui:etherpad-ui"
         ports:
           - 80:80
+          - "{{ '443:443' if (https_flag == 1) }}"
         volumes:
-          - "{{ mnt_path }}/web-proxy-mnt/nginx.conf:/etc/nginx/nginx.conf"
+          - web-proxy-conf-vol:/etc/nginx
+          - web-proxy-vol:/var/www/html
 
   become: yes
   become_user: "root"
