@@ -60,6 +60,7 @@ You can put all the roles within the following order in your playbook (let's cal
 ```
 
 Warning: Order is important:
+>
 > * Packages role is required by other roles and must be installed FIRST.
 
 Then you need to create an inventory file that contains all the variables: see [plugins/inventory/inventory.yml](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/inventory/inventory.yml) file.

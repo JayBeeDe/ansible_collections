@@ -3,9 +3,11 @@
   collections:
     - jaybeede.linux_server
   tasks:
-    # - import_role:
-    #     name: packages
-    # - import_role:
-    #     name: system
+    - import_role:
+        name: packages
+    - import_role:
+        name: system
     - import_role:
         name: docker
+    - import_role:
+        name: cron

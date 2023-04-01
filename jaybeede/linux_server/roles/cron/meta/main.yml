@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: JayBee <jb.social@outlook.com>
+  description: Cron configuration for linux server
+  license: GPL-3.0-or-later
+  galaxy_tags:
+  - "linux"
+  - "debian"
+  - "cron"
+  - "keepass"
+  platforms:
+    - name: Debian
+      versions:
+        - any

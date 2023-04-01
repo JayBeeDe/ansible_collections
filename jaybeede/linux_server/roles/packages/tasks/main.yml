@@ -25,6 +25,8 @@
           - nmap
           - pip
           - python3-docker
+          - python3-pykeepass
+          - python3-pyotp
           - refind
           - rsync
           - tree

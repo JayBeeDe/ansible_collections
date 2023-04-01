@@ -16,6 +16,9 @@ all:
     ini_path: "/opt/IniBackups"
     mnt_path: "/var/lib/docker/mounts"
     vol_path: "/var/lib/docker/volumes"
+    script_path: "/opt/scripts"
+    lib_path: "{{ script_path }}/lib"
+    cron_path: "{{ script_path }}/cron-scripts"
     server_domain: "{{ vault_domain }}"
     https_flag: 1
     acmechallenge_flag: 0
@@ -25,6 +28,9 @@ all:
     limesurveydb_password: "{{ vault_limesurveydb_password }}"
     etherpadui_password: "{{ vault_etherpadui_password }}"
     etherpaddb_password: "{{ vault_etherpaddb_password }}"
+    pushbullet_token: "{{ vault_pushbullet_token }}"
+    kdbx_path: "{{ vault_kdbx_path }}"
+    kdbx_key_path: "{{ vault_kdbx_key_path }}"
   hosts:
     server:
       ansible_host: "{{ vault_ssh_host1 }}"

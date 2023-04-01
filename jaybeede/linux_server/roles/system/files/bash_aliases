@@ -74,5 +74,9 @@ function dk_logs {
     docker logs "$trgt"
 }
 
+function kdbxQuery() {
+    "/opt/scripts/lib/kdbxQuery.py" "$@"
+}
+
 export HISTTIMEFORMAT="%F %T  "
 export EDITOR=nano
