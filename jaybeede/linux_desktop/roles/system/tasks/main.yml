@@ -383,30 +383,27 @@
         ssh_key_type: rsa
       when: user not in userExists.ansible_facts.getent_passwd or not userHasSshKey.stat.exists
 
-    - name: "Configuring rc local service (1/2)..."
-      copy:
-        src: "{{ role_path }}/files/configure-wakeup.sh"
-        dest: /etc/rc.local
-        mode: "0755"
-        owner: "root"
-        group: "root"
-        force: no
+    - name: "Finding Mouse Vendor ID..."
+      shell: lsusb | awk 'tolower($0) ~ /mouse/ {gsub(":[0-9a-f]+", "",$6); print $6; exit}'
+      register: command_output
+      changed_when: false
 
-    - name: "Configuring rc local service (2/2)..."
-      copy:
-        src: "{{ role_path }}/files/rc-local.service"
-        dest: /etc/systemd/system/rc-local.service
+    - name: Logical evaluation...
+      set_fact:
+        mouse_vendor: "{{ command_output.stdout }}"
+        changed_when: false
+
+    - name: "Configuring no-wakup-from-mouse udev rule..."
+      template:
+        src: "{{ role_path }}/files/no-wakup-from-mouse.rules.tpl"
+        dest: /etc/udev/rules.d/98-no-wakup-from-mouse.rules
         mode: "0644"
         owner: "root"
         group: "root"
-        force: no
-
-    - name: "Enabling rc-local service..."
-      systemd:
-        name: "rc-local"
-        state: started
-        enabled: yes
-        daemon_reload: yes
+        force: yes
+      notify:
+        - Reload udev rules 1
+        - Reload udev rules 2
 
     # - name: "Configuring wayland as window manager..."
     #   lineinfile:
