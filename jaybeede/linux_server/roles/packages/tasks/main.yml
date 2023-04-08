@@ -1,0 +1,87 @@
+---
+- block:
+    - apt: name=aptitude state=present
+
+    - name: "install system updates for debian systems (1/2)"
+      apt: update_cache=yes cache_valid_time=3600
+
+    - name: "install system updates for debian systems (2/2)"
+      apt: upgrade=safe
+
+    - name: "Install some system tools..."
+      apt:
+        pkg:
+          - ansible # needed by gnome_extensions module
+          - certbot
+          - curl
+          - firewalld
+          - git
+          - gnupg
+          - initramfs-tools
+          - jq
+          - lsb-release
+          - net-tools
+          - network-manager
+          - nmap
+          - pip
+          - python3-docker
+          - python3-pykeepass
+          - python3-pyotp
+          - refind
+          - rsync
+          - tree
+          - units
+
+    - name: "Logical evaluation..."
+      stat:
+        path: "/etc/apt/sources.list.d/docker.list"
+      register: f
+
+    - name: "Adding Docker Repo key"
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+      when: not f.stat.exists
+
+    - name: "Configuring Docker Repo"
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+      when: not f.stat.exists
+
+    - name: "Install Docker..."
+      apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+      notify: Restart docker
+      when: not f.stat.exists
+
+    - name: "Install locate package..."
+      apt:
+        pkg: locate
+      notify: Run updatedb
+
+    - name: "Configure Regional language (1/2)"
+      community.general.locale_gen:
+        name: "{{ locale }}.UTF-8"
+        state: present
+      when: locale !="en_US"
+
+    - name: "Logical evaluation..."
+      shell: "localectl status | grep LANG={{ locale }}.UTF-8 | cat"
+      when: locale !="en_US"
+      register: lcl
+      changed_when: false
+
+    - name: "Configure Regional language (2/2)"
+      command: localectl set-locale {{ locale }}.UTF-8
+      when: locale !="en_US"
+      changed_when: lcl.stdout == ""
+
+    - name: "Remove dependencies that are no longer required"
+      apt:
+        autoremove: yes
+
+  become: yes
+  become_user: "root"

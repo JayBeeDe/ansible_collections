@@ -138,7 +138,7 @@ def resolvePath(path, partialResolve=False):
             if re.search(r"^\/.*$", v):
                 if v in path:
                     path = re.sub(v, "$" + k, path)
-                    return k + " " + v + " " + path
+                    # return k + " " + v + " " + path
         # replace all resolved value by env variables when possible
     return path
 
@@ -180,6 +180,7 @@ def main():
     if source is not None:
         source = resolvePath(source)
     target = resolvePath(module.params.get("target"), partialResolve=True)
+    # target = module.params.get("target")
     location = resolvePath(str(module.params.get("location")))
     head = module.params.get("head")
     newDir = None
@@ -217,17 +218,20 @@ def main():
     if desktop["Type"] == "Link":
         desktop["URL"] = target
     else:
+        print(target)
         desktop["Exec"] = target
 
     if desktop["Type"] == "Link":
         target = re.sub(r"\/*$", "", target)
         newName = re.sub(r"\.", " ", re.sub(r"\.\S+$", "", target.split("/")[-1])).title()
     else:
-        if re.search(r"^\/.*", target):
+        if re.search(r"^((\/\S*)+) .*$", target):
             # "/usr/bin/vlc --started-from-file %U"s
             newName = os.path.basename(re.compile(r"^((\/\S*)+) .*$").match(target).groups()[0])
-        else:
+        elif re.search(r"^(\S+) .*$", target):
             newName = re.compile(r"^(\S+) .*$").match(target).groups()[0]
+        else:
+            newName = target
     if "Name" not in desktop:
         desktop["Name"] = newName
     desktop["Name[en_US]"] = desktop["Name"]
@@ -284,7 +288,7 @@ def main():
                         iconData = None
         if iconData is not None:
             desktop["Icon"] = iconPath
-    if webBody is None or iconData is None or not iconIsURL:
+    if not "Icon" in desktop and (webBody is None or iconData is None or not iconIsURL):
         iconTheme = Gtk.IconTheme.get_default()
         icon = iconTheme.lookup_icon(desktop["Name"], 48, 0)
         if icon:
@@ -293,16 +297,16 @@ def main():
             desktop["Icon"] = desktop["Name"]
 
     if desktop["Type"] == "Application":
-        if re.search(r"^\/.*", target):
+        if re.search(r"^((\/\S*)+) .*$", target):
             newDir = os.path.dirname(re.compile(r"^((\/\S*)+) .*$").match(target).groups()[0])
         if newDir is not None:
-            newPath = newDir + "/" + desktop["Name"]
+            newPath = newDir + "/" + desktop["Name"].lower()
         else:
-            newPath = desktop["Name"]
+            newPath = desktop["Name"].lower()
         if "Path" not in desktop and newDir is not None:
             desktop["Path"] = newDir
-        if "TryExec" not in desktop:
-            desktop["TryExec"] = newPath
+        # if "TryExec" not in desktop:
+        #     desktop["TryExec"] = newPath
 
     if re.search(r"^.*\/$", location):
         location = location + desktop["Name"] + ".desktop"
@@ -311,6 +315,8 @@ def main():
             location = location + ".desktop"
 
     odesktop = collections.OrderedDict(sorted(desktop.items()))
+    from pprint import pprint as pprint
+    pprint(odesktop)
 
     hasChanged = False
     cnt = 0

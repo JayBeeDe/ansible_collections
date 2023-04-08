@@ -1,15 +1,13 @@
 - hosts: all
   gather_facts: true
   collections:
-    - jaybeede.linux_desktop
+    - jaybeede.linux_server
   tasks:
     - import_role:
         name: packages
     - import_role:
         name: system
     - import_role:
-        name: applications
+        name: docker
     - import_role:
-        name: desktop
-    - import_role:
-        name: gnome
+        name: cron

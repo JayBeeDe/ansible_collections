@@ -71,7 +71,8 @@
         "command": "workbench.action.toggleSidebarVisibility"
     },
     {
-        "key": "ctrl+b",
-        "command": "codebucket.open"
+        "key": "f7",
+        "command": "workbench.action.compareEditor.nextChange",
+        "when": "textCompareEditorVisible"
     }
 ]

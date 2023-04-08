@@ -1,0 +1,13 @@
+- hosts: all
+  gather_facts: true
+  collections:
+    - jaybeede.linux_desktop
+  tasks:
+    - include_role:
+        name: "{{ item }}"
+      loop:
+        - packages
+        - system
+        - applications
+        - desktop
+        - gnome

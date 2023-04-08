@@ -1,0 +1,78 @@
+---
+- block:
+    - name: Creating lib scripts directory....
+      file:
+        path: "{{ lib_path }}"
+        state: directory
+    - name: Installing PyKeePass Wrapper...
+      copy:
+        src: "{{ role_path }}/files/kdbxQuery.py"
+        dest: "{{ lib_path }}/kdbxQuery.py"
+        mode: 755
+    - name: Saving pushbullet token to kdbx...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /others/pushbullet
+        password: "{{ pushbullet_token }}"
+    - name: Saving blog-db password to kdbx...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /database/blog-db
+        username: blog_user
+        password: "{{ blogdb_password }}"
+        url: blog_db
+    - name: Saving virtual-desktop-db password to kdbx...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /database/virtual-desktop-db
+        username: guacamole_user
+        password: "{{ virtualdesktopdb_password }}"
+        url: guacamole_db
+    - name: Saving limesurvey-db password to kdbx...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /database/limesurvey-db
+        username: limesurvey_user
+        password: "{{ limesurveydb_password }}"
+        url: limesurveydb
+    - name: Saving etherpad-db password to kdbx...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /database/etherpad-db
+        username: etherpad_user
+        password: "{{ etherpaddb_password }}"
+        url: etherpaddb
+    - name: Creating cron scripts directory....
+      file:
+        path: "{{ cron_path }}"
+        state: directory
+    - name: Installing Database Backups script...
+      copy:
+        src: "{{ role_path }}/files/dbBackups.sh"
+        dest: "{{ cron_path }}/dbBackups.sh"
+        mode: 700
+    - name: Create daily cron for Database Backups
+      ansible.builtin.cron:
+        name: Database Backups
+        minute: "15"
+        hour: "23"
+        job: "export PYKEEPASS_DATABASE={{ kdbx_key_path }}; export PYKEEPASS_KEYFILE={{ kdbx_path }}; {{ cron_path }}/dbBackups.sh"
+    - name: Installing Certificate Renewal script...
+      copy:
+        src: "{{ role_path }}/files/renewCert.sh"
+        dest: "export PYKEEPASS_DATABASE={{ kdbx_key_path }}; export PYKEEPASS_KEYFILE={{ kdbx_path }}; {{ cron_path }}/renewCert.sh"
+        mode: 700
+    - name: Create daily cron for Certificate Renewal
+      ansible.builtin.cron:
+        name: Certificate Renewal
+        minute: "20"
+        hour: "0"
+        job: '{{ cron_path }}/renewCert.sh "{{ server_domain }}" "{{ email }}"'
+
+  become: yes
+  become_user: "root"

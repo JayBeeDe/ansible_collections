@@ -24,3 +24,9 @@
 
 - name: "Fix broken packages"
   shell: apt --fix-broken -y install
+
+- name: "Reload udev rules 1"
+  command: sudo udevadm control --reload-rules
+
+- name: "Reload udev rules 2"
+  command: sudo udevadm trigger

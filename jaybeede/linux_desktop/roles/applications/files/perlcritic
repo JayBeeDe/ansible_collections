@@ -21,5 +21,9 @@ severity = 1
 [-ValuesAndExpressions::ProhibitNoisyQuotes]
 [-ValuesAndExpressions::RequireNumberSeparators]
 [-Variables::ProhibitPunctuationVars]
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 30
+
 #a voir si bonne idée vraiment
 [-Variables::ProhibitPackageVars]

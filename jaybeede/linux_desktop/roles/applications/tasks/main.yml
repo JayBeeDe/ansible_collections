@@ -14,70 +14,24 @@
         mode: "0777"
       changed_when: false
 
-    - name: "Configuring pulseaudio (1/5)..."
-      lineinfile:
-        path: /etc/pulse/default.pa
-        state: present
-        regexp: "^load-module module-combine channels.*channel_map.*$"
-        line: "load-module module-combine channels=6 channel_map=front-left,front-right,rear-left,rear-right,front-center,lfe"
-        backup: no
-      notify: Restart pulseaudio
-
-    - name: "Configuring pulseaudio (2/5)..."
-      lineinfile:
-        path: /etc/pulse/daemon.conf
-        state: present
-        regexp: "^.*remixing-produce-lfe.*$"
-        line: "remixing-produce-lfe = yes"
-        backup: no
-      notify: Restart pulseaudio
-
-    - name: "Configuring pulseaudio (3/5)..."
-      lineinfile:
-        path: /etc/pulse/daemon.conf
-        state: present
-        regexp: "^.*remixing-consume-lfe.*$"
-        line: "remixing-consume-lfe = yes"
-        backup: no
-      notify: Restart pulseaudio
-
-    - name: "Configuring pulseaudio (4/5)..."
-      lineinfile:
-        path: /etc/pulse/daemon.conf
-        state: present
-        regexp: "^.*default-sample-channels.*$"
-        line: "default-sample-channels = 6"
-        backup: no
-      notify: Restart pulseaudio
-
-    - name: "Configuring pulseaudio (5/5)..."
-      lineinfile:
-        path: /etc/pulse/daemon.conf
-        state: present
-        regexp: "^.*default-channel-map.*$"
-        line: "default-channel-map = front-left,front-right,rear-left,rear-right,front-center,lfe"
-        backup: no
-      notify: Restart pulseaudio
-
-    - name: "Configuring chromium..."
+    - name: "Configuring chrome..."
       file:
-        path: /etc/chromium/policies/managed
+        path: /etc/opt/chrome/policies/managed/
         state: directory
         mode: "0755"
         owner: "root"
         group: "root"
 
-    - name: "Configuring chromium - Policies..."
+    - name: "Configuring chrome - Policies..."
       copy:
         src: "{{ role_path }}/files/chromium.json"
-        dest: "/etc/chromium/policies/managed/settings.json"
+        dest: "/etc/opt/chrome/policies/managed/settings.json"
         mode: "0644"
         owner: "root"
         group: "root"
-  # # # /etc/pulse/default.pa
-  # # #.ifexists module-switch-on-connect.so
-  # # #load-module module-switch-on-connect
-  # # #.endif
+
+  become: yes
+  become_user: "root"
 - block:
     - name: "Configuring KeepassXC (1/2)..."
       file:
@@ -116,6 +70,22 @@
         src: "{{ role_path }}/files/vlc-2"
         dest: "{{ home }}/.config/vlc/vlcrc"
         mode: "0600"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring Telegram..."
+      copy:
+        src: "{{ role_path }}/files/telegram.png"
+        dest: "{{ home }}/.local/share/icons/telegram.png"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Configuring MotionBox..."
+      copy:
+        src: "{{ role_path }}/files/motionbox.png"
+        dest: "{{ home }}/.local/share/icons/motionbox.png"
+        mode: "0755"
         owner: "{{ user }}"
         group: "{{ user }}"
 
@@ -215,11 +185,14 @@
       loop:
         - adpyke.vscode-sql-formatter
         - aeschli.vscode-css-formatter
-        - aswinkumar863.smarty-template-support
+        - alefragnani.project-manager
         - bibhasdn.unique-lines
-        - chaunceykiwi.json-tree-view
+        - codezombiech.gitignore
+        - DavidAnson.vscode-markdownlint
         - dhoeric.ansible-vault
-        - emilast.logfilehighlighter
+        - EditorConfig.EditorConfig
+        - emilast.LogFileHighlighter
+        - exiasr.hadolint
         - foxundermoon.shell-format
         - gamunu.vscode-yarn
         - geeebe.duplicate
@@ -227,20 +200,24 @@
         - hediet.vscode-drawio
         - hogashi.crontab-syntax-highlight
         - junstyle.php-cs-fixer
+        - mhutchie.git-graph
+        - mkhl.shfmt
         - ms-azuretools.vscode-docker
         - ms-python.python
-        - ms-python.vscode-pylance
         - ms-toolsai.jupyter
+        - ms-toolsai.jupyter-keymap
+        - ms-toolsai.jupyter-renderers
         - ms-vscode.cpptools
-        - pstreule.codebucket
+        - nico-castell.linux-desktop-file
+        - redhat.ansible
         - redhat.vscode-commons
         - redhat.vscode-xml
         - redhat.vscode-yaml
         - timonwong.shellcheck
-        - tyriar.sort-lines
-        - vsciot-vscode.vscode-arduino
+        - Tyriar.sort-lines
         - wingrunr21.vscode-ruby
         - zhiyuan-lin.simple-perl
+        - ziyasal.vscode-open-in-github
       register: ext
       changed_when: "'already installed' not in ext.stdout"
 
@@ -389,43 +366,29 @@
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring chromium - Bookmarks (1/2)..."
+    - name: "Configuring chrome - Bookmarks (1/2)..."
       file:
-        path: "{{ home }}/.config/chromium/Default/"
+        path: "{{ home }}/.config/google-chrome/Default/"
         state: directory
         mode: "0755"
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring chromium - Bookmarks (2/2)..."
+    - name: "Configuring chrome - Bookmarks (2/2)..."
       copy:
         src: "{{ role_path }}/files/Bookmarks"
-        dest: "{{ home }}/.config/chromium/Default/Bookmarks"
+        dest: "{{ home }}/.config/google-chrome/Default/Bookmarks"
         mode: "0600"
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring chromium - Search Engines..."
+    - name: "Configuring chrome - Search Engines..."
       copy:
         src: "{{ role_path }}/files/chromium-2.conf"
-        dest: "{{ home }}/.config/chromium/Default/Web Data"
+        dest: "{{ home }}/.config/google-chrome/Default/Web Data"
         mode: "0600"
         owner: "{{ user }}"
         group: "{{ user }}"
-
-    # - name: "Configuring chromium - Fixing beta version popup at startup"
-    #   replace:
-    #     path: "/usr/share/applications/chromium-browser.desktop"
-    #     regexp: "^Exec.chromium-browser.*$"
-    #     replace: 'Exec=env GOOGLE_API_KEY="no" GOOGLE_DEFAULT_CLIENT_ID="no" GOOGLE_DEFAULT_CLIENT_SECRET="no" chromium-browser'
-    #     backup: no
-
-    # - name: "Configuring chromium - Dark Theme..."
-    #   replace:
-    #     path: "{{ home }}/snap/chromium/current/.config/gtk-3.0/settings.ini"
-    #     regexp: "^gtk-application-prefer-dark-theme=[0-9]+$"
-    #     replace: "gtk-application-prefer-dark-theme=1"
-    #     backup: no
 
     - name: "Logical evaluation..."
       stat:
@@ -461,10 +424,5 @@
         scope: global
         value: "{{ git_name }}"
 
-    # # #GTK+
-    # # # enable-force-dark=Enabled
-    # # # --enable-force-dark
-    # # # "/home/user/snap/chromium/common/chromium/Local State"
-    # # # enabled_labs_experiments":["enable-force-dark@1"]
   become: yes
   become_user: "{{ user }}"

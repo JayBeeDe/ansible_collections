@@ -1,0 +1,8 @@
+- name: "Run updatedb"
+  shell: updatedb 2>/dev/null
+  ignore_errors: yes
+
+- name: "Restart docker"
+  service:
+    name: docker
+    state: restarted

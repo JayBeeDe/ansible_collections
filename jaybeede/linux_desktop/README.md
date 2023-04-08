@@ -24,8 +24,8 @@ linux_desktop collection provides a set of ready to use roles & modules to quick
 
 Module | Feature | Description
 ------ | ------- | -----------
-gnome_extensions | Manage desktop icons | create, edit, remove desktop icons according the freedesktop.org specifications
-desktop_launchers | Manage Gnome extensions | install, update, uninstall, enable, disable gnome extensions
+desktop_launchers | Manage desktop icons | create, edit, remove desktop icons according the freedesktop.org specifications
+gnome_extensions | Manage Gnome extensions | install, update, uninstall, enable, disable gnome extensions
 keyboard_shortcuts | Manage keyboard shortcut | create, edit remove buldtin or custom command bindings to a keyboard shortcut
 
 ### Roles
@@ -34,7 +34,7 @@ keyboard_shortcuts | Manage keyboard shortcut | create, edit remove buldtin or c
 
 Application | Configuration | Policy Restriction
 ----------- | ------------- | ------------------
-chromium + extensions | yes | yes
+chrome + extensions | yes | yes
 conky | yes | no
 flameshot | yes | no
 git | yes | no
@@ -42,7 +42,6 @@ keepassXC | yes | yes
 libreoffice | yes | no
 nemo | yes | no
 onedrive | yes | no
-pulseaudio | yes | no
 remmina | yes | no
 terminator | yes | no
 VLC | yes | no
@@ -81,6 +80,8 @@ Create a file all.yml into group_vars directory with the following content:
 ```yaml
 vault_user: "my vault_user"
 vault_password: "my vault_password"  # if user doesn't exist, user will be created with specified password. Otherwise, password will not be updated
+vault_ssh_port: "my vault_ssh_port"
+vault_ssh_host1: "my vault_ssh_host1"
 vault_email: "my vault_email"
 vault_nickname: "my vault_nickname"
 vault_kdbx_path: "my vault_kdbx_path"
@@ -97,11 +98,12 @@ vault_tokenGitlab: "my vault_tokenGitlab"
 
 Node must be running ubuntu desktop and user variable must be correctly defined (in vault).<br />
 Target machine must be reachable over SSH or not if local machine.<br />
+Current user must already be configured<br />
 Partitioning is **NOT** configured by the collection.<br />
 
 Warning: All roles dependencies must be met:<br />
 * applications role:<br />
-  - Add the chomium Bookmarks file into the [files/](https://github.com/JayBeeDe/ansible_collections/tree/main/jaybeede/linux_desktop/roles/applications/files) directory. On Linux, you can find this file under $HOME/.config/chromium/Default/Bookmarks.<br />
+  - Add the chrome Bookmarks file into the [files/](https://github.com/JayBeeDe/ansible_collections/tree/main/jaybeede/linux_desktop/roles/applications/files) directory. On Linux, you can find this file under $HOME/.config/google-chrome/Default/Bookmarks.<br />
 * desktop role:<br />
   - PyGObject is required for the desktop_launchers module: see [official installation instructions](https://pygobject.readthedocs.io/en/latest/getting_started.html).<br />
 * gnome role:<br />
@@ -112,7 +114,7 @@ Warning: All roles dependencies must be met:<br />
 
 ## Quick start
 
-You can put all the roles within the following order in your playbook (let's call it all.yml):
+You can put all the roles within the following order in your playbook (let's call it linux_desktop.yml):
 
 ```yaml
 - hosts: all
@@ -140,8 +142,12 @@ Then you need to create an inventory file that contains all the variables: see [
 
 For the description of all variables, see the role documentation.
 
-Then, once ready, you just need to run:
+Define your current user as sudoer:
+
+echo "my-username  ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/my-username
+
+Then, once ready, you just need to run as current user:
 
 ```bash
-sudo ansible-playbook all.yml -i jaybeede/linux_desktop/plugins/inventory/inventory.yml --ask-vault-pass
+ansible-playbook linux_desktop.yml -i jaybeede/linux_desktop/plugins/inventory/inventory.yml --ask-vault-pass
 ```

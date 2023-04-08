@@ -1,0 +1,25 @@
+---
+namespace: jaybeede
+name: linux_server
+version: 0.1.0
+readme: README.md
+authors:
+  - JayBee <jb.social@outlook.com>
+description: roles & modules to quicky deploy a Debian server
+license:
+  - GPL-3.0-or-later
+tags:
+  - "linux"
+  - "server"
+  - "apt"
+  - "systemd"
+repository: https://github.com/JayBeeDe/ansible_collections
+documentation: https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/README.md
+homepage: https://jean-baptiste-delon.com/
+issues: https://github.com/JayBeeDe/ansible_collections/issues
+build_ignore:
+  - '*/__pycache__/*'
+  - '*.log'
+  - '*.old'
+  - '*/group_vars/all.yml'
+  - '*/vault-tmp'

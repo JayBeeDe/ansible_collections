@@ -1,12 +1,12 @@
 applications
 =========
 
-Desktop applications configuration: pulseaudio, chromium, keepassxc, VLC, conky, flameshot, vscode, terminator, remmina, libreoffice, onedrive, git.
+Desktop applications configuration: chrome, keepassxc, VLC, conky, flameshot, vscode, terminator, remmina, libreoffice, onedrive, git.
 
 Requirements
 ------------
 
-:warning: Add the chomium Bookmarks file into the [files/](files) directory. On Linux, you can find this file under $HOME/.config/chromium/Default/Bookmarks.
+:warning: Add the chrome Bookmarks file into the [files/](files) directory. On Linux, you can find this file under $HOME/.config/google-chrome/Default/Bookmarks.
 
 Role Variables
 --------------

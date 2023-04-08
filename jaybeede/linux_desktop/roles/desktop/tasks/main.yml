@@ -1,25 +1,36 @@
 ---
-
 - block:
     - name: "Configuring arc-menu shortcuts..."
-      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Chromium', 'chromium', 'chromium-browser.desktop', 'Fichiers', 'folder', 'nemo.desktop', 'Visual Studio Code', '/usr/share/pixmaps/com.visualstudio.code.png', 'code.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop', 'Krita', '/usr/share/icons/hicolor/128x128/apps/krita.png', 'org.kde.krita.desktop', 'draw.io', '/snap/drawio/57/meta/gui/icon.png', 'drawio_drawio.desktop', 'P3X OneNote', '/snap/p3x-onenote/81/meta/gui/icon.png', 'p3x-onenote_p3x-onenote.desktop', 'Skype', '/snap/skype/148/meta/gui/skypeforlinux.png', 'skype_skypeforlinux.desktop', 'Gpick', 'gpick', 'gpick.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'PulseEffects', 'pulseeffects', 'com.github.wwmm.pulseeffects.desktop', 'PulseAudio', 'multimedia-volume-control', 'pavucontrol.desktop']"
+      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Google Chrome', 'google-chrome', 'google-chrome.desktop', 'Fichiers', 'folder', 'nemo.desktop', 'Visual Studio Code', '', 'code.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'P3X OneNote', '', 'p3x-onenote_p3x-onenote.desktop', 'Skype', '', 'skype_skypeforlinux.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'MotionBox', '{{ home }}/.local/share/icons/motionbox.png', 'MotionBox.desktop', 'EasyEffects', '', 'com.github.wwmm.easyeffects.desktop']"
 
     - name: "Configuring gnome bookmarks..."
-      dconf: key="/org/gnome/shell/favorite-apps" value="['chromium-browser.desktop', 'nemo.desktop', 'code.desktop', 'vlc.desktop', 'connectWindows.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'p3x-onenote_p3x-onenote.desktop', 'skype_skypeforlinux.desktop', 'gpick.desktop', 'simple-scan.desktop', 'com.github.wwmm.pulseeffects.desktop', 'pavucontrol.desktop']"
+      dconf: key="/org/gnome/shell/favorite-apps" value="['google-chrome.desktop', 'nemo.desktop', 'code.desktop', 'vlc.desktop', 'connectWindows.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'p3x-onenote_p3x-onenote.desktop', 'skype_skypeforlinux.desktop', 'simple-scan.desktop', 'MotionBox.desktop', 'com.github.wwmm.easyeffects.desktop']"
     - name: "Configuring evolution desktop shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/org.gnome.Evolution.desktop"
         target: 'bash -c ''for item in $(ps aux | grep evolution | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 10; evolution 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done'''
         location: "$DIRECTORY_DESKTOP/evolution.desktop"
-      # register: testout
-    # - name: dump test output
-    #   debug:
-    #     msg: "{{ testout }}"
-    - name: "Configuring telegram desktop shortcut..."
+      register: testout
+    - name: dump test output
+      debug:
+        msg: "{{ testout }}"
+    - name: "Configuring telegram desktop 1 shortcut..."
       desktop_launchers:
-        source: "/usr/share/applications/telegramdesktop.desktop"
-        target: 'bash -c ''for item in $(ps aux | grep telegram-desktop | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 5; telegram-desktop 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done'''
+        freedesktop_Name: "Telegram"
+        freedesktop_Icon: "{{ home }}/.local/share/icons/telegram.png"
+        target: "/opt/Telegram/Telegram"
+        location: "{{ home }}/.local/share/applications/telegram.desktop"
+    - name: "Configuring telegram desktop 2 shortcut..."
+      desktop_launchers:
+        source: "{{ home }}/.local/share/applications/telegram.desktop"
+        target: 'bash -c ''for item in $(ps aux | grep Telegram | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 5; /opt/Telegram/Telegram 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done'''
         location: "$DIRECTORY_DESKTOP/telegram.desktop"
+    - name: "Configuring MotionBox desktop shortcut..."
+      desktop_launchers:
+        freedesktop_Name: "MotionBox"
+        freedesktop_Icon: "{{ home }}/.local/share/icons/motionbox.png"
+        target: 'bash -c "export LD_LIBRARY_PATH=/opt/MotionBox; export QT_PLUGIN_PATH=/opt/MotionBox; /opt/MotionBox/MotionBox"'
+        location: "{{ home }}/.local/share/applications/MotionBox.desktop"
     - name: "Configuring keepassxc desktop shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/org.keepassxc.KeePassXC.desktop"
@@ -29,17 +40,13 @@
       desktop_launchers:
         freedesktop_Name: "Windows"
         freedesktop_Comment: "Connect to Ms Windows"
-        freedesktop_Icon: "$HOME/.local/share/icons/windows.png"
+        freedesktop_Icon: "{{ home }}/.local/share/icons/windows.png"
         freedesktop_Categories: "Utility"
         target: 'bash -c "{{ home }}/.local/share/scripts/connectWindows.sh {{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"'
         location: "$HOME/.local/share/applications/connectWindows.desktop"
     - name: "Configuring connectWindows 2 desktop shortcut..."
       desktop_launchers:
-        freedesktop_Name: "Windows"
-        freedesktop_Comment: "Connect to Ms Windows"
-        freedesktop_Icon: "$HOME/.local/share/icons/windows.png"
-        freedesktop_Categories: "Utility"
-        target: 'bash -c "bash {{ home }}/.local/share/scripts/connectWindows.sh {{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"'
+        target: 'bash -c "{{ home }}/.local/share/scripts/connectWindows.sh .local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"'
         location: "$DIRECTORY_DESKTOP/connectWindows.desktop"
     - name: "Configuring conky autostart shortcut..."
       desktop_launchers:
@@ -54,7 +61,7 @@
     - name: "Configuring telegram autostart shortcut..."
       desktop_launchers:
         freedesktop_Name: "Telegram"
-        target: 'bash -c "sleep 5; telegram-desktop 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done"'
+        target: 'bash -c "sleep 5; /opt/Telegram/Telegram 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done"'
         location: "$HOME/.config/autostart/telegram.desktop"
     - name: "Configuring keepassxc autostart shortcut..."
       desktop_launchers:
@@ -64,8 +71,7 @@
     - name: "Configuring nemo autostart shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/nemo-autostart.desktop"
-        freedesktop_Name: "Nemo"
-        target: 'bash -c "sleep 5; keepassxc "{{ kdbx_path }}" --keyfile "{{ key_path }}" 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done & disown;"'
+        target: "nemo-desktop"
         location: "$HOME/.config/autostart/nemo-autostart.desktop"
   become: yes
   become_user: "{{ user }}"

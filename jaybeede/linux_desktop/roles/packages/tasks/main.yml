@@ -1,226 +1,307 @@
 ---
-- apt: name=aptitude state=present
+- block:
+    - name: "Logical evaluation..."
+      stat:
+        path: "/etc/apt/sources.list.d/vscode.list"
+      register: f
 
-- name: "install system updates for ubuntu systems (1/2)"
-  apt: update_cache=yes cache_valid_time=3600
+    - name: "Adding Microsoft Repo key"
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+      when: not f.stat.exists
 
-- name: "install system updates for ubuntu systems (2/2)"
-  apt: upgrade=safe
+    - name: "Configuring Microsoft Repo"
+      apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+      when: not f.stat.exists
 
-- name: "Install some system tools..."
-  apt:
-    pkg:
-      - tree
-      - curl
-      - net-tools
-      - gnome-shell-extensions
-      - gnome-tweak-tool
-      - dconf-editor
-      - terminator
-      - refind
-      - qemu-kvm
-      - qemu
-      - virt-manager
-      - virtinst
-      - qemu-guest-agent
-      - remmina
-      - bridge-utils
-      - cpu-checker
-      - qemu-utils
-      - git
-      - qt5ct
-      - qt5-style-plugins
-      - firewalld
-      - jq
-      - xdotool
-      - ccze
-      - libnm-dev
-      - python3-gi
-      - pylint
-      - ntfs-3g
-      - imagemagick
-      - units
-      - nmap
-      - gparted
-      - libperl-critic-perl
-      - perltidy
-      - id3v2
-      - initramfs-tools
-      - timeshift
-      - lua5.4
-      - pip
-      - acpitool
-      - ansible # needed by gnome_extensions module
+    - name: "Fixing Microsoft Repo..."
+      command: mv "/etc/apt/sources.list.d/packages_microsoft_com_repos_vscode.list" "/etc/apt/sources.list.d/vscode.list"
+      when: not f.stat.exists
 
-- name: "Install locate package..."
-  apt:
-    pkg: locate
-  notify: Run updatedb
+    - name: "Logical evaluation..."
+      stat:
+        path: "/etc/apt/sources.list.d/google-chrome.list"
+      register: f2
 
-- name: "Install pulseaudio related packages..."
-  apt:
-    pkg:
-      - pulseaudio
-      - pulseaudio-utils
-      - pavucontrol
-      - pulseaudio-equalizer
-      - pulseeffects
-      - lsp-plugins
-      - libasound2-plugins-extra
+    - name: "Adding Google Repo key"
+      apt_key:
+        url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+        state: present
+      when: not f2.stat.exists
 
-- name: "Logical evaluation..."
-  stat:
-    path: "/etc/apt/sources.list.d/vscode.list"
-  register: f
+    - name: "Configuring Google Repo"
+      apt_repository:
+        repo: deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main
+      when: not f2.stat.exists
 
-- name: "Adding ms Repo key"
-  apt_key:
-    url: https://packages.microsoft.com/keys/microsoft.asc
-    state: present
-  when: not f.stat.exists
+    - name: "Fixing Google Repo..."
+      command: mv "/etc/apt/sources.list.d/dl_google_com_linux_chrome_deb.list" "/etc/apt/sources.list.d/google-chrome.list"
+      when: not f2.stat.exists
 
-- name: "Configuring Microsoft Repo"
-  apt_repository:
-    repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
-  when: not f.stat.exists
+    - name: "Logical evaluation..."
+      stat:
+        path: "/etc/apt/sources.list.d/onedrive.list"
+      register: f3
 
-- name: "Fixing Repo..."
-  shell: mv "/etc/apt/sources.list.d/packages_microsoft_com_repos_vscode.list" "/etc/apt/sources.list.d/vscode.list"
-  when: not f.stat.exists
+    - name: "Adding onedrive Repo key"
+      apt_key:
+        url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/Release.key
+        state: present
+      when: not f3.stat.exists
 
-- name: "Logical evaluation..."
-  stat:
-    path: "/etc/apt/sources.list.d/mint.list"
-  register: f2
+    - name: "Configuring onedrive Repo"
+      apt_repository:
+        repo: deb https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/ ./
+      when: not f3.stat.exists
 
-- name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (1/3)"
-  apt:
-    deb: http://packages.linuxmint.com/pool/main/l/linuxmint-keyring/linuxmint-keyring_2016.05.26_all.deb
-  when: not f2.stat.exists
+    - name: "Fixing onedrive Repo..."
+      command: mv "/etc/apt/sources.list.d/download_opensuse_org_repositories_home_npreining_debian_ubuntu_onedrive_xUbuntu_22_04.list" "/etc/apt/sources.list.d/onedrive.list"
+      when: not f3.stat.exists
 
-- name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (2/3)"
-  apt_repository:
-    repo: deb http://packages.linuxmint.com uma upstream
-    state: present
-  when: not f2.stat.exists
+    # - name: "install system updates for ubuntu systems"
+    #   apt:
+    #     upgrade: safe
+    #     cache_valid_time: 3600
 
-- name: "Configuring linux mint Repo (to prevent snap incompatibility chromium with keepassxc integration) (3/3)"
-  copy:
-    dest: "/etc/apt/preferences.d/mint-uma-pin"
-    mode: "0644"
-    owner: "root"
-    group: "root"
-    content: |
-      # Allow upgrading only chromium from uma repository
-      Package: chromium
-      Pin: origin packages.linuxmint.com
-      Pin-Priority: 1002
+    - name: "Install some system tools..."
+      apt:
+        pkg:
+          - sshpass
+          - tree
+          - curl
+          - net-tools
+          - gnome-shell-extensions
+          - gnome-tweak-tool
+          - dconf-editor
+          - terminator
+          - refind
+          - qemu-kvm
+          - qemu
+          - virt-manager
+          - virtinst
+          - qemu-guest-agent
+          - remmina
+          - bridge-utils
+          - cpu-checker
+          - qemu-utils
+          - git
+          - qt5ct
+          - qt5-style-plugins
+          - firewalld
+          - jq
+          - network-manager
+          - xdotool
+          - ccze
+          - libnm-dev
+          - python3-gi
+          - pylint
+          - ntfs-3g
+          - imagemagick
+          - units
+          - nmap
+          - gparted
+          - libperl-critic-perl
+          - perltidy
+          - id3v2
+          - initramfs-tools
+          - timeshift
+          - lua5.4
+          - pip
+          - acpitool
+          - kdocker
+          - shellcheck
+          - shfmt
+          - ansible # needed by gnome_extensions module
+          - gettext # needed by arc-menu gnome extension
+          - gir1.2-gmenu-3.0 # needed by arc-menu gnome extension
+          - gnome-menus # needed by arc-menu gnome extension
+          - libgettextpo-dev # needed by arc-menu gnome extension
+          - libglib2.0-bin # needed by arc-menu gnome extension
 
-      # Never prefer other packages from the uma repository
-      Package: *
-      Pin: origin packages.linuxmint.com
-      Pin-Priority: 1
-  when: not f2.stat.exists
+    - name: "Install locate package..."
+      apt:
+        pkg: locate
+      notify: Run updatedb
 
-- name: "Install Desktop Applications (1/3)..."
-  apt:
-    pkg:
-      - vlc
-      - libreoffice-gtk
-      - libreoffice
-      - chromium
-      - code
-      - krita
-      - flameshot
-      - p7zip-full
-      - evolution
-      - evolution-ews
-      - nemo
-      - keepassxc
-      - xsel
-      - telegram-desktop
-      - conky
-      - openssh-server
-      - gpick
-      - audacity
-      - soundconverter
-      - handbrake
-      - gnome-shell-extension-gsconnect
-      - gnome-shell-extension-gsconnect-browsers
-      # - gir1.2-ebook
-      # - gir1.2-ebookcontacts
-      # - gir1.2-edataserver
+    - name: "Install Desktop Applications (1/3)..."
+      apt:
+        pkg:
+          - vlc
+          - libreoffice-gtk
+          - libreoffice
+          - google-chrome-stable
+          - code
+          - krita
+          - flameshot
+          - p7zip-full
+          - evolution
+          - evolution-ews
+          - nemo
+          - keepassxc
+          - xsel
+          - conky
+          - openssh-server
+          - audacity
+          - soundconverter
+          - handbrake
+          - gnome-shell-extension-gsconnect
+          - gnome-shell-extension-gsconnect-browsers
+          # - gir1.2-ebook
+          # - gir1.2-ebookcontacts
+          # - gir1.2-edataserver
 
-# - name: "Install motionbox related packages..."
-#   apt:
-#     pkg:
-#     - libtorrent-dev
-#     - libboost-all-dev
-#     - libdvd-pkg to check interactifve !!!!!! dpkg-reconfigure libdvd-pkg interactive too
-#     - ubuntu-restricted-extras interactifve
+    - name: "Install motionbox related packages..."
+      apt:
+        pkg:
+        - libtorrent-dev
+        - libdvd-pkg
+        - ubuntu-restricted-extras
 
-# kodi
-# kodi-pvr-iptvsimple
+    - name: "Install Desktop Applications (2/3)..."
+      snap:
+        name:
+          - p3x-onenote
+          - drawio
 
-- name: "Install Desktop Applications (2/3)..."
-  snap:
-    name:
-      - p3x-onenote
-      - drawio
+    - name: "Install Desktop Applications (3/3)..."
+      snap:
+        name:
+          - skype
+          - dmd
+        classic: yes
 
-- name: "Install Desktop Applications (3/3)..."
-  snap:
-    name:
-      - skype
-      - dmd
-    classic: yes
+    #snap shfmt
+    #for shell formatter extension ?
 
-#snap shfmt
-#for shell formatter extension ?
+    - name: "Install onedrive related packages..."
+      apt:
+        pkg:
+          - build-essential
+          - libcurl4-openssl-dev
+          - libsqlite3-dev
+          - libnotify-dev
+          - onedrive
 
-- name: "Configuring onedrive Repo"
-  apt_repository:
-    repo: ppa:yann1ck/onedrive
+    - name: "Install Regional Packages..."
+      apt:
+        pkg:
+          - "hunspell-{{ language }}"
+          - "hunspell-{{ language }}-revised"
+          - "libreoffice-l10n-{{ language }}"
+          - "hyphen-{{ language }}"
+          - "mythes-{{ language }}"
 
-- name: "Install onedrive related packages..."
-  apt:
-    pkg:
-      - build-essential
-      - libcurl4-openssl-dev
-      - libsqlite3-dev
-      - libnotify-dev
-      - onedrive
+    - name: "Logical evaluation..."
+      stat:
+        path: /opt/Telegram/Telegram
+      register: f
 
-- name: "Install Regional Packages..."
-  apt:
-    pkg:
-      - "hunspell-{{ language }}"
-      - "hunspell-{{ language }}-revised"
-      - "libreoffice-l10n-{{ language }}"
-      - "hyphen-{{ language }}"
-      - "mythes-{{ language }}"
+    - name: Installing Telegram (1/4)...
+      ansible.builtin.get_url:
+        url: https://telegram.org/dl/desktop/linux
+        dest: /tmp/Telegram.tar.xz
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 777
+      when: not f.stat.exists
 
-- name: "Removing some default Desktop Applications..."
-  apt:
-    pkg:
-      - firefox
-      - aisleriot
-      - cheese
-      - gnome-mahjongg
-      - gnome-mines
-      - gnome-sudoku
-      - gnome-todo
-      - rhythmbox
-      - thunderbird
-      - totem
-      - transmission-gtk
-      - virt-viewer
-      - gnome-initial-setup
-    state: absent
-    purge: yes
+    - name: Extracting Telegram (2/4)...
+      ansible.builtin.unarchive:
+        src: /tmp/Telegram.tar.xz
+        dest: /opt
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 775
+      when: not f.stat.exists
 
-- name: "Remove dependencies that are no longer required"
-  apt:
-    autoremove: yes
-#remove at the end fswatch
-#libsodium-dev
+    - name: "Setting correct permissions to /opt/Telegram (3/4)..."
+      file:
+        path: "/opt/Telegram"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        recurse: yes
+
+    - name: Removing Telegram artefacts {{ user }} (4/4)...
+      ansible.builtin.file:
+        path: /tmp/Telegram.tar.xz
+        state: absent
+
+    - name: "Logical evaluation..."
+      stat:
+        path: /opt/MotionBox/MotionBox
+      register: f
+
+    - name: Installing MotionBox (1/5)...
+      ansible.builtin.get_url:
+        url: https://s3-eu-west-1.amazonaws.com/omega.gg/get/MotionBox/MotionBox-1.8.0-0-linux64.tar.gz
+        dest: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 777
+      when: not f.stat.exists
+
+    - name: Extracting MotionBox (2/5)...
+      ansible.builtin.unarchive:
+        src: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
+        dest: /opt
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 775
+      when: not f.stat.exists
+
+    - name: Preparing MotionBox (3/5)...
+      ansible.builtin.file:
+        dest: /opt/MotionBox
+        src: /opt/MotionBox-1.8.0-0
+        state: link
+
+    - name: "Setting correct permissions to /opt/Telegram (4/5)..."
+      file:
+        path: "/opt/Telegram"
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        recurse: yes
+
+    - name: Removing MotionBox artefacts (5/5)...
+      ansible.builtin.file:
+        path: /tmp/MotionBox-1.8.0-0-linux64.tar.gz
+        state: absent
+
+    - name: "Removing some default Desktop Applications..."
+      apt:
+        pkg:
+          - aisleriot
+          - brasero
+          - cheese
+          - com.github.donadigo.eddy
+          - firefox
+          - foot
+          - geary
+          - gnome-calendar
+          - gnome-initial-setup
+          - gnome-mahjongg
+          - gnome-mines
+          - gnome-sudoku
+          - gnome-todo
+          - mpv
+          - rhythmbox
+          - soundconverter
+          - thunderbird
+          - totem
+          - transmission-gtk
+          - virt-viewer
+        state: absent
+        purge: yes
+
+    - name: "Remove dependencies that are no longer required"
+      apt:
+        autoremove: yes
+  #remove at the end fswatch
+  #libsodium-dev
+
+  become: yes
+  become_user: "root"

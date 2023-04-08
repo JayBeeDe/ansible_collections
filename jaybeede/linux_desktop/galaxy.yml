@@ -12,7 +12,7 @@ tags:
   - "linux"
   - "desktop"
   - "apt"
-  - "chromium"
+  - "chrome"
   - "dashtopanel"
   - "freedesktop"
   - "gnomebookmarks"
@@ -32,7 +32,7 @@ tags:
 repository: https://github.com/JayBeeDe/ansible_collections
 documentation: https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_desktop/README.md
 homepage: https://jean-baptiste-delon.com/
-issues: https://github.com/JayBeeDe/ansible_Linux-Desktop/issues
+issues: https://github.com/JayBeeDe/ansible_collections/issues
 build_ignore:
   - '*/__pycache__/*'
   - '*.log'

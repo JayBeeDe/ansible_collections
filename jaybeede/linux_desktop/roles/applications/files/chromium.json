@@ -4,10 +4,16 @@
     "NewTabPageLocation": "https://google.com/",
     "RestoreOnStartup": 5,
     "ShowHomeButton": true,
+    "ExtensionInstallBlocklist": [
+        "ghbmnnjooekpmoecnnnilnnbdlolhkhi"
+    ],
     "ExtensionInstallForcelist": [
         "gighmmpiobklfepjocnamgkkbiglidom",
         "lfpjkncokllnfokkgpkobnkbkmelfefj",
-        "oboonakemofpalcgghocfoadofidjkkk"
+        "oboonakemofpalcgghocfoadofidjkkk",
+        "gphhapmejobijbbhgpjhcjognlahblep",
+        "cghpggkibkdhekhnobjelccimccodcpd",
+        "flffekjijpabhjgpoapooggncnmcjopa"
     ],
     "PasswordManagerEnabled": false,
     "EnableMediaRouter": false,

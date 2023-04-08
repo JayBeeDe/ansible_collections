@@ -13,3 +13,7 @@ This repo contains ansible collections, roles, modules, etc.
         * [desktop_launchers](jaybeede/linux_desktop/plugins/modules/desktop_launchers.py)
         * [gnome_extensions](jaybeede/linux_desktop/plugins/modules/gnome_extensions.py)
         * [keyboard_shortcuts](jaybeede/linux_desktop/plugins/modules/keyboard_shortcuts.py)
+    * [linux_server](jaybeede/linux_server/README.md)
+      * Roles
+        * [packages](jaybeede/linux_server/roles/packages/README.md)
+        * [system](jaybeede/linux_server/roles/system/README.md)

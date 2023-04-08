@@ -1,0 +1,419 @@
+---
+- block:
+    - name: "Create mounts dir"
+      ansible.builtin.file:
+        path: "{{ mnt_path }}/{{ item }}"
+        state: directory
+        recurse: yes
+        mode: "0755"
+      loop:
+        - blog-db-init-mnt
+        - virtual-desktop-db-init-mnt
+        - limesurvey-db-init-mnt
+        - etherpad-db-init-mnt
+        - etherpad-ui-mnt
+
+    - name: Create a volume
+      community.docker.docker_volume:
+        name: "{{ item }}"
+      loop:
+        - blog-db-vol
+        - blog-ui-uploads-vol
+        - virtual-desktop-db-vol
+        - limesurvey-db-vol
+        - etherpad-db-vol
+        - jawanndenn-ui-vol
+        - web-proxy-conf-vol
+        - web-proxy-vol
+
+    # related to db init <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    - name: Logical evaluation...
+      set_fact:
+        init_mnts:
+          - blog-db
+          - virtual-desktop-db
+          - limesurvey-db
+          - etherpad-db
+
+    - name: "Resetting all init mnt..."
+      shell: rm -fr "{{ mnt_path }}/{{ item }}-init-mnt/"*
+      with_items:
+        - "{{ init_mnts }}"
+
+    - name: Resetting init mnt (1/2)...
+      find:
+        paths: "{{ ini_path }}/{{ item }}/"
+      register: "output"
+      with_items:
+        - "{{ init_mnts }}"
+
+    - name: Logical evaluation...
+      set_fact:
+        resetPaths: "{{ resetPaths | combine({item.item: item.files[0].path}) }}"
+      with_items: "{{ output.results }}"
+      when: item.files[0].path is defined
+
+    - name: The following file(s) is/are going to be used to reset database(s)
+      debug:
+        var: resetPaths
+      when: "{{ resetPaths | length > 0 }}"
+
+    - name: Resetting init mnt (2/2)...
+      copy:
+        remote_src: yes
+        src: "{{ item.value }}"
+        dest: "{{ mnt_path }}/{{ item.key }}-init-mnt/init.sql"
+      with_dict: "{{ resetPaths }}"
+      when: "{{ resetPaths | length > 0 }}"
+
+    # related to volume init >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    - name: Running blog-db
+      community.docker.docker_container:
+        detach: yes
+        hostname: blog-db
+        image: mysql:5.7
+        interactive: yes
+        name: blog-db
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        volumes:
+          - "{{ mnt_path }}/blog-db-init-mnt:/docker-entrypoint-initdb.d"
+          - blog-db-vol:/var/lib/mysql
+        env:
+          MYSQL_DATABASE: blog_db
+          MYSQL_USER: blog_user
+          MYSQL_PASSWORD: "{{ blogdb_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ blogdb_password }}/"
+      when: resetPaths['blog-db'] is defined
+
+    - name: "Preparing blog-ui uploads..."
+      copy:
+        src: "{{ role_path }}/files/blog-ui/uploads/"
+        dest: "{{ vol_path }}/blog-ui-uploads-vol/_data"
+        directory_mode: yes
+
+    - name: Running blog-ui
+      community.docker.docker_container:
+        detach: yes
+        hostname: blog-ui
+        image: wordpress
+        interactive: yes
+        name: blog-ui
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        volumes:
+          - blog-ui-uploads-vol:/var/www/html/wp-content/uploads
+        links:
+          - blog-db:mysql
+        env:
+          WORDPRESS_DB_HOST: blog-db
+          WORDPRESS_DB_NAME: blog_db
+          WORDPRESS_DB_USER: blog_user
+          WORDPRESS_DB_PASSWORD: "{{ blogdb_password }}"
+
+    - name: Installing wp-cli...
+      community.docker.docker_container_exec:
+        user: root
+        container: blog-ui
+        command: /bin/sh -c "curl -LsS https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar >/usr/local/bin/wp; chmod +x /usr/local/bin/wp; rm -f /var/www/html/wp-content/plugins/hello.php"
+
+    - name: Fixing uploads volume...
+      community.docker.docker_container_exec:
+        user: www-data
+        container: blog-ui
+        command: /bin/sh -c "chmod -R 755 /var/www/html/wp-content/uploads"
+
+    - name: Installing and Enabling wordpress theme...
+      community.docker.docker_container_exec:
+        user: www-data
+        container: blog-ui
+        command: /bin/sh -c "wp --path='/var/www/html' theme install https://github.com/JayBeeDe/wp-theme_blog-perso/releases/download/0.1/wp-theme_blog-perso_0.1.zip; mkdir -p /var/www/html/wp-content/themes/blogperso/templates_c; chmod 775 -R /var/www/html/wp-content/themes/blogperso/templates_c; wp --path='/var/www/html' theme activate blogperso"
+
+    - name: Removing some default wordpress themes...
+      community.docker.docker_container_exec:
+        user: www-data
+        container: blog-ui
+        command: /bin/sh -c "wp --allow-root --path='/var/www/html' theme is-installed {{ item }} && wp --allow-root --path='/var/www/html' theme delete {{ item }}"
+      with_items:
+        - twentytwentytwo
+        - twentytwentythree
+
+    - name: Installing wordpress plugins...
+      community.docker.docker_container_exec:
+        user: www-data
+        container: blog-ui
+        command: /bin/sh -c "( wp --path='/var/www/html' plugin is-installed {{ item }} && wp --allow-root --path='/var/www/html' plugin update {{ item }} || wp --allow-root --path='/var/www/html' plugin install {{ item }} ); wp --allow-root --path='/var/www/html' plugin is-active {{ item }} || wp --allow-root --path='/var/www/html' plugin activate {{ item }}"
+      with_items:
+        - add-from-server
+        - akismet
+        - google-sitemap-generator
+        - wps-hide-login
+
+    - name: Running virtual-desktop-db
+      community.docker.docker_container:
+        detach: yes
+        hostname: virtual-desktop-db
+        image: mysql:5.7
+        interactive: yes
+        name: virtual-desktop-db
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        volumes:
+          - "{{ mnt_path }}/virtual-desktop-db-init-mnt:/docker-entrypoint-initdb.d"
+          - virtual-desktop-db-vol:/var/lib/mysql
+        env:
+          MYSQL_DATABASE: guacamole_db
+          MYSQL_USER: guacamole_user
+          MYSQL_PASSWORD: "{{ virtualdesktopdb_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ virtualdesktopdb_password }}"
+      when: resetPaths['virtual-desktop-db'] is defined
+
+    - name: Running virtual-desktop-gtw
+      community.docker.docker_container:
+        detach: yes
+        hostname: virtual-desktop-gtw
+        image: guacamole/guacd
+        interactive: yes
+        name: virtual-desktop-gtw
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+
+    - name: Running virtual-desktop-ui
+      community.docker.docker_container:
+        detach: yes
+        hostname: virtual-desktop-ui
+        image: guacamole/guacamole
+        interactive: yes
+        name: virtual-desktop-ui
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - virtual-desktop-db:mysql
+          - virtual-desktop-gtw:guacd
+        env:
+          MYSQL_DATABASE: guacamole_db
+          MYSQL_USER: guacamole_user
+          MYSQL_PASSWORD: "{{ virtualdesktopdb_password }}"
+          MYSQL_SSL_MODE: disabled
+
+    - name: Preparing virtual-desktop-ui...
+      community.docker.docker_container_exec:
+        user: root
+        container: virtual-desktop-ui
+        command: /bin/sh -c "rm -fr /home/guacamole/tomcat/webapps/ROOT/ && ln -s /home/guacamole/tomcat/webapps/guacamole.war /home/guacamole/tomcat/webapps/virtual-desktop.war && ln -s /home/guacamole/tomcat/webapps/guacamole.war /home/guacamole/tomcat/webapps/ROOT.war"
+
+    - name: Running limesurvey-db
+      community.docker.docker_container:
+        detach: yes
+        hostname: limesurvey-db
+        image: mysql:5.7
+        interactive: yes
+        name: limesurvey-db
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        volumes:
+          - "{{ mnt_path }}/limesurvey-db-init-mnt:/docker-entrypoint-initdb.d"
+          - limesurvey-db-vol:/var/lib/mysql
+        env:
+          MYSQL_DATABASE: limesurveydb
+          MYSQL_USER: limesurvey_user
+          MYSQL_PASSWORD: "{{ limesurveydb_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ limesurveydb_password }}"
+      when: resetPaths['limesurvey-db'] is defined
+
+    - name: Running limesurvey-ui
+      community.docker.docker_container:
+        detach: yes
+        hostname: limesurvey-ui
+        image: jbd92/limesurvey:stable
+        interactive: yes
+        name: limesurvey-ui
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - limesurvey-db:mysql
+        volumes:
+          - "{{ mnt_path }}/limesurvey-ui-mnt/settings.json:/opt/limesurvey-lite/settings.json"
+        env:
+          dbHost: limesurvey-db
+          dbName: limesurveydb
+          dbUser: limesurvey_user
+          dbPass: "{{ limesurveydb_password }}"
+          backOfficeUser: "{{ user }}"
+          backOfficePassword: "{{ limesurveyui_password }}"
+          backOfficeLanguage: fr
+          urlPrefix: /limesurvey/
+
+    - name: Running jawanndenn-ui
+      community.docker.docker_container:
+        detach: yes
+        hostname: jawanndenn-ui
+        image: jbd92/jawanndenn:latest
+        interactive: yes
+        name: jawanndenn-ui
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        volumes:
+          - jawanndenn-ui-vol:/data
+        env:
+          urlPrefix: jawanndenn
+
+    - name: Running etherpad-db
+      community.docker.docker_container:
+        detach: yes
+        hostname: etherpad-db
+        image: mysql:5.7
+        interactive: yes
+        name: etherpad-db
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        volumes:
+          - "{{ mnt_path }}/etherpad-db-init-mnt:/docker-entrypoint-initdb.d"
+          - etherpad-db-vol:/var/lib/mysql
+        env:
+          MYSQL_DATABASE: etherpaddb
+          MYSQL_USER: etherpad_user
+          MYSQL_PASSWORD: "{{ etherpaddb_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ etherpaddb_password }}"
+      when: resetPaths['etherpad-db'] is defined
+
+    - name: Pre-Configuring Etherpad...
+      copy:
+        src: "{{ role_path }}/files/etherpad-ui/settings.jsonc"
+        dest: "{{ mnt_path }}/etherpad-ui-mnt/settings.json"
+        mode: "0755"
+        force: no
+
+    - name: Running etherpad-ui
+      community.docker.docker_container:
+        detach: yes
+        hostname: etherpad-ui
+        image: etherpad/etherpad
+        interactive: yes
+        name: etherpad-ui
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - etherpad-db:mysql
+        volumes:
+          - "{{ mnt_path }}/etherpad-ui-mnt/settings.json:/opt/etherpad-lite/settings.json"
+        env:
+          DB_TYPE: mysql
+          DB_HOST: etherpad-db
+          DB_PORT: "3306"
+          DB_NAME: etherpaddb
+          DB_USER: etherpad_user
+          DB_PASS: "{{ etherpaddb_password }}"
+          DB_CHARSET: utf8mb4
+          TITLE: JayBeeDe
+          SKIN_VARIANTS: "super-dark-toolbar super-dark-background dark-editor"
+          FAVICON: "https://{{ server_domain }}/wp-content/uploads/2017/01/favicon.png"
+          DEFAULT_PAD_TEXT: ""
+          PORT: "9001"
+          ADMIN_PASSWORD: "{{ etherpadui_password }}"
+
+    - name: Pre-Installing Etherpad Plugins...
+      community.docker.docker_container_exec:
+        container: etherpad-ui
+        command: /bin/bash -c "/usr/local/bin/npm update"
+
+    - name: Installing Etherpad Plugins...
+      community.docker.docker_container_exec:
+        container: etherpad-ui
+        command: /bin/bash -c "/usr/local/bin/npm install {{ item }}"
+      loop:
+        - ep_embedded_hyperlinks2
+        - ep_align
+        - ep_tables4
+        - ep_copy_paste_images
+        - ep_code_formatting
+        - ep_comments_page
+        - ep_spellcheck
+        - ep_mathjax
+        - ep_markdown
+        - ep_adminpads2
+      register: result
+
+    - name: Print stderr lines
+      debug:
+        var: result
+
+    - name: Restarting Etherpad...
+      community.docker.docker_container:
+        name: etherpad-ui
+        restart: true
+
+    - name: "Configuring SSL for web-proxy..."
+      shell: "rsync -avr --copy-unsafe-links /etc/letsencrypt/live {{ vol_path }}/web-proxy-conf-vol/_data/ssl"
+      when: https_flag == 1
+
+    - name: "Configuring web-proxy..."
+      template:
+        src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
+        dest: "{{ vol_path }}/web-proxy-conf-vol/_data/nginx.conf"
+        mode: "0755"
+        owner: "root"
+        group: "root"
+        force: yes
+
+    - name: Running web-proxy
+      community.docker.docker_container:
+        detach: yes
+        hostname: web-proxy
+        image: nginx:1.15.5
+        interactive: yes
+        name: web-proxy
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - "blog-ui:blog-ui"
+          - "virtual-desktop-ui:virtual-desktop-ui"
+          - "limesurvey-ui:limesurvey-ui"
+          - "jawanndenn-ui:jawanndenn-ui"
+          - "etherpad-ui:etherpad-ui"
+        ports:
+          - 80:80
+          - "{{ '443:443' if (https_flag == 1) }}"
+        volumes:
+          - web-proxy-conf-vol:/etc/nginx
+          - web-proxy-vol:/var/www/html
+
+  become: yes
+  become_user: "root"
+  vars:
+    resetPaths: {}
