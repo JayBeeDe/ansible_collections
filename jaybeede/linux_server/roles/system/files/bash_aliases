@@ -50,6 +50,7 @@ function dk_getTarget() {
     fi
     echo "$trgt"
 }
+export -f dk_getTarget
 
 function dk_getStatus {
     echo "===Volumes STATUS==="
@@ -59,6 +60,7 @@ function dk_getStatus {
     echo "===Containers STATUS==="
     docker ps -a --format "{{.Status}}\t{{.Names}}\t{{.Image}}\t{{.Ports}}"
 }
+export -f dk_getStatus
 
 function dk_bash {
     target=$1
@@ -66,6 +68,7 @@ function dk_bash {
     echo "===Starting SHELL ON $trgt==="
     docker exec -it "$trgt" bash || docker exec -it "$trgt" sh
 }
+export -f dk_bash
 
 function dk_logs {
     target=$1
@@ -73,10 +76,12 @@ function dk_logs {
     echo "===Starting LOGS ON $trgt==="
     docker logs "$trgt"
 }
+export -f dk_logs
 
 function kdbxQuery() {
     "/opt/scripts/lib/kdbxQuery.py" "$@"
 }
+export -f kdbxQuery
 
 export HISTTIMEFORMAT="%F %T  "
 export EDITOR=nano

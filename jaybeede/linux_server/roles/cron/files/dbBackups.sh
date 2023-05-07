@@ -1,18 +1,15 @@
 #!/bin/bash
 
 #########################global variable
-abs_path=$(readlink -f "$0")
-script_name=$(basename "$abs_path" ".sh")
 # shellcheck disable=SC2034
-rel_dir=$(pwd)
-# shellcheck disable=SC2034
-oid=$(kdbxQuery "/others/pushbullet" password 2>/dev/null)
+t_chatid=$(kdbxQuery "/others/telegram" username 2>/dev/null)
+t_token=$(kdbxQuery "/others/telegram" password 2>/dev/null)
 
 #########################functions
 
 function notify() {
     msg=$1
-    curl -sS -X POST -H "Access-Token: $oid" -H "Content-type: application/json" -d "{\"type\":\"note\", \"title\":\"$script_name\", \"body\":\"$msg\"}" "https://api.pushbullet.com/v2/pushes"
+    curl -sS -X POST -H "Content-Type: application/json" -d "{\"chat_id\":\"$t_chatid\",\"text\":\"$msg\", \"disable_notification\": false}" "https://api.telegram.org/bot${t_token}/sendMessage"
 }
 
 function backup() {

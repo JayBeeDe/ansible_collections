@@ -6,7 +6,7 @@ if [[ "$BASH_SOURCE" != "$0" ]]; then
     echo -e "\e[31mThe script must be runned with sh command: no source or dot!\e[0m"
     return 1
 fi
-oid=$(kdbxQuery "/others/pushbullet" password 2>/dev/null)
+tid=$(kdbxQuery "/others/telegram" password 2>/dev/null)
 logDir="/var/log/ssl"
 # script not finished
 
