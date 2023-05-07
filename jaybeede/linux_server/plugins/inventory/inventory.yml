@@ -28,7 +28,8 @@ all:
     limesurveydb_password: "{{ vault_limesurveydb_password }}"
     etherpadui_password: "{{ vault_etherpadui_password }}"
     etherpaddb_password: "{{ vault_etherpaddb_password }}"
-    pushbullet_token: "{{ vault_pushbullet_token }}"
+    telegram_token: "{{ vault_telegram_token }}"
+    telegram_chatid: "{{ vault_telegram_chatid }}"
     kdbx_path: "{{ vault_kdbx_path }}"
     kdbx_key_path: "{{ vault_kdbx_key_path }}"
   hosts:

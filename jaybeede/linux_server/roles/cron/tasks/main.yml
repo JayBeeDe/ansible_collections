@@ -9,12 +9,13 @@
         src: "{{ role_path }}/files/kdbxQuery.py"
         dest: "{{ lib_path }}/kdbxQuery.py"
         mode: 755
-    - name: Saving pushbullet token to kdbx...
+    - name: Saving telegram token to kdbx...
       keepass:
         database: "{{ kdbx_path }}"
         keyfile: "{{ kdbx_key_path }}"
-        title: /others/pushbullet
-        password: "{{ pushbullet_token }}"
+        title: /others/telegram
+        username: "{{ telegram_chatid }}"
+        password: "{{ telegram_token }}"
     - name: Saving blog-db password to kdbx...
       keepass:
         database: "{{ kdbx_path }}"
@@ -61,11 +62,11 @@
         name: Database Backups
         minute: "15"
         hour: "23"
-        job: "export PYKEEPASS_DATABASE={{ kdbx_key_path }}; export PYKEEPASS_KEYFILE={{ kdbx_path }}; {{ cron_path }}/dbBackups.sh"
+        job: "export PYKEEPASS_DATABASE={{ kdbx_path }}; export PYKEEPASS_KEYFILE={{ kdbx_key_path }}; {{ cron_path }}/dbBackups.sh"
     - name: Installing Certificate Renewal script...
       copy:
         src: "{{ role_path }}/files/renewCert.sh"
-        dest: "export PYKEEPASS_DATABASE={{ kdbx_key_path }}; export PYKEEPASS_KEYFILE={{ kdbx_path }}; {{ cron_path }}/renewCert.sh"
+        dest: "{{ cron_path }}/renewCert.sh"
         mode: 700
     - name: Create daily cron for Certificate Renewal
       ansible.builtin.cron:
