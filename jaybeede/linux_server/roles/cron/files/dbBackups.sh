@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck disable=SC1091
+source "${HOME}/.bash_aliases"
+
 #########################global variable
 # shellcheck disable=SC2034
 t_chatid=$(kdbxQuery "/others/telegram" username 2>/dev/null)
@@ -101,9 +104,7 @@ function purgeSystem() {
         done
         notify "${resCnt} dangling docker volumes have been removed : ${volList} !"
     fi
-    echo "Cleaning apt..."
-    apt-get autoremove
-    echo "System clean !"
+    apt-get autoremove -yq
 }
 
 #########################Main script

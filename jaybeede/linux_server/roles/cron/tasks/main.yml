@@ -61,8 +61,8 @@
       ansible.builtin.cron:
         name: Database Backups
         minute: "15"
-        hour: "23"
-        job: "export PYKEEPASS_DATABASE={{ kdbx_path }}; export PYKEEPASS_KEYFILE={{ kdbx_key_path }}; {{ cron_path }}/dbBackups.sh"
+        hour: "21"
+        job: "export PYKEEPASS_DATABASE={{ kdbx_path }}; export PYKEEPASS_KEYFILE={{ kdbx_key_path }}; {{ cron_path }}/dbBackups.sh 2>&1 >> /var/log/dbBackups.log"
     - name: Installing Certificate Renewal script...
       copy:
         src: "{{ role_path }}/files/renewCert.sh"

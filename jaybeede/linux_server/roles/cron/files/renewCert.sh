@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck disable=SC1091
+source "${HOME}/.bash_aliases"
+
 #########################global variable
 # shellcheck disable=SC2128
 if [[ "$BASH_SOURCE" != "$0" ]]; then

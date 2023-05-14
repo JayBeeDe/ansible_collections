@@ -85,3 +85,4 @@ export -f kdbxQuery
 
 export HISTTIMEFORMAT="%F %T  "
 export EDITOR=nano
+export LANG=C
