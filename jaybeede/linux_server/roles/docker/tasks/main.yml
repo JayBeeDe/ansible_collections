@@ -379,6 +379,13 @@
       shell: "rsync -avr --copy-unsafe-links /etc/letsencrypt/live {{ vol_path }}/web-proxy-conf-vol/_data/ssl"
       when: https_flag == 1
 
+    - name: "Create /etc/letsencrypt/conf dir"
+      ansible.builtin.file:
+        path: "/etc/letsencrypt/conf"
+        state: directory
+        recurse: yes
+        mode: "0755"
+
     - name: "Configuring web-proxy..."
       template:
         src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
@@ -387,6 +394,59 @@
         owner: "root"
         group: "root"
         force: yes
+
+    - name: "Configuring web-proxy 2..."
+      template:
+        src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
+        dest: "/etc/letsencrypt/conf/nginx-https.conf"
+        mode: "0755"
+        owner: "root"
+        group: "root"
+        force: yes
+      when: https_flag == 1
+
+    - name: Logical evaluation...
+      set_fact:
+        old_https_flag: "{{ https_flag }}"
+        changed_when: false
+
+    - name: Logical evaluation...
+      set_fact:
+        old_acmechallenge_flag: "{{ acmechallenge_flag }}"
+        changed_when: false
+
+    - name: Logical evaluation...
+      set_fact:
+        https_flag: 0
+        changed_when: false
+      when: old_https_flag == 1
+
+    - name: Logical evaluation...
+      set_fact:
+        acmechallenge_flag: 1
+        changed_when: false
+      when: old_https_flag == 1
+
+    - name: "Configuring web-proxy 3..."
+      template:
+        src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
+        dest: "/etc/letsencrypt/conf/nginx-http.conf"
+        mode: "0755"
+        owner: "root"
+        group: "root"
+        force: yes
+
+    - name: Logical evaluation...
+      set_fact:
+        https_flag: "{{ old_https_flag }}"
+        changed_when: false
+      when: old_https_flag == 1
+
+    - name: Logical evaluation...
+      set_fact:
+        acmechallenge_flag: "{{ old_acmechallenge_flag }}"
+        changed_when: false
+      when: old_https_flag == 1
 
     - name: Running web-proxy
       community.docker.docker_container:

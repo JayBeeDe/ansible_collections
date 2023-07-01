@@ -31,7 +31,7 @@ http {
 		server_name {{ server_domain }} www.{{ server_domain }};
 		ssl_certificate /etc/nginx/ssl/{{ server_domain }}/fullchain.pem;
 		ssl_certificate_key /etc/nginx/ssl/{{ server_domain }}/privkey.pem;
-		ssl_ciphers "ECDHE+ECDSA:!ECDHE+ECDSA+AES128+SHA256:!ECDHE+ECDSA+AES256+SHA384:!CAMELLIA:!NULL";
+		ssl_ciphers "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256";
 		ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
 		ssl_session_cache shared:SSL:10m;
 		ssl_session_timeout 10m;
@@ -59,7 +59,7 @@ http {
 			proxy_pass http://service-virtual-desktop;
 		}
 		location /jawanndenn {
-		 	rewrite ^(jawanndenn)$ $1/ permanent;
+			rewrite ^(jawanndenn)$ $1/ permanent;
 			proxy_pass http://service-jawanndenn;
 		}
 		location /etherpad/ {

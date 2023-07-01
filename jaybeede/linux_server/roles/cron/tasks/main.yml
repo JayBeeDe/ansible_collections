@@ -73,7 +73,7 @@
         name: Certificate Renewal
         minute: "20"
         hour: "0"
-        job: '{{ cron_path }}/renewCert.sh "{{ server_domain }}" "{{ email }}"'
+        job: "export PYKEEPASS_DATABASE={{ kdbx_path }}; export PYKEEPASS_KEYFILE={{ kdbx_key_path }}; {{ cron_path }}/renewCert.sh {{ server_domain }} {{ email }} 2>&1 >> /var/log/renewCert.log"
 
   become: yes
   become_user: "root"
