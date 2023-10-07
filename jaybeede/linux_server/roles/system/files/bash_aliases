@@ -74,7 +74,7 @@ function dk_logs {
     target=$1
     trgt=$(dk_getTarget "$target")
     echo "===Starting LOGS ON $trgt==="
-    docker logs "$trgt"
+    docker logs -n 10 -f "$trgt"
 }
 export -f dk_logs
 
