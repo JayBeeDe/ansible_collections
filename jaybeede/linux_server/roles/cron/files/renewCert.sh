@@ -102,8 +102,6 @@ if [ "$mode" == "renewing" ]; then
     notify "Certificate expiration date is ${prettyDteCert}, ${mode} is required and will be performed"
 fi
 
-# openssl dhparam -out "/etc/letsencrypt/live/${domain}-0001/dhparam2048.pem 2048"
-
 restartProxy "$tmpProto" "http"
 wait4curl "${domain}:${tmpPort}"
 
@@ -115,9 +113,10 @@ else
 fi
 
 mkdir -p "/var/lib/docker/volumes/web-proxy-conf-vol/_data/ssl/${domain}/"
-# cp -f "/etc/letsencrypt/live/${domain}-0001/dhparam2048.pem" "/var/lib/docker/volumes/web-proxy-conf-vol/_data/ssl/${domain}/dhparam2048.pem"
-cp -f "/etc/letsencrypt/live/${domain}-0001/privkey.pem" "/var/lib/docker/volumes/web-proxy-conf-vol/_data/ssl/${domain}/privkey.pem"
-cp -f "/etc/letsencrypt/live/${domain}-0001/fullchain.pem" "/var/lib/docker/volumes/web-proxy-conf-vol/_data/ssl/${domain}/fullchain.pem"
+# /etc/letsencrypt/live/${domain}/ is a symlink to /etc/letsencrypt/archive/${domain}-00XX/, where 00XX is incrementing at each renew
+# symink is created by certbot just above, so no need to worry, /etc/letsencrypt/live/${domain}/ is always latest
+cp -f "/etc/letsencrypt/live/${domain}/privkey.pem" "/var/lib/docker/volumes/web-proxy-conf-vol/_data/ssl/${domain}/privkey.pem"
+cp -f "/etc/letsencrypt/live/${domain}/fullchain.pem" "/var/lib/docker/volumes/web-proxy-conf-vol/_data/ssl/${domain}/fullchain.pem"
 
 if [ "$tmpProto" == "http" ]; then
     cp -f "/etc/letsencrypt/conf/nginx-https.conf" "/var/lib/docker/volumes/web-proxy-conf-vol/_data/nginx.conf"
@@ -128,9 +127,8 @@ wait4curl "${domain}:443"
 dte=$(date "+%Y-%m-%d-%H%M%S")
 echo "Backuping artefacts, timestamp is ${dte}..."
 mkdir -p "/opt/CrtBackups/${domain}"
-# cp "/etc/letsencrypt/live/${domain}-0001/dhparam2048.pem" "/opt/CrtBackups/${domain}/${dte}-dhparam2048.pem"
-cp "/etc/letsencrypt/live/${domain}-0001/privkey.pem" "/opt/CrtBackups/${domain}/${dte}.key"
-cp "/etc/letsencrypt/live/${domain}-0001/fullchain.pem" "/opt/CrtBackups/${domain}/${dte}.crt"
+cp "/etc/letsencrypt/live/${domain}/privkey.pem" "/opt/CrtBackups/${domain}/${dte}.key"
+cp "/etc/letsencrypt/live/${domain}/fullchain.pem" "/opt/CrtBackups/${domain}/${dte}.crt"
 
 echo "Removing temporary artefacts..."
 
