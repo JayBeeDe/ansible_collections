@@ -20,8 +20,8 @@ DOCUMENTATION = '''
 module: keyboard_shortcuts
 author: JayBee
 version_added: "2.0.0"
-short_description: Create keyboard sortcuts on linux workstation running gnome
-description: Ansible Module to create keyboard sortcuts on linux workstation running gnome
+short_description: Create keyboard shortcuts on linux workstation running gnome
+description: Ansible Module to create keyboard shortcuts on linux workstation running gnome
 
 options:
   binding:
@@ -351,7 +351,7 @@ def main():
                 hasChanged = True
                 customKeyBindingsList.remove(str(prefixDconfCustomPath + suffixDconfCustomPath + str(indexCustom) + "/"))
                 dconf.write(prefixDconfCustomPath + suffixDconfCustomRootPath, axstr(customKeyBindingsList))
-                # we have found a indexCustom so we are sure that there is equivalence with existance of custom + indexCustom key
+                # we have found a indexCustom so we are sure that there is equivalence with existence of custom + indexCustom key
                 dconf.reset(prefixDconfCustomPath + suffixDconfCustomPath + str(indexCustom) + "/name")
                 dconf.reset(prefixDconfCustomPath + suffixDconfCustomPath + str(indexCustom) + "/binding")
                 dconf.reset(prefixDconfCustomPath + suffixDconfCustomPath + str(indexCustom) + "/command")

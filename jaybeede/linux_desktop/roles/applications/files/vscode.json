@@ -54,7 +54,7 @@
         "**/*.tdy": true,
         "**/*~": true,
         "**/.code-workspace": true,
-        "**/.vscode": true,
+        "**/.vscode": true
     },
     "git.autofetch": "all",
     "git.autorefresh": true,
@@ -153,7 +153,7 @@
     "redhat.telemetry.enabled": false,
     "yaml.format.bracketSpacing": true,
     "[yaml]": {
-        "editor.autoIndent": "full",
+        "editor.autoIndent": "full"
     },
     "yaml.yamlVersion": "1.2",
     "yaml.format.singleQuote": false,

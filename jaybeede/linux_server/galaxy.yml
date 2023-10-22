@@ -5,7 +5,7 @@ version: 0.1.0
 readme: README.md
 authors:
   - JayBee <jb.social@outlook.com>
-description: roles & modules to quicky deploy a Debian server
+description: roles & modules to quickly deploy a Debian server
 license:
   - GPL-3.0-or-later
 tags:

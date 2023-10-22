@@ -557,7 +557,7 @@ def main():
         hasChanged = True
 
     # @todo
-    # extra wrapper aroung dconf object...
+    # extra wrapper around dconf object...
 
     module.exit_json(changed=hasChanged, ansible_module_results="lol")
 

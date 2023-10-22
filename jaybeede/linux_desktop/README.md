@@ -1,6 +1,6 @@
 # linux_desktop
 
-linux_desktop collection provides a set of ready to use roles & modules to quicky deploy a Ubuntu desktop computer: OS, desktop and application configuration.
+linux_desktop collection provides a set of ready to use roles & modules to quickly deploy a Ubuntu desktop computer: OS, desktop and application configuration.
 
 ## Collection Content
 
@@ -26,7 +26,7 @@ Module | Feature | Description
 ------ | ------- | -----------
 desktop_launchers | Manage desktop icons | create, edit, remove desktop icons according the freedesktop.org specifications
 gnome_extensions | Manage Gnome extensions | install, update, uninstall, enable, disable gnome extensions
-keyboard_shortcuts | Manage keyboard shortcut | create, edit remove buldtin or custom command bindings to a keyboard shortcut
+keyboard_shortcuts | Manage keyboard shortcut | create, edit remove builtin or custom command bindings to a keyboard shortcut
 
 ### Roles
 
@@ -110,7 +110,7 @@ Warning: All roles dependencies must be met:<br />
   - /usr/share/gnome-shell/extensions/ must have recursively 777 as chmod when scope is set to system.<br />
 * system role:<br />
   - /VMs will be used as folder to store the local virtual machine file. Please ensure you have enough space.<br />
-  - nmcli python library might need to be patched. Please remplace (or ensure the content is already ok): see [system role documentation for details](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_desktop/roles/system/README.md)<br />
+  - nmcli python library might need to be patched. Please replace (or ensure the content is already ok): see [system role documentation for details](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_desktop/roles/system/README.md)<br />
 
 ## Quick start
 

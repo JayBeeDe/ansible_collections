@@ -1,6 +1,6 @@
 # linux_server
 
-linux_server collection provides a set of ready to use roles & modules to quicky deploy a Debian server: OS and application configuration.
+linux_server collection provides a set of ready to use roles & modules to quickly deploy a Debian server: OS and application configuration.
 
 ## Collection Content
 
