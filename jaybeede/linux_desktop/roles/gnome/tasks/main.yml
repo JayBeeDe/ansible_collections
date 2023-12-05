@@ -597,119 +597,105 @@
       loop_control:
         loop_var: ks_item
 
-    - name: Setting Up shortcuts (1/19)...
+    - name: Setting Up shortcuts (1/17)...
       keyboard_shortcuts:
         dynamic: true
         name: home
         binding: <Super>e
 
-    - name: Setting Up shortcuts (2/19)...
+    - name: Setting Up shortcuts (2/17)...
       keyboard_shortcuts:
         dynamic: true
         name: control-center
         binding: <Super>i
 
-    - name: Setting Up shortcuts (3/19)...
+    - name: Setting Up shortcuts (3/17)...
       keyboard_shortcuts:
         dynamic: true
         name: panel-run-dialog
         binding: <Super>r
 
-    - name: Setting Up shortcuts (4/19)...
+    - name: Setting Up shortcuts (4/17)...
       keyboard_shortcuts:
         dynamic: true
         name: Ajustements
         command: /usr/bin/gnome-tweaks
         binding: <Super>u
 
-    - name: Setting Up shortcuts (5/19)...
+    - name: Setting Up shortcuts (5/17)...
       keyboard_shortcuts:
         dynamic: true
         name: Capture
         command: /usr/bin/flameshot gui
         binding: Print
 
-    - name: Setting Up shortcuts (6/19)...
+    - name: Setting Up shortcuts (6/17)...
       keyboard_shortcuts:
         dynamic: true
         name: Nothing
         binding: <Super>q
 
-    - name: Setting Up shortcuts (7/19)...
+    - name: Setting Up shortcuts (7/17)...
       keyboard_shortcuts:
         dynamic: true
         name: show-desktop
         binding: <Super>d
 
-    - name: Setting Up shortcuts (8/19)...
-      keyboard_shortcuts:
-        name: Pull Projets Perso
-        command: "/bin/bash {{ git_rootrepo }}/Linux-Scripts-Toolkit/manageGit/manageGit.sh {{ git_rootrepo }} pull"
-        binding: <Primary><Alt>ampersand
-    # is personal, will not work for you
-
-    - name: Setting Up shortcuts (9/19)...
-      keyboard_shortcuts:
-        name: Push Projets Perso
-        command: "/bin/bash {{ git_rootrepo }}/Linux-Scripts-Toolkit/manageGit/manageGit.sh {{ git_rootrepo }} push"
-        binding: <Primary><Alt>eacute
-    # is personal, will not work for you
-
-    - name: Setting Up shortcuts (10/19)...
+    - name: Setting Up shortcuts (8/17)...
       keyboard_shortcuts:
         name: Terminator
         command: /usr/bin/terminator
         binding: <Primary><Alt>t
 
-    - name: Setting Up shortcuts (11/19)...
+    - name: Setting Up shortcuts (9/17)...
       keyboard_shortcuts:
         dynamic: true
         name: close
         binding: <Alt>F4
 
-    - name: Setting Up shortcuts (12/19)...
+    - name: Setting Up shortcuts (10/17)...
       keyboard_shortcuts:
         dynamic: true
         name: minimize
         binding: <Super>Down
 
-    - name: Setting Up shortcuts (13/19)...
+    - name: Setting Up shortcuts (11/17)...
       keyboard_shortcuts:
         dynamic: true
         name: maximize
         binding: <Super>Up
 
-    - name: Setting Up shortcuts (14/19)...
+    - name: Setting Up shortcuts (12/17)...
       keyboard_shortcuts:
         dynamic: true
         name: switch-windows
         binding: <Alt>Tab
 
-    - name: Setting Up shortcuts (15/19)...
+    - name: Setting Up shortcuts (13/17)...
       keyboard_shortcuts:
         dynamic: true
         name: switch-windows-backward
         binding: <Shift><Alt>Tab
 
-    - name: Setting Up shortcuts (16/19)...
+    - name: Setting Up shortcuts (14/17)...
       keyboard_shortcuts:
         dynamic: true
         name: toggle-tiled-left
         binding: <Super>Left
 
-    - name: Setting Up shortcuts (17/19)...
+    - name: Setting Up shortcuts (15/17)...
       keyboard_shortcuts:
         dynamic: true
         name: toggle-tiled-right
         binding: <Super>Right
 
-    - name: Setting Up shortcuts (18/19)...
+    - name: Setting Up shortcuts (16/17)...
       keyboard_shortcuts:
         dynamic: true
         name: pop-monitor-left
         binding: <Shift><Super>Left
 
-    - name: Setting Up shortcuts (19/19)...
+    - name: Setting Up shortcuts (17/17)...
       keyboard_shortcuts:
         dynamic: true
         name: pop-monitor-right
