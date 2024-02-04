@@ -18,7 +18,7 @@ all:
     printer_ip: "192.168.1.16"
     printer_model: DCP-7070DW
     rdp_host: "172.31.55.2"
-    rdp_name: JBD-CLI-CLB
+    rdp_name: JBD-CLI-P17
     rdp_port: "{{ vault_rdp_port }}"
     rdp_user: "{{ vault_rdp_user }}"
     tokenGithub: "{{ vault_tokenGithub }}"
