@@ -438,7 +438,7 @@
 
     - name: Logical evaluation...
       set_fact:
-        https_flag: "{{ old_https_flag }}"
+        https_flag: 1
         changed_when: false
       when: old_https_flag == 1
 

@@ -31,8 +31,8 @@ http {
 		server_name {{ server_domain }} www.{{ server_domain }};
 		ssl_certificate /etc/nginx/ssl/{{ server_domain }}/fullchain.pem;
 		ssl_certificate_key /etc/nginx/ssl/{{ server_domain }}/privkey.pem;
-		ssl_ciphers "EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5";
-		ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+		ssl_protocols TLSv1.3 TLSv1.2;
+		ssl_ciphers "HIGH:!aNULL:!MD5";
 		ssl_session_cache shared:SSL:10m;
 		ssl_session_timeout 10m;
 		ssl_prefer_server_ciphers on;
