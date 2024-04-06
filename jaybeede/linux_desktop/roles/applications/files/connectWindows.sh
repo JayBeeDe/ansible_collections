@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # @title: windows connect script
-# @author: Jean-Baptiste Delon, https://jean-baptiste-delon.com
+# @author: JayBeeDe, https://github.com/JayBeeDe/ansible_collections
 # @date: 13/06/2021
 # @version: 0.2
 # @description: this script can be used as launcher for windows VM connection over RDP

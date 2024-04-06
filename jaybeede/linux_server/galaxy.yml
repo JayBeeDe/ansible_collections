@@ -1,7 +1,7 @@
 ---
 namespace: jaybeede
 name: linux_server
-version: 0.1.0
+version: 1.0.0
 readme: README.md
 authors:
   - JayBee <jb.social@outlook.com>
@@ -13,9 +13,10 @@ tags:
   - "server"
   - "apt"
   - "systemd"
+  - "docker"
 repository: https://github.com/JayBeeDe/ansible_collections
 documentation: https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/README.md
-homepage: https://jean-baptiste-delon.com/
+homepage: https://github.com/JayBeeDe/ansible_collections
 issues: https://github.com/JayBeeDe/ansible_collections/issues
 build_ignore:
   - '*/__pycache__/*'

@@ -58,8 +58,8 @@
         group: "{{ user }}"
 
     - name: "Configuring VLC (2/3)..."
-      copy:
-        src: "{{ role_path }}/files/vlc.conf"
+      template:
+        src: "{{ role_path }}/files/vlc.ini.tpl"
         dest: "{{ home }}/.config/vlc/vlc-qt-interface.conf"
         mode: "0664"
         owner: "{{ user }}"
@@ -141,8 +141,8 @@
         group: "{{ user }}"
 
     - name: "Configuring flameshot (2/2)..."
-      copy:
-        src: "{{ role_path }}/files/flameshot.ini"
+      template:
+        src: "{{ role_path }}/files/flameshot.ini.tpl"
         dest: "{{ home }}/.config/flameshot/flameshot.ini"
         mode: "0644"
         owner: "{{ user }}"

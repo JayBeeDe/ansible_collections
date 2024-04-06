@@ -1,5 +1,5 @@
 [General]
-filedialog-path=@Variant(\0\0\0\x11\0\0\0\f/home/jdelon)
+filedialog-path=@Variant(\0\0\0\x11\0\0\0\f{{ home }})
 geometry=@ByteArray(\x1\xd9\xd0\xcb\0\x3\0\0\0\0\0\0\0\0\0 \0\0\a\x7f\0\0\x4\x37\0\0\x2\x94\0\0\x1J\0\0\x4\xeb\0\0\x2\xed\0\0\0\0\x2\0\0\0\a\x80\0\0\0\0\0\0\0\x45\0\0\a\x7f\0\0\x4\x37)
 
 [FullScreen]
