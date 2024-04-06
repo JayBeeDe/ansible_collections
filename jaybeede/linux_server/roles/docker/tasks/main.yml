@@ -12,6 +12,9 @@
         - limesurvey-db-init-mnt
         - etherpad-db-init-mnt
         - etherpad-ui-mnt
+        - matrix-db-init-mnt
+        - matrix-ui-mnt
+        - matrix-gtw-mnt
 
     - name: Create a volume
       community.docker.docker_volume:
@@ -23,6 +26,8 @@
         - limesurvey-db-vol
         - etherpad-db-vol
         - jawanndenn-ui-vol
+        - matrix-db-vol
+        - matrix-telegram-bridge-vol
         - web-proxy-conf-vol
         - web-proxy-vol
 
@@ -35,6 +40,7 @@
           - virtual-desktop-db
           - limesurvey-db
           - etherpad-db
+          - matrix-db
 
     - name: "Resetting all init mnt..."
       shell: rm -fr "{{ mnt_path }}/{{ item }}-init-mnt/"*
@@ -375,6 +381,167 @@
         name: etherpad-ui
         restart: true
 
+    - name: Create a network
+      community.docker.docker_network:
+        name: matrix_net
+        driver: bridge
+        ipam_config:
+          - subnet: 10.10.10.0/24
+            gateway: 10.10.10.1
+
+    - name: Running matrix-db
+      community.docker.docker_container:
+        detach: yes
+        hostname: matrix-db
+        image: postgres:14
+        interactive: yes
+        name: matrix-db
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        networks:
+          - name: matrix_net
+            ipv4_address: 10.10.10.2
+        volumes:
+          - "{{ mnt_path }}/matrix-db-init-mnt:/docker-entrypoint-initdb.d"
+          - matrix-db-vol:/var/lib/postgresql/data
+        env:
+          POSTGRES_DB: matrixdb
+          POSTGRES_USER: matrixdb
+          POSTGRES_PASSWORD: "{{ matrixdb_password }}"
+          POSTGRES_INITDB_ARGS: "--encoding='UTF8' --lc-collate='C' --lc-ctype='C'"
+      when: resetPaths['matrix-db'] is defined
+
+    - name: Pre-Configuring Matrix...
+      template:
+        src: "{{ role_path }}/files/matrix-ui/element.json.tpl"
+        dest: "{{ mnt_path }}/matrix-ui-mnt/element.json"
+        mode: "0755"
+        force: yes
+
+    - name: Running matrix-ui
+      community.docker.docker_container:
+        detach: yes
+        hostname: matrix-ui
+        image: vectorim/element-web:latest
+        interactive: yes
+        name: matrix-ui
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - matrix-db:postgres
+        volumes:
+          - "{{ mnt_path }}/matrix-ui-mnt/element.json:/app/config.json"
+        networks:
+          - name: matrix_net
+            ipv4_address: 10.10.10.3
+          - name: bridge
+
+    - name: Pre-Configuring Matrix...
+      template:
+        src: "{{ role_path }}/files/matrix-gtw/synapse.yaml.tpl"
+        dest: "{{ mnt_path }}/matrix-gtw-mnt/synapse.yaml"
+        mode: "0755"
+        force: yes
+
+    - name: Pre-Configuring Matrix...
+      template:
+        src: "{{ role_path }}/files/matrix-gtw/mautrix-telegram-registration.yaml.tpl"
+        dest: "{{ mnt_path }}/matrix-gtw-mnt/mautrix-telegram-registration.yaml"
+        mode: "0755"
+        force: yes
+
+    - name: Running matrix-gtw
+      community.docker.docker_container:
+        detach: yes
+        hostname: matrix-gtw
+        image: matrixdotorg/synapse:latest
+        interactive: yes
+        name: matrix-gtw
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - matrix-db:postgres
+          - matrix-telegram-bridge:telegram
+        volumes:
+          - "{{ mnt_path }}/matrix-gtw-mnt/synapse.yaml:/data/homeserver.yaml"
+          - "{{ mnt_path }}/matrix-gtw-mnt/mautrix-telegram-registration.yaml:/data/mautrix-telegram-registration.yaml"
+        networks:
+          - name: matrix_net
+            ipv4_address: 10.10.10.4
+          - name: bridge
+
+    - name: Running matrix-gtw pre-script
+      community.docker.docker_container_exec:
+        container: matrix-gtw
+        command: /bin/bash -c "/usr/bin/chown -R 991:991 /data"
+
+    - name: Running matrix-proxy
+      community.docker.docker_container:
+        detach: yes
+        hostname: matrix-proxy
+        image: ghcr.io/matrix-org/sliding-sync:latest
+        interactive: yes
+        name: matrix-proxy
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - matrix-db:postgres
+        env:
+          SYNCV3_SERVER: "https://{{ server_domain }}/matrix"
+          SYNCV3_DB: "user=matrixdb dbname=syncv3 sslmode=disable host=matrix-db password='{{ matrixdb_password }}'"
+          SYNCV3_SECRET: "{{ matrixproxy_secret }}"
+          SYNCV3_BINDADDR: 0.0.0.0:8009
+        networks:
+          - name: matrix_net
+            ipv4_address: 10.10.10.5
+          - name: bridge
+
+    - name: Pre-Configuring Telegram Bridge...
+      template:
+        src: "{{ role_path }}/files/matrix-telegram-bridge/telegram.yaml.tpl"
+        dest: "{{ vol_path }}/matrix-telegram-bridge-vol/_data/config.yaml"
+        mode: "0755"
+        force: yes
+
+    - name: Pre-Configuring Telegram Bridge 2/2...
+      template:
+        src: "{{ role_path }}/files/matrix-gtw/mautrix-telegram-registration.yaml.tpl"
+        dest: "{{ vol_path }}/matrix-telegram-bridge-vol/_data/registration.yaml"
+        mode: "0755"
+        force: yes
+
+    - name: Running Telegram Bridge
+      community.docker.docker_container:
+        detach: yes
+        hostname: matrix-telegram-bridge
+        image: dock.mau.dev/mautrix/telegram
+        interactive: yes
+        name: matrix-telegram-bridge
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - matrix-gtw:synapse
+        volumes:
+          - matrix-telegram-bridge-vol:/data
+        networks:
+          - name: matrix_net
+            ipv4_address: 10.10.10.6
+
     - name: "Configuring SSL for web-proxy..."
       shell: "rsync -avr --copy-unsafe-links /etc/letsencrypt/live {{ vol_path }}/web-proxy-conf-vol/_data/ssl"
       when: https_flag == 1
@@ -466,6 +633,9 @@
           - "limesurvey-ui:limesurvey-ui"
           - "jawanndenn-ui:jawanndenn-ui"
           - "etherpad-ui:etherpad-ui"
+          - "matrix-ui:matrix-ui"
+          - "matrix-gtw:matrix-gtw"
+          - "matrix-proxy:matrix-proxy"
         ports:
           - 80:80
           - "{{ '443:443' if (https_flag == 1) }}"

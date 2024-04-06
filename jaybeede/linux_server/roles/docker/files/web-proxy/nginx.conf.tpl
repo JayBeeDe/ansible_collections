@@ -6,6 +6,15 @@ http {
 	upstream service-jawanndenn {
 		server jawanndenn-ui:80;
 	}
+	upstream service-matrix {
+		server matrix-ui:80;
+	}
+	upstream service-matrix-gtw {
+		server matrix-gtw:8008;
+	}
+	upstream service-matrix-proxy {
+		server matrix-proxy:8009;
+	}
 	upstream service-etherpad {
 		server etherpad-ui:9001;
 	}
@@ -69,6 +78,25 @@ http {
 			proxy_set_header X-Real-IP $remote_addr;
 			proxy_set_header Host $host;
 			proxy_http_version 1.1;
+		}
+		location /messages/ {
+			proxy_pass http://service-matrix/;
+		}
+		location /matrix/ {
+			proxy_pass http://service-matrix-gtw/;
+			proxy_set_header X-Forwarded-For $remote_addr;
+			proxy_set_header X-Forwarded-Proto $scheme;
+			proxy_set_header Host $host;
+		}
+		location /matrix/sliding-sync/ {
+			proxy_pass http://service-matrix-proxy/;
+			proxy_set_header X-Forwarded-For $remote_addr;
+			proxy_set_header X-Forwarded-Proto $scheme;
+			proxy_set_header Host $host;
+		}
+		location /.well-known/matrix/client {
+			add_header Access-Control-Allow-Origin *;
+			return 200 '{ "m.homeserver": { "base_url": "https://{{ server_domain }}/matrix" }, "org.matrix.msc3575.proxy": { "url": "https://{{ server_domain }}/matrix/sliding-sync" } }';
 		}
 		location /limesurvey/ {
 			proxy_pass http://service-limesurvey/;
