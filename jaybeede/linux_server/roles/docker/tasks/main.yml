@@ -28,6 +28,7 @@
         - jawanndenn-ui-vol
         - matrix-db-vol
         - matrix-telegram-bridge-vol
+        - matrix-whatsapp-bridge-vol
         - web-proxy-conf-vol
         - web-proxy-vol
 
@@ -442,17 +443,24 @@
             ipv4_address: 10.10.10.3
           - name: bridge
 
-    - name: Pre-Configuring Matrix...
+    - name: Pre-Configuring Matrix (1/3)...
       template:
         src: "{{ role_path }}/files/matrix-gtw/synapse.yaml.tpl"
         dest: "{{ mnt_path }}/matrix-gtw-mnt/synapse.yaml"
         mode: "0755"
         force: yes
 
-    - name: Pre-Configuring Matrix...
+    - name: Pre-Configuring Matrix (2/3)...
       template:
         src: "{{ role_path }}/files/matrix-gtw/mautrix-telegram-registration.yaml.tpl"
         dest: "{{ mnt_path }}/matrix-gtw-mnt/mautrix-telegram-registration.yaml"
+        mode: "0755"
+        force: yes
+
+    - name: Pre-Configuring Matrix (3/3)...
+      template:
+        src: "{{ role_path }}/files/matrix-gtw/mautrix-whatsapp-registration.yaml.tpl"
+        dest: "{{ mnt_path }}/matrix-gtw-mnt/mautrix-whatsapp-registration.yaml"
         mode: "0755"
         force: yes
 
@@ -471,9 +479,11 @@
         links:
           - matrix-db:postgres
           - matrix-telegram-bridge:telegram
+          - matrix-whatsapp-bridge:whatsapp
         volumes:
           - "{{ mnt_path }}/matrix-gtw-mnt/synapse.yaml:/data/homeserver.yaml"
           - "{{ mnt_path }}/matrix-gtw-mnt/mautrix-telegram-registration.yaml:/data/mautrix-telegram-registration.yaml"
+          - "{{ mnt_path }}/matrix-gtw-mnt/mautrix-whatsapp-registration.yaml:/data/mautrix-whatsapp-registration.yaml"
         networks:
           - name: matrix_net
             ipv4_address: 10.10.10.4
@@ -508,14 +518,14 @@
             ipv4_address: 10.10.10.5
           - name: bridge
 
-    - name: Pre-Configuring Telegram Bridge...
+    - name: Pre-Configuring Telegram Bridge (1/2)...
       template:
         src: "{{ role_path }}/files/matrix-telegram-bridge/telegram.yaml.tpl"
         dest: "{{ vol_path }}/matrix-telegram-bridge-vol/_data/config.yaml"
         mode: "0755"
         force: yes
 
-    - name: Pre-Configuring Telegram Bridge 2/2...
+    - name: Pre-Configuring Telegram Bridge (2/2)...
       template:
         src: "{{ role_path }}/files/matrix-gtw/mautrix-telegram-registration.yaml.tpl"
         dest: "{{ vol_path }}/matrix-telegram-bridge-vol/_data/registration.yaml"
@@ -541,6 +551,40 @@
         networks:
           - name: matrix_net
             ipv4_address: 10.10.10.6
+
+    - name: Pre-Configuring Whatsapp Bridge (1/2)...
+      template:
+        src: "{{ role_path }}/files/matrix-whatsapp-bridge/whatsapp.yaml.tpl"
+        dest: "{{ vol_path }}/matrix-whatsapp-bridge-vol/_data/config.yaml"
+        mode: "0755"
+        force: yes
+
+    - name: Pre-Configuring Whatsapp Bridge (2/2)...
+      template:
+        src: "{{ role_path }}/files/matrix-gtw/mautrix-whatsapp-registration.yaml.tpl"
+        dest: "{{ vol_path }}/matrix-whatsapp-bridge-vol/_data/registration.yaml"
+        mode: "0755"
+        force: yes
+
+    - name: Running Whatsapp Bridge
+      community.docker.docker_container:
+        detach: yes
+        hostname: matrix-whatsapp-bridge
+        image: dock.mau.dev/mautrix/whatsapp
+        interactive: yes
+        name: matrix-whatsapp-bridge
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        links:
+          - matrix-gtw:synapse
+        volumes:
+          - matrix-whatsapp-bridge-vol:/data
+        networks:
+          - name: matrix_net
+            ipv4_address: 10.10.10.7
 
     - name: "Configuring SSL for web-proxy..."
       shell: "rsync -avr --copy-unsafe-links /etc/letsencrypt/live {{ vol_path }}/web-proxy-conf-vol/_data/ssl"

@@ -38,3 +38,4 @@ trusted_key_servers:
   - server_name: matrix.org
 app_service_config_files:
   - /data/mautrix-telegram-registration.yaml
+  - /data/mautrix-whatsapp-registration.yaml

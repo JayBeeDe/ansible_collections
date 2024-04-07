@@ -2,7 +2,7 @@
 homeserver:
     # The address that this appservice can use to connect to the homeserver.
     address: "http://matrix-gtw:8008"
-    # The domain of the homeserver (for MXIDs, etc).
+    # The domain of the homeserver (also known as server_name, used for MXIDs, etc).
     domain: "{{ server_domain }}"
     # Whether or not to verify the SSL certificate of the homeserver.
     # Only applies if address starts with https://
@@ -30,7 +30,6 @@ appservice:
     # When using https:// the TLS certificate and key files for the address.
     tls_cert: false
     tls_key: false
-
     # The hostname and port where this appservice should listen.
     hostname: 0.0.0.0
     port: 29317
@@ -89,21 +88,9 @@ appservice:
     as_token: "{{ matrixtelegrambridge_astoken }}"
     hs_token: "{{ matrixtelegrambridge_hstoken }}"
 
-# Prometheus telemetry config. Requires prometheus-client to be installed.
 metrics:
     enabled: false
     listen_port: 8000
-
-# Manhole config.
-manhole:
-    # Whether or not opening the manhole is allowed.
-    enabled: false
-    # The path for the unix socket.
-    path: /var/tmp/mautrix-telegram.manhole
-    # The list of UIDs who can be added to the whitelist.
-    # If empty, any UIDs can be specified in the open-manhole command.
-    whitelist:
-        - 0
 bridge:
     # Localpart template of MXIDs for Telegram users.
     # {userid} is replaced with the user ID of the Telegram user.
@@ -325,7 +312,6 @@ bridge:
             # session before changing it. The Matrix spec recommends 100 as the
             # default.
             messages: 100
-
             # Disable rotating keys when a user's devices change?
             # You should not enable this option unless you understand all the implications.
             disable_device_change_key_rotation: false
