@@ -73,7 +73,7 @@ appservice:
     # The unique ID of this appservice.
     id: telegram
     # Username of the appservice bot.
-    bot_username: telegram_JayBeeDeBot
+    bot_username: telegrambot
     # Display name and avatar for bot. Set to "remove" to remove display name/avatar, leave empty
     # to leave display name/avatar as-is.
     bot_displayname: Telegram bridge bot
@@ -127,7 +127,7 @@ bridge:
     allow_avatar_remove: false
     # Should contact names and profile pictures be allowed?
     # This is only safe to enable on single-user instances.
-    allow_contact_info: false
+    allow_contact_info: true
 
     # Maximum number of members to sync per portal when starting up. Other members will be
     # synced when they send messages. The maximum is 10000, after which the Telegram server
@@ -146,7 +146,7 @@ bridge:
     skip_deleted_members: true
     # Whether or not to automatically synchronize contacts and chats of Matrix users logged into
     # their Telegram account at startup.
-    startup_sync: false
+    startup_sync: true
     # Number of most recently active dialogs to check when syncing chats.
     # Set to 0 to remove limit.
     sync_update_limit: 0
@@ -155,9 +155,9 @@ bridge:
     sync_create_limit: 15
     # Should all chats be scheduled to be created later?
     # This is best used in combination with MSC2716 infinite backfill.
-    sync_deferred_create_all: false
+    sync_deferred_create_all: true
     # Whether or not to sync and create portals for direct chats at startup.
-    sync_direct_chats: false
+    sync_direct_chats: true
     # The maximum number of simultaneous Telegram deletions to handle.
     # A large number of simultaneous redactions could put strain on your homeserver.
     max_telegram_delete: 10
@@ -175,7 +175,7 @@ bridge:
     # Whether or not to update the m.direct account data event when double puppeting is enabled.
     # Note that updating the m.direct event is not atomic (except with mautrix-asmux)
     # and is therefore prone to race conditions.
-    sync_direct_chat_list: false
+    sync_direct_chat_list: true
     # Servers to always allow double puppeting from
     double_puppet_server_map:
         example.com: https://example.com
@@ -320,7 +320,7 @@ bridge:
     # If set to `default`, this will be enabled in encrypted rooms and disabled in unencrypted rooms.
     # If set to `always`, all DM rooms will have explicit names and avatars set.
     # If set to `never`, DM rooms will never have names and avatars set.
-    private_chat_portal_meta: default
+    private_chat_portal_meta: always
     # Disable generating reply fallbacks? Some extremely bad clients still rely on them,
     # but they're being phased out and will be completely removed in the future.
     disable_reply_fallbacks: false
@@ -512,7 +512,7 @@ bridge:
     #     mxid - Specific user
     permissions:
         "domain": relaybot
-        "{{ server_domain }}": full
+        "{{ server_domain }}": admin
         "@admin:{{ server_domain }}": admin
     relaybot:
         private_chat:
@@ -539,7 +539,7 @@ bridge:
         ignore_own_incoming_events: true
         # List of usernames/user IDs who are also allowed to use the bot commands.
         whitelist:
-            - jaybeede
+            - "{{ telegram_chatid }}"
 telegram:
     # Get your own API keys at https://my.telegram.org/apps
     api_id: "{{ matrixtelegrambridge_appid }}"
