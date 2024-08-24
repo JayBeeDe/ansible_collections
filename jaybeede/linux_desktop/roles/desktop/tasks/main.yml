@@ -1,7 +1,7 @@
 ---
 - block:
     - name: "Configuring arc-menu shortcuts..."
-      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Google Chrome', 'google-chrome', 'google-chrome.desktop', 'Fichiers', 'folder', 'nemo.desktop', 'Visual Studio Code', '', 'code.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'P3X OneNote', '', 'p3x-onenote_p3x-onenote.desktop', 'Skype', '', 'skype_skypeforlinux.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'MotionBox', '{{ home }}/.local/share/icons/motionbox.png', 'MotionBox.desktop', 'EasyEffects', '', 'com.github.wwmm.easyeffects.desktop']"
+      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Google Chrome', 'google-chrome', 'google-chrome.desktop', 'Element', 'element-desktop', 'element-desktop.desktop', 'Fichiers', 'folder', 'nemo.desktop', 'Visual Studio Code', '', 'code.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'P3X OneNote', '', 'p3x-onenote_p3x-onenote.desktop', 'Skype', '', 'skype_skypeforlinux.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'MotionBox', '{{ home }}/.local/share/icons/motionbox.png', 'MotionBox.desktop', 'EasyEffects', '', 'com.github.wwmm.easyeffects.desktop']"
 
     - name: "Configuring gnome bookmarks..."
       dconf: key="/org/gnome/shell/favorite-apps" value="['google-chrome.desktop', 'nemo.desktop', 'code.desktop', 'vlc.desktop', 'connectWindows.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'p3x-onenote_p3x-onenote.desktop', 'skype_skypeforlinux.desktop', 'simple-scan.desktop', 'MotionBox.desktop', 'com.github.wwmm.easyeffects.desktop']"
@@ -14,17 +14,6 @@
     - name: dump test output
       debug:
         msg: "{{ testout }}"
-    - name: "Configuring telegram desktop 1 shortcut..."
-      desktop_launchers:
-        freedesktop_Name: "Telegram"
-        freedesktop_Icon: "{{ home }}/.local/share/icons/telegram.png"
-        target: "/opt/Telegram/Telegram"
-        location: "{{ home }}/.local/share/applications/telegram.desktop"
-    - name: "Configuring telegram desktop 2 shortcut..."
-      desktop_launchers:
-        source: "{{ home }}/.local/share/applications/telegram.desktop"
-        target: 'bash -c ''for item in $(ps aux | grep Telegram | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 5; /opt/Telegram/Telegram 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done'''
-        location: "$DIRECTORY_DESKTOP/telegram.desktop"
     - name: "Configuring MotionBox desktop shortcut..."
       desktop_launchers:
         freedesktop_Name: "MotionBox"
@@ -58,11 +47,11 @@
         freedesktop_Name: "Evolution"
         target: 'bash -c "sleep 10; evolution 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done"'
         location: "$HOME/.config/autostart/evolution.desktop"
-    - name: "Configuring telegram autostart shortcut..."
+    - name: "Configuring element autostart shortcut..."
       desktop_launchers:
-        freedesktop_Name: "Telegram"
-        target: 'bash -c "sleep 5; /opt/Telegram/Telegram 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done"'
-        location: "$HOME/.config/autostart/telegram.desktop"
+        freedesktop_Name: "Element"
+        target: 'bash -c "sleep 5; element-desktop 2>/dev/null & pid=$!; xdotool windowactivate $(xdotool search --pid $pid | sort | head -n 1); sleep 2; xdotool key Control_L+w"'
+        location: "$HOME/.config/autostart/element.desktop"
     - name: "Configuring keepassxc autostart shortcut..."
       desktop_launchers:
         freedesktop_Name: "KeepassXC"
