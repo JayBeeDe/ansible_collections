@@ -20,23 +20,20 @@
   become_user: root
 
 - block:
-    # - name: Installing and enabling Gnome Extensions (forcing mode)...
-    #   gnome_extensions:
-    #     url: "{{ extension_item }}"
-    #     action: enable
-    #     scope: system
-    #     # force: True
-    #     tokenGithub: "{{ tokenGithub }}"
-    #   loop:
-    #     # - https://extensions.gnome.org/extension-data/panel-date-formatatareao.es.v5.shell-extension.zip
-    #     # - https://github.com/oae/gnome-shell-minimize-to-tray
-    #     # - https://github.com/MartinPL/Tray-Icons-Reloaded
-    #     - https://extensions.gnome.org/extension-data/trayIconsReloadedselfmade.pl.v25.shell-extension.zip
-    #     # - https://github.com/darkretailer/gnome-shell-extension_maxi
-    #     # - https://extensions.gnome.org/extension-data/unblanksun.wxggmail.com.v22.shell-extension.zip
-    #   ignore_errors: True
-    # loop_control:
-    #   loop_var: extension_item
+    - name: Installing and enabling Gnome Extensions (forcing mode)...
+      gnome_extensions:
+        url: "{{ extension_item }}"
+        action: enable
+        scope: system
+        # force: True
+        tokenGithub: "{{ tokenGithub }}"
+      loop:
+        - https://extensions.gnome.org/extension-data/panel-date-formatatareao.es.v5.shell-extension.zip
+        - https://github.com/darkretailer/gnome-shell-extension_maxi
+        - https://extensions.gnome.org/extension-data/unblanksun.wxggmail.com.v22.shell-extension.zip
+      ignore_errors: True
+      loop_control:
+        loop_var: extension_item
 
     - name: Installing and enabling Gnome Extensions...
       gnome_extensions:
@@ -46,11 +43,14 @@
         tokenGithub: "{{ tokenGithub }}"
       loop:
         - https://github.com/home-sweet-gnome/dash-to-panel
+        - https://extensions.gnome.org/extension-data/dingrastersoft.com.v63.shell-extension.zip
+        - https://github.com/GSConnect/gnome-shell-extension-gsconnect
         - https://github.com/kgshank/gse-sound-output-device-chooser
         - https://github.com/neffo/bing-wallpaper-gnome-extension
         - https://extensions.gnome.org/extension-data/windowIsReady_Removernunofarrucagmail.com.v18.shell-extension.zip
         - pop-shell@system76.com
         - https://extensions.gnome.org/extension-data/color-pickertuberry.v28.shell-extension.zip
+        - https://extensions.gnome.org/extension-data/window-thumbnailsG-dH.github.com.v9.shell-extension.zip
       notify: Reload gnome sleep
       ignore_errors: True
       loop_control:
@@ -319,9 +319,6 @@
     - name: Configuring Panel Date Format extension...
       dconf: key="/org/gnome/shell/extensions/panel-date-format/format" value="'%Y-%m-%d %H:%M:%S'"
 
-    - name: Configuring minimize-to-tray extension...
-      dconf: key="/org/gnome/shell/extensions/minimize-to-tray/mtt-data" value="{{ mttdata }}"
-
     - name: Configuring bingwallpaper...
       dconf: key="/org/gnome/shell/extensions/bingwallpaper/{{ line_item.key }}" value="{{ line_item.value }}"
       with_items:
@@ -497,6 +494,21 @@
         - { key: enable-shortcut, value: "true" }
         - { key: enable-systray, value: "false" }
         - { key: notify-style, value: "uint32 1" }
+      loop_control:
+        loop_var: line_item
+
+    - name: Configuring window-thumbnails...
+      dconf: key="/org/gnome/shell/extensions/window-thumbnails/{{ line_item.key }}" value="{{ line_item.value }}"
+      with_items:
+        - { key: enable-shortcut, value: "true" }
+        - { key: ctrl-prim-btn-action, value: "0" }
+        - { key: ctrl-scroll-action, value: "0" }
+        - { key: ctrl-sec-btn-action, value: "0" }
+        - { key: default-opacity, value: "90" }
+        - { key: default-scale, value: "32" }
+        - { key: disable-meta-unredirection, value: "true" }
+        - { key: double-click-action, value: "0" }
+        - { key: sec-btn-action, value: "0" }
       loop_control:
         loop_var: line_item
 
@@ -714,7 +726,6 @@
   become: yes
   become_user: "{{ user }}"
   vars:
-    mttdata: "{{ lookup('file', '{{ role_path }}/files/minimize-to-tray.json') | from_json | jaybeede.linux_desktop.json2variant }}"
     dashtopanel: "{{ lookup('file', '{{ role_path }}/files/dash-to-panel.json') | from_json | jaybeede.linux_desktop.json2variant }}"
   environment:
     HOME: "/home/{{ user }}"

@@ -54,16 +54,16 @@ Gnome Feature | Configuration
 ------------- | -------------
 extension: [ArcMenu](https://gitlab.com/arcmenu/ArcMenu) | yes
 extension: [bing-wallpaper-gnome](https://github.com/neffo/bing-wallpaper-gnome-extension) | yes
+extension: [color-picker](https://github.com/tuberry/color-picker) | yes
 extension: [dash-to-panel](https://github.com/home-sweet-gnome/dash-to-panel) | yes
-extension: [datetime-format](https://extensions.gnome.org/extension/1173/datetime-format/) | yes
+extension: [Desktop Icons NG (DING)](https://gitlab.com/rastersoft/desktop-icons-ng) | yes
 extension: [GSConnect](https://github.com/GSConnect/gnome-shell-extension-gsconnect) | yes
+extension: [Maxi](https://github.com/darkretailer/gnome-shell-extension_maxi) | yes
+extension: [Panel Date format](https://github.com/atareao/panel-date-format) | yes
 extension: [gse-sound-output-device-chooser](https://github.com/kgshank/gse-sound-output-device-chooser) | yes
-extension: [minimize-to-tray](https://github.com/oae/gnome-shell-minimize-to-tray) | yes
-extension: [Put Window](https://github.com/negesti/gnome-shell-extensions-negesti) | yes
-extension: [remove-dropdown-arrows](https://github.com/mpdeimos/gnome-shell-remove-dropdown-arrows) | yes
-extension: [removeaccesibility](https://extensions.gnome.org/extension/112/remove-accesibility/) | yes
 extension: [steal-my-focus](https://extensions.gnome.org/extension/234/steal-my-focus/) | yes
 extension: [unblank](https://extensions.gnome.org/extension/1414/unblank/) | yes
+extension: [WTMB (Window Thumbnails)](https://github.com/G-dH/window-thumbnails) | yes
 dark-mode | yes
 night-light | yes
 power settings | yes
