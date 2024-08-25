@@ -14,6 +14,11 @@
     - name: dump test output
       debug:
         msg: "{{ testout }}"
+    - name: "Configuring element desktop shortcut..."
+      desktop_launchers:
+        source: "/usr/share/applications/element-desktop.desktop"
+        target: 'bash -c ''for item in $(ps aux | grep element-desktop | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 5; element-desktop 2>/dev/null & pid=$!; xdotool windowactivate $(xdotool search --pid $pid | sort | head -n 1); sleep 2; xdotool key Control_L+w'''
+        location: "$DIRECTORY_DESKTOP/element.desktop"
     - name: "Configuring MotionBox desktop shortcut..."
       desktop_launchers:
         freedesktop_Name: "MotionBox"
