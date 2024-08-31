@@ -599,6 +599,7 @@
         - toggle-floating
         - toggle-fullscreen
         - toggle-maximized
+        - toggle-overview
         - toggle-stacking
         - toggle-stacking-global
         - toggle-tiling
