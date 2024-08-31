@@ -683,6 +683,7 @@
         ports:
           - 80:80
           - "{{ '443:443' if (https_flag == 1) }}"
+          - "{{ '8448:8448' if (https_flag == 1) }}"
         volumes:
           - web-proxy-conf-vol:/etc/nginx
           - web-proxy-vol:/var/www/html

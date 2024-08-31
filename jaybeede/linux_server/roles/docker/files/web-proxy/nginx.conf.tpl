@@ -82,17 +82,29 @@ http {
 		location /messages/ {
 			proxy_pass http://service-matrix/;
 		}
+		location ~ ^/_(matrix|synapse/client) {
+			rewrite ^/_(matrix|synapse/client)(.*)$ /matrix$2 permanent;
+		}
 		location /matrix/ {
 			proxy_pass http://service-matrix-gtw/;
 			proxy_set_header X-Forwarded-For $remote_addr;
 			proxy_set_header X-Forwarded-Proto $scheme;
 			proxy_set_header Host $host;
+			# Nginx by default only allows file uploads up to 1M in size
+			# Increase client_max_body_size to match max_upload_size defined in homeserver.yaml
+			client_max_body_size 50M;
+			# Synapse responses may be chunked, which is an HTTP/1.1 feature.
+			proxy_http_version 1.1;
 		}
 		location /matrix/sliding-sync/ {
 			proxy_pass http://service-matrix-proxy/;
 			proxy_set_header X-Forwarded-For $remote_addr;
 			proxy_set_header X-Forwarded-Proto $scheme;
 			proxy_set_header Host $host;
+		}
+		location /.well-known/matrix/server {
+			add_header Access-Control-Allow-Origin *;
+			return 200 '{ "m.server": "{{ server_domain }}:8448" }';
 		}
 		location /.well-known/matrix/client {
 			add_header Access-Control-Allow-Origin *;
@@ -113,6 +125,30 @@ http {
 		}
 		location = /40x.html {
 			root /var/www/errors;
+		}
+	}
+server {
+{% if https_flag == 0 %}
+		listen 8448;
+		listen [::]:8448;
+		server_name {{ server_domain }} www.{{ server_domain }};
+{% else %}
+		listen 8448 ssl http2;
+		listen [::]:8448 ssl http2;
+		server_name {{ server_domain }} www.{{ server_domain }};
+		ssl_certificate /etc/nginx/ssl/{{ server_domain }}/fullchain.pem;
+		ssl_certificate_key /etc/nginx/ssl/{{ server_domain }}/privkey.pem;
+{% endif %}
+		location / {
+			proxy_pass http://service-matrix-gtw/;
+			proxy_set_header X-Forwarded-For $remote_addr;
+			proxy_set_header X-Forwarded-Proto $scheme;
+			proxy_set_header Host $host;
+			# Nginx by default only allows file uploads up to 1M in size
+			# Increase client_max_body_size to match max_upload_size defined in homeserver.yaml
+			client_max_body_size 50M;
+			# Synapse responses may be chunked, which is an HTTP/1.1 feature.
+			proxy_http_version 1.1;
 		}
 	}
 }
