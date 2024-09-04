@@ -11,7 +11,7 @@
     - name: "Install some system tools..."
       apt:
         pkg:
-          - ansible # needed by gnome_extensions module
+          - ansible
           - certbot
           - curl
           - firewalld
@@ -19,6 +19,7 @@
           - gnupg
           - initramfs-tools
           - jq
+          - libolm-dev
           - lsb-release
           - net-tools
           - network-manager
@@ -31,6 +32,15 @@
           - rsync
           - tree
           - units
+
+    - name: "Install Python packages"
+      pip:
+        name: "{{ pip_item }}"
+        executable: pip3
+      loop:
+        - matrix-commander
+      loop_control:
+        loop_var: pip_item
 
     - name: "Logical evaluation..."
       stat:
