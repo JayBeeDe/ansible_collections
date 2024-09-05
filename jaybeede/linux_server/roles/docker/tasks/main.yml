@@ -597,6 +597,18 @@
         recurse: yes
         mode: "0755"
 
+    - name: Logical evaluation...
+      set_fact:
+        scheme: http://
+        changed_when: false
+      when: https_flag == 1
+
+    - name: Logical evaluation...
+      set_fact:
+        scheme: https://
+        changed_when: false
+      when: https_flag == 1
+
     - name: "Configuring web-proxy..."
       template:
         src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
@@ -682,8 +694,8 @@
           - "matrix-proxy:matrix-proxy"
         ports:
           - 80:80
+          - 8448:8448
           - "{{ '443:443' if (https_flag == 1) }}"
-          - "{{ '8448:8448' if (https_flag == 1) }}"
         volumes:
           - web-proxy-conf-vol:/etc/nginx
           - web-proxy-vol:/var/www/html

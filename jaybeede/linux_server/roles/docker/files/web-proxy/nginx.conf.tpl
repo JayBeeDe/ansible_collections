@@ -82,9 +82,6 @@ http {
 		location /messages/ {
 			proxy_pass http://service-matrix/;
 		}
-		location ~ ^/_(matrix|synapse/client) {
-			rewrite ^/_(matrix|synapse/client)(.*)$ /matrix$2 permanent;
-		}
 		location /matrix/ {
 			proxy_pass http://service-matrix-gtw/;
 			proxy_set_header X-Forwarded-For $remote_addr;
@@ -108,7 +105,7 @@ http {
 		}
 		location /.well-known/matrix/client {
 			add_header Access-Control-Allow-Origin *;
-			return 200 '{ "m.homeserver": { "base_url": "https://{{ server_domain }}/matrix" }, "org.matrix.msc3575.proxy": { "url": "https://{{ server_domain }}/matrix/sliding-sync" } }';
+			return 200 '{ "m.homeserver": { "base_url": "{{scheme}}{{ server_domain }}/matrix" }, "org.matrix.msc3575.proxy": { "url": "{{scheme}}{{ server_domain }}/matrix/sliding-sync" } }';
 		}
 		location /limesurvey/ {
 			proxy_pass http://service-limesurvey/;
@@ -127,7 +124,7 @@ http {
 			root /var/www/errors;
 		}
 	}
-server {
+	server {
 {% if https_flag == 0 %}
 		listen 8448;
 		listen [::]:8448;
