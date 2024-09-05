@@ -601,7 +601,6 @@
       set_fact:
         scheme: http://
         changed_when: false
-      when: https_flag == 1
 
     - name: Logical evaluation...
       set_fact:
