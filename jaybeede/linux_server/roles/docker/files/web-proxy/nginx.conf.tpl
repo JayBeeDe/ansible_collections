@@ -105,7 +105,7 @@ http {
 		}
 		location /.well-known/matrix/client {
 			add_header Access-Control-Allow-Origin *;
-			return 200 '{ "m.homeserver": { "base_url": "{{scheme}}{{ server_domain }}/matrix" }, "org.matrix.msc3575.proxy": { "url": "{{scheme}}{{ server_domain }}/matrix/sliding-sync" } }';
+			return 200 '{ "m.homeserver": { "base_url": "{{ matrix_homeserver }}" }, "org.matrix.msc3575.proxy": { "url": "{{ matrix_homeserver }}/sliding-sync" } }';
 		}
 		location /limesurvey/ {
 			proxy_pass http://service-limesurvey/;

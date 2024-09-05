@@ -597,17 +597,6 @@
         recurse: yes
         mode: "0755"
 
-    - name: Logical evaluation...
-      set_fact:
-        scheme: http://
-        changed_when: false
-
-    - name: Logical evaluation...
-      set_fact:
-        scheme: https://
-        changed_when: false
-      when: https_flag == 1
-
     - name: "Configuring web-proxy..."
       template:
         src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
