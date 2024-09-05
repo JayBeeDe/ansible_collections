@@ -33,12 +33,26 @@
           - tree
           - units
 
+    - name: "Install some system dependencies..." # matrix-commander dependencies
+      apt:
+        pkg:
+          - libffi-dev
+          - libgdbm-dev
+          - libncurses-dev
+          - libncurses5-dev
+          - libnspr4
+          - libnspr4-dev
+          - libnss3
+          - libnss3-dev
+          - libreadline-dev
+          - libsqlite3-dev
+
     - name: "Install Python packages"
       pip:
         name: "{{ pip_item }}"
         executable: pip3
       loop:
-        - matrix-commander
+        - matrix-commander # requires python 3.11 that has been installed manually from source (in addition to distribution's python 3.9), in the meantime 3.11 to be available as deb package
       loop_control:
         loop_var: pip_item
 

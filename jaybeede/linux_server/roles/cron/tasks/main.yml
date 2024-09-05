@@ -16,6 +16,21 @@
         title: /others/telegram
         username: "{{ telegram_chatid }}"
         password: "{{ telegram_token }}"
+    - name: Saving matrix token to kdbx (1/2)...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /others/matrix
+        username: "{{ matrix_userid }}"
+        password: "{{ matrix_token }}"
+        url: "{{ matrix_homeserver }}" # note that the "store" is still needed for matrix-commander...
+    - name: Saving matrix token to kdbx (2/2)...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /others/matrix2
+        username: "{{ matrix_chatid }}"
+        password: "{{ matrix_deviceid }}"
     - name: Saving blog-db password to kdbx...
       keepass:
         database: "{{ kdbx_path }}"

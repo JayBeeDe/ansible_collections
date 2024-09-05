@@ -7,12 +7,20 @@ source "${HOME}/.bash_aliases"
 # shellcheck disable=SC2034
 t_chatid=$(kdbxQuery "/others/telegram" username 2>/dev/null)
 t_token=$(kdbxQuery "/others/telegram" password 2>/dev/null)
+m_userid=$(kdbxQuery "/others/matrix" username 2>/dev/null)
+m_token=$(kdbxQuery "/others/matrix" password 2>/dev/null)
+m_url=$(kdbxQuery "/others/matrix" url 2>/dev/null)
+m_chatid=$(kdbxQuery "/others/matrix2" username 2>/dev/null)
+m_deviceid=$(kdbxQuery "/others/matrix2" password 2>/dev/null)
 
 #########################functions
 
 function notify() {
     msg=$1
     curl -sS -X POST -H "Content-Type: application/json" -d "{\"chat_id\":\"$t_chatid\",\"text\":\"$msg\", \"disable_notification\": false}" "https://api.telegram.org/bot${t_token}/sendMessage"
+    echo "{\"homeserver\": \"${m_url}\", \"device_id\": \"${m_deviceid}\", \"user_id\": \"${m_userid}\", \"room_id\": \"${m_chatid}\", \"access_token\": \"${m_token}\"}" > "${HOME}/.config/matrix-commander/credentials.json"
+    matrix-commander -m "$msg" --encrypted
+    rm -f "${HOME}/.config/matrix-commander/credentials.json"
 }
 
 function backup() {
