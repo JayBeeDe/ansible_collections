@@ -158,6 +158,42 @@
         backup: no
       notify: Kernel attributes update
 
+    - name: "Configuring dunst alternative notification service (1/5)..."
+      lineinfile:
+        path: /usr/share/dbus-1/services/org.knopwob.dunst.service
+        state: present
+        regexp: "^(Exec=/usr/bin/dunst).*"
+        line: "Exec=/usr/bin/dunst -config /etc/dunst/dunstrc"
+        backup: no
+
+    - name: "Configuring dunst alternative notification service (2/5)..."
+      file:
+        path: /etc/dunst
+        state: directory
+
+    - name: "Configuring dunst alternative notification service (3/5)..."
+      copy:
+        src: "{{ role_path }}/files/dunst.ini"
+        dest: /etc/dunst/dunstrc
+
+    - name: "Logical evaluation..."
+      stat:
+        path: /usr/share/dbus-1/services/org.gnome.Shell.Notifications.service
+      register: f
+
+    - name: "Configuring dunst alternative notification service (4/5)..."
+      command: "mv /usr/share/dbus-1/services/org.gnome.Shell.Notifications.service /usr/share/dbus-1/services/org.gnome.Shell.Notifications.service.disabled"
+      when: f.stat.exists
+
+    - name: "Logical evaluation..."
+      stat:
+        path: /usr/share/dbus-1/services/com.ph-uhl.deadd.notification.service
+      register: f
+
+    - name: "Configuring dunst alternative notification service (5/5)..."
+      command: "mv /usr/share/dbus-1/services/com.ph-uhl.deadd.notification.service /usr/share/dbus-1/services/com.ph-uhl.deadd.notification.service.disabled"
+      when: f.stat.exists
+
     - name: "Configuring grub (1/2)..."
       lineinfile:
         path: /etc/default/grub
@@ -419,6 +455,14 @@
   become_user: "root"
 
 - block:
+    - name: "Starting dunst alternative notification service..."
+      systemd:
+        name: dunst
+        state: started
+        enabled: yes
+        scope: user
+        daemon_reload: true
+
     - name: "Fix owner of the generated pub key"
       file:
         path: "{{ home }}/.ssh/id_rsa.pub"

@@ -71,6 +71,7 @@
           - sshpass
           - tree
           - curl
+          - dunst
           - net-tools
           - gnome-shell-extensions
           - gnome-tweak-tool
