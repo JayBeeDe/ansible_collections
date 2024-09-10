@@ -18,9 +18,9 @@ Variable Name | Description
 ------------- | -----------
 user | The target machine session username
 home | The target machine session username's home directory
-email | Email to display on the gnome banner message
+legal_email | Legal email to display on the gnome banner message
+legal_name | Legal name to display on the gnome banner message
 git_rootrepo | Path to the git root repo (personal)
-nickname | Nickname to display on the gnome banner message
 tokenGithub | GitHub token to bypass GitHub API limitation when downloading gnome extension
 
 Example Playbook

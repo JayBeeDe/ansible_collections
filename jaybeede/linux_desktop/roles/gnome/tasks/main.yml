@@ -80,7 +80,7 @@
       with_items:
         - { key: logo, value: "'/usr/share/plymouth/custom.png'" }
         - { key: banner-message-enable, value: "true" }
-        - { key: banner-message-text, value: "'{{ nickname }} {{ email }}'" }
+        - { key: banner-message-text, value: "'{{ legal_name }} {{ legal_email }}'" }
       loop_control:
         loop_var: line_item
 

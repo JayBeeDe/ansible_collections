@@ -1,4 +1,4 @@
 user: default
 home: "/home/{{ user }}"
-email: "{{ user }}"
-nickname: "{{ user }}"
+legal_email: "{{ user }}"
+legal_name: "{{ user }}"

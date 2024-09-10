@@ -20,7 +20,7 @@ linux_desktop collection provides a set of ready to use roles & modules to quick
 
 ## Features overview
 
-### Modules
+### Modules <!-- markdownlint-disable-line no-duplicate-heading -->
 
 Module | Feature | Description
 ------ | ------- | -----------
@@ -28,7 +28,7 @@ desktop_launchers | Manage desktop icons | create, edit, remove desktop icons ac
 gnome_extensions | Manage Gnome extensions | install, update, uninstall, enable, disable gnome extensions
 keyboard_shortcuts | Manage keyboard shortcut | create, edit remove builtin or custom command bindings to a keyboard shortcut
 
-### Roles
+### Roles <!-- markdownlint-disable-line no-duplicate-heading -->
 
 "Configuration" doesn't prevent the user from changing the configuration whereas "Policy" prevents the user from changing the configuration
 
@@ -82,6 +82,8 @@ vault_user: "my vault_user"
 vault_password: "my vault_password"  # if user doesn't exist, user will be created with specified password. Otherwise, password will not be updated
 vault_ssh_port: "my vault_ssh_port"
 vault_ssh_host1: "my vault_ssh_host1"
+vault_legal_email: "my vault_legal_email"
+vault_legal_name: "my vault_legal_name"
 vault_email: "my vault_email"
 vault_nickname: "my vault_nickname"
 vault_kdbx_path: "my vault_kdbx_path"
@@ -102,6 +104,7 @@ Current user must already be configured<br />
 Partitioning is **NOT** configured by the collection.<br />
 
 Warning: All roles dependencies must be met:<br />
+
 * applications role:<br />
   - Add the chrome Bookmarks file into the [files/](https://github.com/JayBeeDe/ansible_collections/tree/main/jaybeede/linux_desktop/roles/applications/files) directory. On Linux, you can find this file under $HOME/.config/google-chrome/Default/Bookmarks.<br />
 * desktop role:<br />
@@ -135,6 +138,7 @@ You can put all the roles within the following order in your playbook (let's cal
 ```
 
 Warning: Order is important:
+>
 > * Packages role is required by other roles and must be installed FIRST.
 > * Desktop role is required by gnome role: gnome role must be run AFTER desktop role
 
