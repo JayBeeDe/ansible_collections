@@ -158,30 +158,25 @@
         backup: no
       notify: Kernel attributes update
 
-    - name: "Configuring dunst alternative notification service (1/5)..."
-      lineinfile:
-        path: /usr/share/dbus-1/services/org.knopwob.dunst.service
-        state: present
-        regexp: "^(Exec=/usr/bin/dunst).*"
-        line: "Exec=/usr/bin/dunst -config /etc/dunst/dunstrc"
-        backup: no
-
-    - name: "Configuring dunst alternative notification service (2/5)..."
+    - name: "Configuring dunst alternative notification service (1/4)..."
       file:
         path: /etc/dunst
         state: directory
 
-    - name: "Configuring dunst alternative notification service (3/5)..."
+    - name: "Configuring dunst alternative notification service (2/4)..."
       copy:
         src: "{{ role_path }}/files/dunst.ini"
         dest: /etc/dunst/dunstrc
+        mode: "0755"
+        owner: "root"
+        group: "root"
 
     - name: "Logical evaluation..."
       stat:
         path: /usr/share/dbus-1/services/org.gnome.Shell.Notifications.service
       register: f
 
-    - name: "Configuring dunst alternative notification service (4/5)..."
+    - name: "Configuring dunst alternative notification service (3/4)..."
       command: "mv /usr/share/dbus-1/services/org.gnome.Shell.Notifications.service /usr/share/dbus-1/services/org.gnome.Shell.Notifications.service.disabled"
       when: f.stat.exists
 
@@ -190,7 +185,7 @@
         path: /usr/share/dbus-1/services/com.ph-uhl.deadd.notification.service
       register: f
 
-    - name: "Configuring dunst alternative notification service (5/5)..."
+    - name: "Configuring dunst alternative notification service (4/4)..."
       command: "mv /usr/share/dbus-1/services/com.ph-uhl.deadd.notification.service /usr/share/dbus-1/services/com.ph-uhl.deadd.notification.service.disabled"
       when: f.stat.exists
 
@@ -455,6 +450,12 @@
   become_user: "root"
 
 - block:
+    - name: "Configuring dunst alternative notification service..."
+      file:
+        src: /etc/dunst
+        dest: "{{ home }}/.config/dunst"
+        state: link
+
     - name: "Starting dunst alternative notification service..."
       systemd:
         name: dunst
