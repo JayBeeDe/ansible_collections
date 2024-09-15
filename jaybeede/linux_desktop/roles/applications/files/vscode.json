@@ -100,7 +100,7 @@
         "--rcfile",
         "/dev/null",
         "--disable",
-        "attribute-defined-outside-init, import-error, inconsistent-return-statements, invalid-name, line-too-long, locally-disabled, logging-not-lazy, missing-docstring, no-name-in-module, no-self-use, too-many-branches, too-many-instance-attributes, too-many-locals, too-many-nested-blocks, too-many-statements"
+        "attribute-defined-outside-init, import-error, inconsistent-return-statements, invalid-name, line-too-long, locally-disabled, logging-not-lazy, missing-docstring, no-name-in-module, no-self-use, too-many-branches, too-many-instance-attributes, too-many-locals, too-many-nested-blocks, too-many-statements, bare-except"
     ],
     "security.workspace.trust.banner": "never",
     "security.workspace.trust.enabled": false,
@@ -120,7 +120,6 @@
         "-P",
         "--"
     ],
-    "sortLines.sortEntireFile": true,
     "update.mode": "none",
     "update.showReleaseNotes": false,
     "window.menuBarVisibility": "visible",
@@ -128,19 +127,6 @@
     "window.restoreWindows": "folders",
     "window.titleBarStyle": "custom",
     "workbench.activityBar.visible": false,
-    "workbench.colorCustomizations": {
-        "titleBar.activeBackground": "#414141",
-        "titleBar.activeForeground": "#FFFFFF",
-        "statusBar.background": "#1A1A1A",
-        "statusBar.noFolderBackground": "#212121",
-        "statusBar.debuggingBackground": "#263238",
-        "editor.findMatchBackground": "#eeff00",
-        "editor.findMatchBorder": "#ff0000",
-        "diffEditor.removedTextBackground": "#ff00003f",
-        "diffEditor.removedTextBorder": "#00000000",
-        "diffEditor.insertedTextBackground": "#00ff0060",
-        "diffEditor.insertedTextBorder": "#00000000"
-    },
     "workbench.editor.revealIfOpen": true,
     "workbench.editor.wrapTabs": true,
     "workbench.editorAssociations": {
@@ -157,7 +143,7 @@
     },
     "yaml.yamlVersion": "1.2",
     "yaml.format.singleQuote": false,
-    "markdown.preview.fontSize": 10,
+    "markdown.preview.fontSize": 15,
     "notebook.diff.enablePreview": true,
     "simple-perl.perltidyArgs": [
         "-l=0",
@@ -170,7 +156,6 @@
     "[markdown]": {
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
     },
-    "workbench.colorTheme": "Default High Contrast",
     "[shellscript]": {
         "editor.defaultFormatter": "mkhl.shfmt"
     },
@@ -185,5 +170,26 @@
         "--ignore=DL3028",
         "--no-color"
     ],
-    "window.zoomLevel": 1
+    "[css]": {
+        "editor.defaultFormatter": "vscode.css-language-features"
+    },
+    "[scss]": {
+        "editor.defaultFormatter": "lonefy.vscode-JS-CSS-HTML-formatter"
+    },
+    "yaml.schemas": {
+        "https://json.schemastore.org/github-workflow": "/.github/workflows/**/*.yml"
+    },
+    "html.format.wrapLineLength": 0,
+    "cSpell.enableFiletypes": [
+        "markdown"
+    ],
+    "cSpell.language": "en,fr",
+    "cSpell.userWords": [
+        "ansible",
+        "jaybeede",
+        "linux",
+        "unblank"
+    ],
+    "workbench.colorTheme": "Violet Accentuation Dark High Contrast",
+    "luahelper.format.column_limit": 500,
 }
