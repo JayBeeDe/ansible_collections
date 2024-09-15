@@ -109,6 +109,8 @@
           - initramfs-tools
           - timeshift
           - lua5.4
+          - lua-json
+          - lua-socket
           - pip
           - acpitool
           - kdocker
