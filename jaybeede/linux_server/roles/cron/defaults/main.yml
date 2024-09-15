@@ -1,0 +1,2 @@
+user: default
+home: "/home/{{ user }}"

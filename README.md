@@ -15,5 +15,9 @@ This repo contains ansible collections, roles, modules, etc.
         * [keyboard_shortcuts](jaybeede/linux_desktop/plugins/modules/keyboard_shortcuts.py)
     * [linux_server](jaybeede/linux_server/README.md)
       * Roles
+        * [cron](jaybeede/linux_server/roles/cron/README.md)
+        * [docker](jaybeede/linux_server/roles/docker/README.md)
         * [packages](jaybeede/linux_server/roles/packages/README.md)
         * [system](jaybeede/linux_server/roles/system/README.md)
+      * Modules
+        * [keepass](jaybeede/linux_server/plugins/modules/keepass.py)

@@ -9,6 +9,30 @@ linux_server collection provides a set of ready to use roles & modules to quickl
 * [packages](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/packages/README.md)
 * [system](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/system/README.md)
 * [docker](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/docker/README.md)
+* [cron](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/cron/README.md)
+
+### Modules
+
+* [keepass](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/plugins/modules/keepass.py)
+
+## Features overview
+
+### Modules <!-- markdownlint-disable-line no-duplicate-heading -->
+
+Module | Feature | Description
+------ | ------- | -----------
+keepass | Password management | Secure place to save all passwords and token used by cron scripts
+
+### Roles <!-- markdownlint-disable-line no-duplicate-heading -->
+
+Feature |
+------- |
+[Apache Guacamole](https://guacamole.apache.org/) clientless remote desktop gateway
+[Etherpad](https://etherpad.org/) online editor
+[jawanndenn](https://github.com/hartwork/jawanndenn) meetings scheduler and polls manager
+[Matrix](https://matrix.org/) network for secure and decentralised communication
+[Nginx](https://nginx.org/) reverse proxy
+[Wordpress](https://wordpress.com/) blog
 
 ## Prerequisites
 
@@ -20,16 +44,37 @@ Create a file all.yml into group_vars directory with the following content:
 ```yaml
 vault_user: "my vault_user"
 vault_password: "my vault_password"  # if user doesn't exist, user will be created with specified password. Otherwise, password will not be updated
-vault_ssh_port: "my vault_ssh_port"
-vault_ssh_host1: "my vault_ssh_host1"
 vault_email: "my vault_email"
 vault_nickname: "my vault_nickname"
+vault_ssh_port: "my vault_ssh_port"
+vault_ssh_host1: "my vault_ssh_host1"
+vault_become_pass: "my vault_become_pass"
+vault_domain: "my vault_domain"
+vault_blogdb_password: "my vault_blogdb_password"
+vault_virtualdesktopdb_password: "my vault_virtualdesktopdb_password"
+vault_limesurveyui_password: "my vault_limesurveyui_password"
+vault_limesurveydb_password: "my vault_limesurveydb_password"
+vault_etherpadui_password: "my vault_etherpadui_password"
+vault_etherpaddb_password: "my vault_etherpaddb_password"
+vault_matrixdb_password: "my vault_matrixdb_password"
+vault_matrixproxy_secret: "my vault_matrixproxy_secret"
+vault_matrixgtw_register_secret: "my vault_matrixgtw_register_secret"
+vault_telegram_token: "my vault_telegram_token"
+vault_telegram_chatid: "my vault_telegram_chatid"
+vault_matrix_deviceid: "my vault_matrix_deviceid"
+vault_matrix_userid: "my vault_matrix_userid"
+vault_matrix_chatid: "my vault_matrix_chatid"
+vault_matrix_token: "my vault_matrix_token"
+vault_matrixtelegrambridge_appid: "my vault_matrixtelegrambridge_appid"
+vault_matrixtelegrambridge_apphash: "my vault_matrixtelegrambridge_apphash"
+vault_matrixtelegrambridge_astoken: "my vault_matrixtelegrambridge_astoken"
+vault_matrixtelegrambridge_hstoken: "my vault_matrixtelegrambridge_hstoken"
+vault_matrixtelegrambridge_senderlocalpart: "my vault_matrixtelegrambridge_senderlocalpart"
+vault_matrixwhatsappbridge_astoken: "my vault_matrixwhatsappbridge_astoken"
+vault_matrixwhatsappbridge_hstoken: "my vault_matrixwhatsappbridge_hstoken"
+vault_matrixwhatsappbridge_senderlocalpart: "my vault_matrixwhatsappbridge_senderlocalpart"
 vault_kdbx_path: "my vault_kdbx_path"
-vault_key_path: "my vault_key_path"
-vault_rdp_port: "my vault_rdp_port"
-vault_rdp_user: "my vault_rdp_user"
-vault_tokenGithub: "my vault_tokenGithub"
-vault_tokenGitlab: "my vault_tokenGitlab"
+vault_kdbx_key_path: "my vault_kdbx_key_path"
 ```
 
 **Encrypt** that file.
@@ -57,6 +102,8 @@ You can put all the roles within the following order in your playbook (let's cal
         name: system
     - import_role:
         name: docker
+    - import_role:
+        name: cron
 ```
 
 Warning: Order is important:

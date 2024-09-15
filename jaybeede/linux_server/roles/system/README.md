@@ -3,11 +3,6 @@ system
 
 Services and shell configuration for linux server: networking, ssh, firewall, virtualization, grub, motd, printer, bash aliases, environment variables, rc local scripts.
 
-Requirements
-------------
-
-
-
 Role Variables
 --------------
 
@@ -18,10 +13,6 @@ home | The target machine session username's home directory
 git_rootrepo | Path to the git root repo (personal)
 network_dns | DNS Client to be configured on target machine
 network_interface | Network interface to be configured on target machine
-network_ip | Network IP address to be configured on target machine
-network_subnet | Network subnet to be configured on target machine
-password | (optional) If set, target user password will be changed
-rdp_name | RDP name for the local virtual machine
 ssh_port | local SSH port (to configure SSH loopback)
 
 Example Playbook

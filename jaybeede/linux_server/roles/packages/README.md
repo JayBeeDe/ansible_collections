@@ -8,7 +8,7 @@ Role Variables
 
 Variable Name | Description
 ------------- | -----------
-language | Display language to be configured (ISO code)
+locale | Display language to be configured (ISO code)
 
 Example Playbook
 ----------------
