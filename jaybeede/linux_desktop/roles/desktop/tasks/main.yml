@@ -45,7 +45,7 @@
     - name: "Configuring conky autostart shortcut..."
       desktop_launchers:
         freedesktop_Name: "Conky"
-        target: 'sh -c "conky --config=$HOME/.conky/default/default.conf --alignment=top_left -x 1300 --daemonize 2>&1 >/dev/null"'
+        target: 'bash -c "cd $HOME/.config/conky/default; conky --config=default.conf --alignment=top_right -x 5 --daemonize"'
         location: "$HOME/.config/autostart/conky.desktop"
     - name: "Configuring evolution autostart shortcut..."
       desktop_launchers:

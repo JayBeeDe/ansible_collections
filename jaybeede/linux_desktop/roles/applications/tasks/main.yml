@@ -83,29 +83,22 @@
 
     - name: "Configuring conky (1/5)..."
       file:
-        path: "{{ home }}/.conky/default/"
+        path: "{{ home }}/.config/conky/"
         state: directory
         mode: "0755"
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring conky (2/5)..."
-      copy:
-        src: "{{ role_path }}/files/conky.conf"
-        dest: "{{ home }}/.conky/default/default.conf"
-        mode: "0755"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-      notify: Refresh font information cache
+    - name: "Setting Conky (2/5)..."
+      git:
+        repo: "https://github.com/JayBeeDe/conky-scripts.git"
+        dest: "{{ home }}/.config/conky/JayBeeDe"
 
-    - name: "Configuring conky (3/5)..."
-      copy:
-        src: "{{ role_path }}/files/favicon.png"
-        dest: "{{ home }}/.conky/default/favicon.png"
-        mode: "0755"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-      notify: Refresh font information cache
+    - name: "Setting Conky (3/5)..."
+      file:
+        src: "{{ home }}/.config/conky/JayBeeDe"
+        dest: "{{ home }}/.config/conky/default"
+        state: link
 
     - name: "Setting Conky (4/5)..."
       file:
@@ -122,7 +115,6 @@
         mode: "0755"
         owner: "{{ user }}"
         group: "{{ user }}"
-      notify: Refresh font information cache
 
     - name: "Configuring flameshot (1/2)..."
       file:
