@@ -191,7 +191,10 @@
         - golang.go
         - hediet.vscode-drawio
         - hogashi.crontab-syntax-highlight
+        - JayBeeDe.violet-accentuation-dark-high-contrast
+        - jq-syntax-highlighting.jq-syntax-highlighting
         - junstyle.php-cs-fixer
+        - lkrms.inifmt
         - mhutchie.git-graph
         - mkhl.shfmt
         - ms-azuretools.vscode-docker
@@ -199,15 +202,18 @@
         - ms-toolsai.jupyter
         - ms-toolsai.jupyter-keymap
         - ms-toolsai.jupyter-renderers
+        - ms-vscode.cmake-tools
         - ms-vscode.cpptools
         - nico-castell.linux-desktop-file
         - redhat.ansible
         - redhat.vscode-commons
         - redhat.vscode-xml
         - redhat.vscode-yaml
+        - streetsidesoftware.code-spell-checker
+        - streetsidesoftware.code-spell-checker-french
         - timonwong.shellcheck
-        - Tyriar.sort-lines
         - wingrunr21.vscode-ruby
+        - yinfei.luahelper
         - zhiyuan-lin.simple-perl
         - ziyasal.vscode-open-in-github
       register: ext
