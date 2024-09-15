@@ -1,10 +1,6 @@
 user: default
 home: "/home/{{ user }}"
-git_rootrepo: "{{ home }}/git"
 network_dns: "8.8.8.8"
-network_interface: "{{ ansible_default_ipv4.interface|default(ansible_all_ipv4_interface[0]) }}"
-ssh_port: 22
-allowed_ip: "{{ hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[0] }}"
-
-#network_gateway, network_mask
-# network_subnet
+network_dns2: "8.8.4.4"
+mnt_path: "/var/lib/docker/mounts"
+vol_path: "/var/lib/docker/volumes"

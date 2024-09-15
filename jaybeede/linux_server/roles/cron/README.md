@@ -6,6 +6,8 @@ Services and shell configuration for linux server: networking, ssh, firewall, vi
 Requirements
 ------------
 
+[keepass](../../plugins/modules/keepass.py) module is required for that role.
+
 Role Variables
 --------------
 
@@ -13,14 +15,21 @@ Variable Name | Description
 ------------- | -----------
 user | The target machine session username
 home | The target machine session username's home directory
-git_rootrepo | Path to the git root repo (personal)
-network_dns | DNS Client to be configured on target machine
-network_interface | Network interface to be configured on target machine
-network_ip | Network IP address to be configured on target machine
-network_subnet | Network subnet to be configured on target machine
-password | (optional) If set, target user password will be changed
-rdp_name | RDP name for the local virtual machine
-ssh_port | local SSH port (to configure SSH loopback)
+kdbx_path | Path where the encrypted passwords will be saved
+kdbx_key_path | Path to the key file needed to decrypt passwords
+email | email used in SSL certificate renewal process
+server_domain | server domain to renew in SSL certificate renewal process
+telegram_chatid | Telegram chat id to send cron notification messages
+telegram_token | Telegram token to send cron notification messages
+matrix_userid | Matrix user id to send cron notification messages (backup channel)
+matrix_token | Matrix token to send cron notification messages (backup channel)
+matrix_homeserver | Matrix home server domain to send cron notification messages (backup channel)
+matrix_chatid | Matrix chat id to send cron notification messages (backup channel)
+matrix_deviceid | Matrix device id to send cron notification messages (backup channel)
+blogdb_password | Database password used to perform blog backup
+virtualdesktopdb_password | Database password used to perform guacamole backup
+limesurveydb_password | Database password used to perform limesurvey backup
+etherpaddb_password | Database password used to perform etherpad backup
 
 Example Playbook
 ----------------

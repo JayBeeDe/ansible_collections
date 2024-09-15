@@ -14,8 +14,6 @@ all:
     ssh_port: "{{ vault_ssh_port }}"
     allowed_ip: "{{ hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[0] }}"
     ini_path: "/opt/IniBackups"
-    mnt_path: "/var/lib/docker/mounts"
-    vol_path: "/var/lib/docker/volumes"
     script_path: "/opt/scripts"
     lib_path: "{{ script_path }}/lib"
     cron_path: "{{ script_path }}/cron-scripts"
