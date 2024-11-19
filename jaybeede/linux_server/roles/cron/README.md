@@ -19,6 +19,7 @@ kdbx_path | Path where the encrypted passwords will be saved
 kdbx_key_path | Path to the key file needed to decrypt passwords
 email | email used in SSL certificate renewal process
 server_domain | server domain to renew in SSL certificate renewal process
+matrix_domain | matrix domain to renew in SSL certificate renewal process
 telegram_chatid | Telegram chat id to send cron notification messages
 telegram_token | Telegram token to send cron notification messages
 matrix_userid | Matrix user id to send cron notification messages (backup channel)

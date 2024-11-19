@@ -509,7 +509,7 @@
         links:
           - matrix-db:postgres
         env:
-          SYNCV3_SERVER: "https://{{ server_domain }}/matrix"
+          SYNCV3_SERVER: "{{ matrix_homeserver }}"
           SYNCV3_DB: "user=matrixdb dbname=syncv3 sslmode=disable host=matrix-db password='{{ matrixdb_password }}'"
           SYNCV3_SECRET: "{{ matrixproxy_secret }}"
           SYNCV3_BINDADDR: 0.0.0.0:8009
@@ -659,6 +659,17 @@
         changed_when: false
       when: old_https_flag == 1
 
+    - name: Logical evaluation...
+      set_fact:
+        proxy_ports:
+          - 80:80
+          - 8448:8448
+
+    - name: Logical evaluation...
+      set_fact:
+        proxy_ports: "{{ proxy_ports + ['443:443'] }}"
+      when: https_flag == 1
+
     - name: Running web-proxy
       community.docker.docker_container:
         detach: yes
@@ -680,10 +691,7 @@
           - "matrix-ui:matrix-ui"
           - "matrix-gtw:matrix-gtw"
           - "matrix-proxy:matrix-proxy"
-        ports:
-          - 80:80
-          - 8448:8448
-          - "{{ '443:443' if (https_flag == 1) }}"
+        ports: "{{ proxy_ports }}"
         volumes:
           - web-proxy-conf-vol:/etc/nginx
           - web-proxy-vol:/var/www/html

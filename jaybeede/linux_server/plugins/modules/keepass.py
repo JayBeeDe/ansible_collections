@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 import random
 import string
 import traceback
@@ -249,6 +250,7 @@ def main():
     if result["title"] != title or result["username"] != username or result["password"] != password or result["url"] != url:
         # we have a change
         result["changed"] = True
+        time.sleep(0.25)
         if entry:
             entry.title = os.path.basename(title)
             entry.username = username or ""

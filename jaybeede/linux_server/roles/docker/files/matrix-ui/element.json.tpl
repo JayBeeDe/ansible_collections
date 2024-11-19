@@ -1,8 +1,8 @@
 {
     "default_server_config": {
         "m.homeserver": {
-            "base_url": "https://{{ server_domain }}/matrix",
-            "server_name": "{{ server_domain }}"
+            "base_url": "{{ matrix_homeserver }}",
+            "server_name": "{{ matrix_domain }}"
         },
         "m.identity_server": {
             "base_url": "https://vector.im"

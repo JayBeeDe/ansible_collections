@@ -82,31 +82,6 @@ http {
 		location /messages/ {
 			proxy_pass http://service-matrix/;
 		}
-		location /matrix/ {
-			proxy_pass http://service-matrix-gtw/;
-			proxy_set_header X-Forwarded-For $remote_addr;
-			proxy_set_header X-Forwarded-Proto $scheme;
-			proxy_set_header Host $host;
-			# Nginx by default only allows file uploads up to 1M in size
-			# Increase client_max_body_size to match max_upload_size defined in homeserver.yaml
-			client_max_body_size 50M;
-			# Synapse responses may be chunked, which is an HTTP/1.1 feature.
-			proxy_http_version 1.1;
-		}
-		location /matrix/sliding-sync/ {
-			proxy_pass http://service-matrix-proxy/;
-			proxy_set_header X-Forwarded-For $remote_addr;
-			proxy_set_header X-Forwarded-Proto $scheme;
-			proxy_set_header Host $host;
-		}
-		location /.well-known/matrix/server {
-			add_header Access-Control-Allow-Origin *;
-			return 200 '{ "m.server": "{{ server_domain }}:8448" }';
-		}
-		location /.well-known/matrix/client {
-			add_header Access-Control-Allow-Origin *;
-			return 200 '{ "m.homeserver": { "base_url": "{{ matrix_homeserver }}" }, "org.matrix.msc3575.proxy": { "url": "{{ matrix_homeserver }}/sliding-sync" } }';
-		}
 		location /limesurvey/ {
 			proxy_pass http://service-limesurvey/;
 			proxy_set_header Host $host;
@@ -128,14 +103,25 @@ http {
 {% if https_flag == 0 %}
 		listen 8448;
 		listen [::]:8448;
-		server_name {{ server_domain }} www.{{ server_domain }};
+		server_name {{ matrix_domain }} www.{{ matrix_domain }};
 {% else %}
 		listen 8448 ssl http2;
 		listen [::]:8448 ssl http2;
-		server_name {{ server_domain }} www.{{ server_domain }};
+		server_name {{ matrix_domain }} www.{{ matrix_domain }};
 		ssl_certificate /etc/nginx/ssl/{{ server_domain }}/fullchain.pem;
 		ssl_certificate_key /etc/nginx/ssl/{{ server_domain }}/privkey.pem;
+		ssl_protocols TLSv1.3 TLSv1.2;
+		ssl_ciphers "HIGH:!aNULL:!MD5";
+		ssl_session_cache shared:SSL:10m;
+		ssl_session_timeout 10m;
+		ssl_prefer_server_ciphers on;
+		ssl_dhparam /etc/nginx/ssl/{{ server_domain }}/dhparam2048.pem;
+		ssl_session_tickets off;
+		ssl_stapling on;
+		ssl_stapling_verify on;
+		resolver {{ network_dns }} {{ network_dns2 }} valid=300s;
 {% endif %}
+		server_tokens off;
 		location / {
 			proxy_pass http://service-matrix-gtw/;
 			proxy_set_header X-Forwarded-For $remote_addr;
@@ -146,6 +132,70 @@ http {
 			client_max_body_size 50M;
 			# Synapse responses may be chunked, which is an HTTP/1.1 feature.
 			proxy_http_version 1.1;
+		}
+	}
+	server {
+		listen 80;
+		listen [::]:80;
+		server_name {{ matrix_domain }} www.{{ matrix_domain }};
+{% if https_flag == 1 %}
+		return 301 https://$server_name$request_uri;
+	}
+	server {
+		listen 443 ssl http2;
+		listen [::]:443 ssl http2;
+		server_name {{ matrix_domain }} www.{{ matrix_domain }};
+		ssl_certificate /etc/nginx/ssl/{{ server_domain }}/fullchain.pem;
+		ssl_certificate_key /etc/nginx/ssl/{{ server_domain }}/privkey.pem;
+		ssl_protocols TLSv1.3 TLSv1.2;
+		ssl_ciphers "HIGH:!aNULL:!MD5";
+		ssl_session_cache shared:SSL:10m;
+		ssl_session_timeout 10m;
+		ssl_prefer_server_ciphers on;
+		ssl_dhparam /etc/nginx/ssl/{{ server_domain }}/dhparam2048.pem;
+		ssl_session_tickets off;
+		ssl_stapling on;
+		ssl_stapling_verify on;
+		resolver {{ network_dns }} {{ network_dns2 }} valid=300s;
+		resolver_timeout 10s;
+{% endif %}
+		server_tokens off;
+		location / {
+			proxy_pass http://service-matrix-gtw/;
+			proxy_set_header X-Forwarded-For $remote_addr;
+			proxy_set_header X-Forwarded-Proto $scheme;
+			proxy_set_header Host $host;
+			# Nginx by default only allows file uploads up to 1M in size
+			# Increase client_max_body_size to match max_upload_size defined in homeserver.yaml
+			client_max_body_size 50M;
+			# Synapse responses may be chunked, which is an HTTP/1.1 feature.
+			proxy_http_version 1.1;
+		}
+		location /sliding-sync/ {
+			proxy_pass http://service-matrix-proxy/;
+			proxy_set_header X-Forwarded-For $remote_addr;
+			proxy_set_header X-Forwarded-Proto $scheme;
+			proxy_set_header Host $host;
+		}
+		location /.well-known/matrix/server {
+			add_header Access-Control-Allow-Origin *;
+			return 200 '{ "m.server": "{{ matrix_domain }}:8448" }';
+		}
+		location /.well-known/matrix/client {
+			add_header Access-Control-Allow-Origin *;
+			return 200 '{ "m.homeserver": { "base_url": "{{ matrix_homeserver }}" }, "org.matrix.msc3575.proxy": { "url": "{{ matrix_homeserver }}/sliding-sync" } }';
+		}
+{% if acmechallenge_flag == 1 %}
+		location /.well-known/acme-challenge {
+			default_type "text/plain";
+			root         /var/www/html/;
+		}
+{% endif %}
+		location = /50x.html {
+			root /var/www/errors;
+		}
+		location = /40x.html {
+			root /var/www/errors;
 		}
 	}
 }

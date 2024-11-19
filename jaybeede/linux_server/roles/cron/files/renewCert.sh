@@ -3,17 +3,11 @@
 # shellcheck disable=SC1091
 source "${HOME}/.bash_aliases"
 
-set -x
-
 #########################global variable
 # shellcheck disable=SC2034
-t_chatid=$(kdbxQuery "/others/telegram" username 2>/dev/null)
-t_token=$(kdbxQuery "/others/telegram" password 2>/dev/null)
-m_userid=$(kdbxQuery "/others/matrix" username 2>/dev/null)
-m_token=$(kdbxQuery "/others/matrix" password 2>/dev/null)
-m_url=$(kdbxQuery "/others/matrix" url 2>/dev/null)
-m_chatid=$(kdbxQuery "/others/matrix2" username 2>/dev/null)
-m_deviceid=$(kdbxQuery "/others/matrix2" password 2>/dev/null)
+read -r t_chatid t_token <<<"$(kdbxQuery -g others -t telegram)"
+read -r m_userid m_token m_url <<<"$(kdbxQuery -g others -t matrix -a username -a password -a url)"
+read -r m_chatid m_deviceid <<<"$(kdbxQuery -g others -t matrix2)"
 
 #########################functions
 
@@ -83,6 +77,7 @@ domain="$1"
 certEmail="$2"
 if [ "$3" == "force" ]; then
     mode="request"
+    IFS="," read -r -a subDomains <<< "$4"
 else
     mode="renewing"
 fi
@@ -106,13 +101,17 @@ restartProxy "https" "http"
 wait4curl "${domain}:80"
 
 echo "Performing certificate ${mode}..."
-set -x
+CMD=("certbot")
 if [ "$mode" == "renewing" ]; then
-    certbot renew --cert-name "$domain"
+    CMD+=("renew" "--cert-name" "$domain")
 else
-    certbot certonly --webroot --email="$certEmail" --webroot-path=/var/lib/docker/volumes/web-proxy-vol/_data/ -d "$domain" -d "www.${domain}" --agree-tos --force-renew
+    CMD+=("certonly" "--webroot" "--email" "$certEmail" "--webroot-path" "/var/lib/docker/volumes/web-proxy-vol/_data/" "--agree-tos" "--force-renew" "-d" "$domain")
+    for subDomain in "${subDomains[@]}"; do
+        CMD+=("-d" "$subDomain")
+    done
 fi
-set +x
+
+"${CMD[@]}"
 
 mkdir -p "/var/lib/docker/volumes/web-proxy-conf-vol/_data/ssl/${domain}/"
 # /etc/letsencrypt/live/${domain}/ is a symlink to /etc/letsencrypt/archive/${domain}-00XX/, where 00XX is incrementing at each renew

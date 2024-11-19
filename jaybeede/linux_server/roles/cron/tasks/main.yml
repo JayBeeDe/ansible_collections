@@ -35,34 +35,66 @@
       keepass:
         database: "{{ kdbx_path }}"
         keyfile: "{{ kdbx_key_path }}"
-        title: /database/blog-db
+        title: /databases/blog-db/blog_db
         username: blog_user
         password: "{{ blogdb_password }}"
-        url: blog_db
+        url: "mysql://blog-db/blog_db"
     - name: Saving virtual-desktop-db password to kdbx...
       keepass:
         database: "{{ kdbx_path }}"
         keyfile: "{{ kdbx_key_path }}"
-        title: /database/virtual-desktop-db
+        title: /databases/virtual-desktop-db/guacamole_db
         username: guacamole_user
         password: "{{ virtualdesktopdb_password }}"
-        url: guacamole_db
+        url: "mysql://virtual-desktop-db/guacamole_db"
     - name: Saving limesurvey-db password to kdbx...
       keepass:
         database: "{{ kdbx_path }}"
         keyfile: "{{ kdbx_key_path }}"
-        title: /database/limesurvey-db
+        title: /databases/limesurvey-db/limesurveydb
         username: limesurvey_user
         password: "{{ limesurveydb_password }}"
-        url: limesurveydb
+        url: "mysql://limesurvey-db/limesurveydb"
     - name: Saving etherpad-db password to kdbx...
       keepass:
         database: "{{ kdbx_path }}"
         keyfile: "{{ kdbx_key_path }}"
-        title: /database/etherpad-db
+        title: /databases/etherpad-db/etherpaddb
         username: etherpad_user
         password: "{{ etherpaddb_password }}"
-        url: etherpaddb
+        url: "mysql://etherpad-db/etherpaddb"
+    - name: Saving matrix-db password to kdbx...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /databases/matrix-db/matrixdb
+        username: matrixdb
+        password: "{{ matrixdb_password }}"
+        url: "postgres://matrix-db/matrixdb"
+    - name: Saving syncv3 password to kdbx...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /databases/matrix-db/syncv3
+        username: matrixdb
+        password: "{{ matrixdb_password }}"
+        url: "postgres://matrix-db/syncv3"
+    - name: Saving telegram password to kdbx...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /databases/matrix-db/telegram
+        username: matrixdb
+        password: "{{ matrixdb_password }}"
+        url: "postgres://matrix-db/telegram"
+    - name: Saving whatsapp password to kdbx...
+      keepass:
+        database: "{{ kdbx_path }}"
+        keyfile: "{{ kdbx_key_path }}"
+        title: /databases/matrix-db/whatsapp
+        username: matrixdb
+        password: "{{ matrixdb_password }}"
+        url: "postgres://matrix-db/whatsapp"
     - name: Creating cron scripts directory....
       file:
         path: "{{ cron_path }}"
@@ -77,7 +109,7 @@
         name: Database Backups
         minute: "15"
         hour: "21"
-        job: "export PYKEEPASS_DATABASE={{ kdbx_path }}; export PYKEEPASS_KEYFILE={{ kdbx_key_path }}; {{ cron_path }}/dbBackups.sh 2>&1 >> /var/log/dbBackups.log"
+        job: "export PYKEEPASS_DATABASE={{ kdbx_path }}; export PYKEEPASS_KEYFILE={{ kdbx_key_path }}; {{ cron_path }}/dbBackups.sh /databases/blog-db/blog_db /databases/virtual-desktop-db/guacamole_db /databases/limesurvey-db/limesurveydb /databases/etherpad-db/etherpaddb /databases/matrix-db/matrixdb /databases/matrix-db/syncv3 /databases/matrix-db/telegram /databases/matrix-db/whatsapp 2>&1 >> /var/log/dbBackups.log"
     - name: Installing Certificate Renewal script...
       copy:
         src: "{{ role_path }}/files/renewCert.sh"

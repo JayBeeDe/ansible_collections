@@ -5,13 +5,9 @@ source "${HOME}/.bash_aliases"
 
 #########################global variable
 # shellcheck disable=SC2034
-t_chatid=$(kdbxQuery "/others/telegram" username 2>/dev/null)
-t_token=$(kdbxQuery "/others/telegram" password 2>/dev/null)
-m_userid=$(kdbxQuery "/others/matrix" username 2>/dev/null)
-m_token=$(kdbxQuery "/others/matrix" password 2>/dev/null)
-m_url=$(kdbxQuery "/others/matrix" url 2>/dev/null)
-m_chatid=$(kdbxQuery "/others/matrix2" username 2>/dev/null)
-m_deviceid=$(kdbxQuery "/others/matrix2" password 2>/dev/null)
+read -r t_chatid t_token <<<"$(kdbxQuery -g others -t telegram)"
+read -r m_userid m_token m_url <<<"$(kdbxQuery -g others -t matrix -a username -a password -a url)"
+read -r m_chatid m_deviceid <<<"$(kdbxQuery -g others -t matrix2)"
 
 #########################functions
 
@@ -24,21 +20,33 @@ function notify() {
 }
 
 function backup() {
-    database=$1
-    dte=$2
-    username=$(kdbxQuery "/database/${database}" username 2>/dev/null)
-    password=$(kdbxQuery "/database/${database}" password 2>/dev/null)
-    url=$(kdbxQuery "/database/${database}" url 2>/dev/null)
-    mkdir -p "/opt/DBBackups/${database}"
-    docker exec -u 0 "$database" sh -c "mysqldump --no-tablespaces -u $username -p${password} $url" >"/opt/DBBackups/${database}/${database}-${dte}.dmp"
+    db_scheme=$1
+    db_host=$2
+    db_name=$3
+    db_username=$4
+    db_password=$5
+    dte=$6
+
+    mkdir -p "/opt/DBBackups/${db_host}"
+    CMD=("docker" "exec" "-u" "0" "$db_host" "sh" "-c")
+    if [ "$db_scheme" == "mysql" ]; then
+        CMD+=("mysqldump --no-tablespaces -u $db_username -p${db_password} $db_name")
+    elif [ "$db_scheme" == "postgres" ]; then
+        CMD+=("echo \"$db_password\" | pg_dump -a -U $db_username -d $db_name")
+    else
+        echo "export of database type ${db_scheme} not implemented"
+        return
+    fi
+    "${CMD[@]}" >"/opt/DBBackups/${db_host}/${db_name}-${dte}.dmp"
 }
 function report() {
-    database=$1
-    dte=$2
-    if [ -f "/opt/DBBackups/${database}/${database}-${dte}.dmp" ]; then
+    db_host=$1
+    db_name=$2
+    dte=$3
+    if [ -f "/opt/DBBackups/${db_host}/${db_name}-${dte}.dmp" ]; then
         # shellcheck disable=SC2012
-        currSize=$(ls -lh "/opt/DBBackups/${database}/${database}-${dte}.dmp" | awk '{print $5}')
-        currMD5=$(md5sum "/opt/DBBackups/${database}/${database}-${dte}.dmp" | awk '{print $1}')
+        currSize=$(ls -lh "/opt/DBBackups/${db_host}/${db_name}-${dte}.dmp" | awk '{print $5}')
+        currMD5=$(md5sum "/opt/DBBackups/${db_host}/${db_name}-${dte}.dmp" | awk '{print $1}')
         report="${report}\nBackup: Size ${currSize} / md5 ${currMD5}"
     else
         report="${report}\nBackup: Failed!"
@@ -46,14 +54,15 @@ function report() {
 }
 
 function archive() {
-    database=$1
+    db_host=$1
+    db_name=$2
     previousFileSize=0
     previousFileMonth=0
     rmCnt=0
     fileCnt=0
     startFileDate=""
     # shellcheck disable=SC2012
-    for item in $(ls -1 "/opt/DBBackups/${database}/${database}-"*".dmp" | sort); do
+    for item in $(ls -1 "/opt/DBBackups/${db_host}/${db_name}-"*".dmp" | sort); do
         currentFileDate=$(basename "$item" | sed -r 's/^(.*)([0-9]{4}(-[0-9]{2}){2})(.*)$/\2/g')
         if [ "$startFileDate" == "" ]; then
             startFileDate=$currentFileDate
@@ -121,11 +130,20 @@ echo "The script dbBackup is starting (${dte})!"
 
 report="$dte"
 
-for database in etherpad-db virtual-desktop-db blog-db limesurvey-db; do
-    report="${report}\n\n${database}"
-    backup "$database" "$dte"
-    report "$database" "$dte"
-    archive "$database"
+for backup_item in "$@"; do # for example /databases/matrix-db/syncv3
+    backup_group=$(dirname "$backup_item") # for example /databases/matrix-db
+    backup_title=$(basename "$backup_item") # for example syncv3
+
+    read -r db_username db_password backup_url <<<"$(kdbxQuery -g "$backup_group" -t "$backup_title" -a username -a password -a url)"
+    db_name=$(basename "$backup_url") # for example syncv3
+    IFS=":" read -r db_scheme db_host <<< "$(dirname "$backup_url")" # for example postgres //matrix-db
+    db_host="${db_host/\/\//}" # for example matrix-db
+
+    report="${report}\n\n${backup_url}"
+
+    backup "$db_scheme" "$db_host" "$db_name" "$db_username" "$db_password" "$dte"
+    report "$db_host" "$db_name" "$dte"
+    archive "$db_host" "$db_name"
 done
 
 if [ -n "$report" ]; then
