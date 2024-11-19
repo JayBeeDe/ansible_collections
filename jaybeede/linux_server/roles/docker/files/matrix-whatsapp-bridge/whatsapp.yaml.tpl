@@ -3,7 +3,7 @@ homeserver:
     # The address that this appservice can use to connect to the homeserver.
     address: "http://matrix-gtw:8008"
     # The domain of the homeserver (also known as server_name, used for MXIDs, etc).
-    domain: "{{ server_domain }}"
+    domain: "{{ matrix_domain }}"
     # What software is the homeserver running?
     # Standard Matrix homeservers like Synapse, Dendrite and Conduit should just use "standard" here.
     software: standard
@@ -395,8 +395,8 @@ bridge:
     #     mxid - Specific user
     permissions:
         "domain": relay
-        "{{ server_domain }}": admin
-        "@admin:{{ server_domain }}": admin
+        "{{ matrix_domain }}": admin
+        "@admin:{{ matrix_domain }}": admin
 
 whatsapp:
     # Device name that's shown in the "WhatsApp Web" section in the mobile app.
