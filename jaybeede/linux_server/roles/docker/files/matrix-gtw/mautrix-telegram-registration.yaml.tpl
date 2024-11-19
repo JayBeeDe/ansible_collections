@@ -6,12 +6,12 @@ sender_localpart: "{{ matrixtelegrambridge_senderlocalpart }}"
 namespaces:
     users:
     - exclusive: true
-      regex: '@telegram_.*:{{ server_domain | regex_replace("\.", "\\.") }}'
+      regex: '@telegram_.*:{{ matrix_domain | regex_replace("\.", "\\.") }}'
     - exclusive: true
-      regex: '@telegrambot:{{ server_domain | regex_replace("\.", "\\.") }}'
+      regex: '@telegrambot:{{ matrix_domain | regex_replace("\.", "\\.") }}'
     aliases:
     - exclusive: true
-      regex: \#telegram_.*:{{ server_domain | regex_replace("\.", "\\.") }}
+      regex: \#telegram_.*:{{ matrix_domain | regex_replace("\.", "\\.") }}
 rate_limited: false
 de.sorunome.msc2409.push_ephemeral: true
 push_ephemeral: true

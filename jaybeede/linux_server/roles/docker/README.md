@@ -12,6 +12,7 @@ user | The target machine session username
 home | The target machine session username's home directory
 ini_path | path where database initial backups are stored to bootstrap database
 server_domain | Server domain
+matrix_domain | Matrix server domain
 network_dns | nginx primary resolver
 network_dns2 | nginx secondary resolver
 https_flag | Use HTTPS when set to 1

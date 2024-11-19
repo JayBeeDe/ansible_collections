@@ -18,6 +18,7 @@ all:
     lib_path: "{{ script_path }}/lib"
     cron_path: "{{ script_path }}/cron-scripts"
     server_domain: "{{ vault_domain }}"
+    matrix_domain: "{{ vault_matrix_domain }}"
     https_flag: 1
     acmechallenge_flag: 0
     blogdb_password: "{{ vault_blogdb_password }}"
@@ -40,7 +41,7 @@ all:
     matrix_userid: "{{ vault_matrix_userid }}"
     matrix_chatid: "{{ vault_matrix_chatid }}"
     matrix_token: "{{ vault_matrix_token }}"
-    matrix_homeserver: "{{ 'https://' if https_flag == 1 else 'http://' }}{{ vault_domain }}/matrix"
+    matrix_homeserver: "{{ 'https://' if https_flag == 1 else 'http://' }}{{ matrix_domain }}"
     matrixwhatsappbridge_astoken: "{{ vault_matrixwhatsappbridge_astoken }}"
     matrixwhatsappbridge_hstoken: "{{ vault_matrixwhatsappbridge_hstoken }}"
     matrixwhatsappbridge_senderlocalpart: "{{ vault_matrixwhatsappbridge_senderlocalpart }}"
