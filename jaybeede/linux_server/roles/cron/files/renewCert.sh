@@ -16,7 +16,7 @@ function notify() {
     echo "$msg"
     curl -sS -X POST -H "Content-Type: application/json" -d "{\"chat_id\":\"$t_chatid\",\"text\":\"$msg\", \"disable_notification\": false}" "https://api.telegram.org/bot${t_token}/sendMessage"
     echo "{\"homeserver\": \"${m_url}\", \"device_id\": \"${m_deviceid}\", \"user_id\": \"${m_userid}\", \"room_id\": \"${m_chatid}\", \"access_token\": \"${m_token}\"}" > "${HOME}/.config/matrix-commander/credentials.json"
-    matrix-commander -m "$msg" --encrypted
+    matrix-commander -m "$msg" --encrypted -s "${COMMANDER_STORE_DIR}" -c "${HOME}/.config/matrix-commander/credentials.json"
     rm -f "${HOME}/.config/matrix-commander/credentials.json"
 }
 

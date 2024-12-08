@@ -47,6 +47,7 @@ all:
     matrixwhatsappbridge_senderlocalpart: "{{ vault_matrixwhatsappbridge_senderlocalpart }}"
     kdbx_path: "{{ vault_kdbx_path }}"
     kdbx_key_path: "{{ vault_kdbx_key_path }}"
+    commander_store_dir: "{{ vault_commander_store_dir }}"
   hosts:
     server:
       ansible_host: "{{ vault_ssh_host1 }}"
