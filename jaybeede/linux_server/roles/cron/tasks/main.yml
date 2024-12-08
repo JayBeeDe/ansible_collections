@@ -95,6 +95,31 @@
         username: matrixdb
         password: "{{ matrixdb_password }}"
         url: "postgres://matrix-db/whatsapp"
+    - name: Create daily cron env variables (1/5)
+      ansible.builtin.cron:
+        name: SHELL
+        env: yes
+        job: /bin/bash
+    - name: Create daily cron env variables (2/5)
+      ansible.builtin.cron:
+        name: PATH
+        env: yes
+        job: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    - name: Create daily cron env variables (3/5)
+      ansible.builtin.cron:
+        name: COMMANDER_STORE_DIR
+        env: yes
+        job: "{{ commander_store_dir }}"
+    - name: Create daily cron env variables (4/5)
+      ansible.builtin.cron:
+        name: PYKEEPASS_DATABASE
+        env: yes
+        job: "{{ kdbx_path }}"
+    - name: Create daily cron env variables (5/5)
+      ansible.builtin.cron:
+        name: PYKEEPASS_KEYFILE
+        env: yes
+        job: "{{ kdbx_key_path }}"
     - name: Creating cron scripts directory....
       file:
         path: "{{ cron_path }}"
@@ -109,7 +134,7 @@
         name: Database Backups
         minute: "15"
         hour: "21"
-        job: "export PYKEEPASS_DATABASE={{ kdbx_path }}; export PYKEEPASS_KEYFILE={{ kdbx_key_path }}; {{ cron_path }}/dbBackups.sh /databases/blog-db/blog_db /databases/virtual-desktop-db/guacamole_db /databases/limesurvey-db/limesurveydb /databases/etherpad-db/etherpaddb /databases/matrix-db/matrixdb /databases/matrix-db/syncv3 /databases/matrix-db/telegram /databases/matrix-db/whatsapp 2>&1 >> /var/log/dbBackups.log"
+        job: "{{ cron_path }}/dbBackups.sh /databases/blog-db/blog_db /databases/virtual-desktop-db/guacamole_db /databases/limesurvey-db/limesurveydb /databases/etherpad-db/etherpaddb /databases/matrix-db/matrixdb /databases/matrix-db/syncv3 /databases/matrix-db/telegram /databases/matrix-db/whatsapp 2>&1 >> /var/log/dbBackups.log"
     - name: Installing Certificate Renewal script...
       copy:
         src: "{{ role_path }}/files/renewCert.sh"
@@ -120,7 +145,7 @@
         name: Certificate Renewal
         minute: "20"
         hour: "0"
-        job: "export PYKEEPASS_DATABASE={{ kdbx_path }}; export PYKEEPASS_KEYFILE={{ kdbx_key_path }}; {{ cron_path }}/renewCert.sh {{ server_domain }} {{ email }} 2>&1 >> /var/log/renewCert.log"
+        job: "{{ cron_path }}/renewCert.sh {{ server_domain }} {{ email }} 2>&1 >> /var/log/renewCert.log"
 
   become: yes
   become_user: "root"
