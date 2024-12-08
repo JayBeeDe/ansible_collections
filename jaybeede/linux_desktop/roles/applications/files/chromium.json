@@ -44,6 +44,9 @@
     "SyncDisabled": true,
     "TranslateEnabled": false,
     "CookiesAllowedForUrls": [
+        "https://de.wikipedia.org",
+        "https://en.wikipedia.org",
+        "https://fr.wikipedia.org",
         "https://www.youtube.com",
         "https://www.google.com",
         "https://www.google.fr",
