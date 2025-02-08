@@ -1,14 +1,14 @@
 {
     "HomepageIsNewTabPage": false,
-    "HomepageLocation": "https://duckduckgo.com/?kae=t&kav=1&kz=-1&k1=-1&kaj=m&kak=-1&kax=-1&kaq=-1&kap=-1&kau=-1&kao=-1&kw=w&k18=1&ko=1&km=m&kac=-1",
-    "NewTabPageLocation": "https://duckduckgo.com/?kae=t&kav=1&kz=-1&k1=-1&kaj=m&kak=-1&kax=-1&kaq=-1&kap=-1&kau=-1&kao=-1&kw=w&k18=1&ko=1&km=m&kac=-1",
+    "HomepageLocation": "https://duckduckgo.com/?kp=1&kah=us-en%2Cfr-fr&kl=us-en&kbg=-1&kau=-1&kao=-1&kap=-1&kaq=-1&kax=-1&kak=-1&kay=b&kaj=m&kk=-1&k1=-1&kn=1&kpsb=-1&kbe=0&kz=-1&kac=-1&kae=d",
+    "NewTabPageLocation": "https://duckduckgo.com/?kp=1&kah=us-en%2Cfr-fr&kl=us-en&kbg=-1&kau=-1&kao=-1&kap=-1&kaq=-1&kax=-1&kak=-1&kay=b&kaj=m&kk=-1&k1=-1&kn=1&kpsb=-1&kbe=0&kz=-1&kac=-1&kae=d",
     "RestoreOnStartup": 5,
     "ShowHomeButton": true,
     "ExtensionInstallBlocklist": [
         "ghbmnnjooekpmoecnnnilnnbdlolhkhi"
     ],
     "ExtensionInstallForcelist": [
-        "gighmmpiobklfepjocnamgkkbiglidom",
+        "cjpalhdlnbpafiamejdnhcphjbkeiagm",
         "lfpjkncokllnfokkgpkobnkbkmelfefj",
         "oboonakemofpalcgghocfoadofidjkkk",
         "gphhapmejobijbbhgpjhcjognlahblep",
@@ -66,15 +66,15 @@
     "DefaultSearchProviderEnabled": true,
     "DefaultSearchProviderKeyword": "d",
     "DefaultSearchProviderName": "DuckDuckGo",
-    "DefaultSearchProviderNewTabURL": "https://duckduckgo.com/?q={searchTerms}&kae=t&kav=1&kz=-1&k1=-1&kaj=m&kak=-1&kax=-1&kaq=-1&kap=-1&kau=-1&kao=-1&kw=w&k18=1&ko=1&km=m&kac=-1",
-    "DefaultSearchProviderSearchURL": "https://duckduckgo.com/?q={searchTerms}&kae=t&kav=1&kz=-1&k1=-1&kaj=m&kak=-1&kax=-1&kaq=-1&kap=-1&kau=-1&kao=-1&kw=w&k18=1&ko=1&km=m&kac=-1",
+    "DefaultSearchProviderNewTabURL": "https://duckduckgo.com/?q={searchTerms}&kp=1&kah=us-en%2Cfr-fr&kl=us-en&kbg=-1&kau=-1&kao=-1&kap=-1&kaq=-1&kax=-1&kak=-1&kay=b&kaj=m&kk=-1&k1=-1&kn=1&kpsb=-1&kbe=0&kz=-1&kac=-1&kae=d",
+    "DefaultSearchProviderSearchURL": "https://duckduckgo.com/?q={searchTerms}&kp=1&kah=us-en%2Cfr-fr&kl=us-en&kbg=-1&kau=-1&kao=-1&kap=-1&kaq=-1&kax=-1&kak=-1&kay=b&kaj=m&kk=-1&k1=-1&kn=1&kpsb=-1&kbe=0&kz=-1&kac=-1&kae=d",
     "DefaultSearchProviderAlternateURLs": [
         "https://www.bing.com/search?q={searchTerms}&PC=U316&FORM=CHROMN",
         "https://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords={searchTerms}",
         "https://www.amazon.de/s/ref=nb_sb_noss?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&url=search-alias%3Daps&field-keywords={searchTerms}",
         "https://www.amazon.fr/s/ref=nb_sb_noss_2?__mk_fr_FR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&url=search-alias%3Daps&field-keywords={searchTerms}",
         "https://hub.docker.com/search/?q={searchTerms}",
-        "https://duckduckgo.com/?q={searchTerms}&kae=t&kav=1&kz=-1&k1=-1&kaj=m&kak=-1&kax=-1&kaq=-1&kap=-1&kau=-1&kao=-1&kw=w&k18=1&ko=1&km=m&kac=-1",
+        "https://duckduckgo.com/?q={searchTerms}&kp=1&kah=us-en%2Cfr-fr&kl=us-en&kbg=-1&kau=-1&kao=-1&kap=-1&kaq=-1&kax=-1&kak=-1&kay=b&kaj=m&kk=-1&k1=-1&kn=1&kpsb=-1&kbe=0&kz=-1&kac=-1&kae=d",
         "https://github.com/search?q={searchTerms}&ref=opensearch",
         "http://www.google.de/search?hl=de&q={searchTerms}",
         "http://www.google.fr/search?hl=fr&q={searchTerms}",
