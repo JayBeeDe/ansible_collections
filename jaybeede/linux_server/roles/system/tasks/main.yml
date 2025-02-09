@@ -22,96 +22,43 @@
         autoconnect: yes
         state: present
 
-    - name: "Configuring sshd (1/8)..."
-      replace:
-        path: /etc/ssh/sshd_config
-        regexp: "^#?Port [0-9]+$"
-        replace: "Port {{ ssh_port }}"
-        backup: no
+    - name: "Configuring sshd..."
+      template:
+        src: "{{ role_path }}/files/sshd_config.tpl"
+        dest: /etc/ssh/sshd_config
+        mode: "0644"
+        owner: "root"
+        group: "root"
+        force: yes
       notify: Restart sshd
 
-    - name: "Configuring sshd (2/8)..."
-      replace:
-        path: /etc/ssh/sshd_config
-        regexp: "^#?UseDNS .+$"
-        replace: "UseDNS no"
-        backup: no
-      notify: Restart sshd
-
-    - name: "Configuring sshd (3/8)..."
-      replace:
-        path: /etc/ssh/sshd_config
-        regexp: "^#?PermitRootLogin .+$"
-        replace: "PermitRootLogin prohibit-password"
-        backup: no
-      notify: Restart sshd
-
-    - name: "Configuring sshd (4/8)..."
-      replace:
-        path: /etc/ssh/sshd_config
-        regexp: "^#?PermitEmptyPasswords .+$"
-        replace: "PermitEmptyPasswords no"
-        backup: no
-      notify: Restart sshd
-
-    - name: "Configuring sshd (5/8)..."
-      replace:
-        path: /etc/ssh/sshd_config
-        regexp: "^#?PasswordAuthentication .+$"
-        replace: "PasswordAuthentication no"
-        backup: no
-      notify: Restart sshd
-
-    - name: "Configuring sshd (6/8)..."
-      replace:
-        path: /etc/ssh/sshd_config
-        regexp: "^#?UsePAM .+$"
-        replace: "UsePAM no"
-        backup: no
-      notify: Restart sshd
-
-    - name: "Configuring sshd (7/8)..."
-      replace:
-        path: /etc/ssh/sshd_config
-        regexp: "^#?PrintMotd .+$"
-        replace: "PrintMotd yes"
-        backup: no
-      notify: Restart sshd
-
-    - name: "Configuring sshd (8/8)..."
-      lineinfile:
-        path: /etc/ssh/sshd_config
-        state: present
-        regexp: "^AllowUsers {{ user }}@{{ allowed_ip }} root@localhost root@127.0.0.1 {{ user }}@127.0.0.1 {{ user }}@localhost {{ user }}@172.18.* {{ user }}@172.17.*"
-        line: "AllowUsers {{ user }}@{{ allowed_ip }} root@localhost root@127.0.0.1 {{ user }}@127.0.0.1 {{ user }}@localhost {{ user }}@172.18.* {{ user }}@172.17.*"
-        backup: no
-      notify: Restart sshd
-
-    - name: "Configuring firewalld (1/3)..."
-      copy:
-        src: "{{ role_path }}/files/firewalld.xml"
+    - name: "Configuring firewalld..."
+      template:
+        src: "{{ role_path }}/files/firewalld.xml.tpl"
         dest: /etc/firewalld/zones/public.xml
         mode: "0644"
         owner: "root"
         group: "root"
-        force: no
+        force: yes
       notify: Restart firewalld
 
-    - name: "Configuring firewalld (2/3)..."
-      replace:
-        path: /etc/firewalld/zones/public.xml
-        regexp: "allowed-ip-ansible-template"
-        replace: "{{ allowed_ip }}/32"
-        backup: no
-      notify: Restart firewalld
+    - name: "Configuring IPv6..."
+      sysctl:
+        name: net.ipv6.conf.all.disable_ipv6
+        state: absent
+      when: ipv6_flag == 1
 
-    - name: "Configuring firewalld (3/3)..."
-      replace:
-        path: /etc/firewalld/zones/public.xml
-        regexp: "ssh-port-ansible-template"
-        replace: "{{ ssh_port | string }}"
-        backup: no
-      notify: Restart firewalld
+    - name: "Configuring IPv4 forwarding..."
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+      when: inventory_hostname in groups["vpn"]
+
+    - name: "Configuring IPv6 forwarding..."
+      sysctl:
+        name: net.ipv6.conf.all.forwarding
+        value: 1
+      when: ipv6_flag == 1 and inventory_hostname in groups["vpn"]
 
     - name: "Masking ctrl-alt-del.target..."
       systemd:
@@ -122,84 +69,49 @@
 
     - name: "Configuring motd..."
       copy:
-        src: "{{ role_path }}/files/motd"
+        src: "{{ role_path }}/files/motd-{{ host_item | lower }}.txt"
         dest: /etc/motd
         mode: "0755"
         owner: "root"
         group: "root"
+      with_items: "{{ ansible_host }}"
+      loop_control:
+        loop_var: host_item
+      ignore_errors: yes
 
-    - name: "Configuring aliases for root user (1/2)..."
-      copy:
-        src: "{{ role_path }}/files/bash_aliases"
-        dest: /root/.bash_aliases
+    - name: "Configuring aliases(1/2)..."
+      template:
+        src: "{{ role_path }}/files/bash_aliases.tpl"
+        dest: "{{ line_item.home }}/.bash_aliases"
         mode: "0755"
-        owner: "root"
-        group: "root"
-        force: no
+        owner: "{{ line_item.user }}"
+        group: "{{ line_item.user }}"
+        block_start_string: "<%"
+        block_end_string: "%>"
+        variable_start_string: "[%" # because script contains default character
+        variable_end_string: "%]" # because script contains default character
+        comment_start_string: "{=" # because script contains default character
+        comment_end_string: "=}" # because script contains default character
+      with_items:
+        - { home: "/root", user: "root" }
+        - { home: "{{ home }}", user: "{{ user }}" }
+      loop_control:
+        loop_var: line_item
 
-    - name: "Configuring aliases for root user (2/2)..."
+    - name: "Configuring aliases(2/2)..."
       lineinfile:
-        path: /root/.bashrc
+        path: "{{ home_item }}/.bashrc"
         state: present
         regexp: ^(\s*)(.|source)( ~/.bash_aliases)(\s*)$
         line: ". ~/.bash_aliases"
         backup: no
-
-    - name: "Overriding env variables to {{ user }} for root user (1/3)..."
-      replace:
-        path: /root/.bash_aliases
-        regexp: '\$VPJP'
-        replace: "{{ git_rootrepo }}/"
-        backup: no
-      changed_when: false
-
-    - name: "Overriding env variables to {{ user }} for root user (2/3)..."
-      replace:
-        path: /root/.bash_aliases
-        regexp: '\$HOME'
-        replace: "{{ home }}/"
-        backup: no
-      changed_when: false
-
-    - name: "Overriding env variables to {{ user }} for root user (3/3)..."
-      replace:
-        path: /root/.bash_aliases
-        regexp: '\$USER'
-        replace: "{{ user }}"
-        backup: no
-      changed_when: false
+      with_items:
+        - /root
+        - "{{ home }}"
+      loop_control:
+        loop_var: home_item
 
   become: yes
   become_user: "root"
-  environment:
-    PWD: ""
-- block:
-    - name: "Configuring aliases for {{ user }} user (1/2)..."
-      copy:
-        src: "{{ role_path }}/files/bash_aliases"
-        dest: "{{ home }}/.bash_aliases"
-        mode: "0755"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-        force: no
-
-    - name: "Configuring aliases for {{ user }} user (2/2)..."
-      lineinfile:
-        path: "{{ home }}/.bashrc"
-        state: present
-        regexp: ^(\s*)(.|source)( ~/.bash_aliases)(\s*)$
-        line: ". ~/.bash_aliases"
-        backup: no
-
-    - name: "Overriding env variables to {{ user }} for {{ user }} user..."
-      replace:
-        path: "{{ home }}/.bash_aliases"
-        regexp: '\$VPJP'
-        replace: "{{ git_rootrepo }}/"
-        backup: no
-      changed_when: false
-
-  become: yes
-  become_user: "{{ user }}"
   environment:
     PWD: ""

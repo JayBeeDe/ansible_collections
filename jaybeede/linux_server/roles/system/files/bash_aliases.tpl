@@ -36,11 +36,11 @@ export LANG=C
 
 ## personal aliases
 
-export vd="$HOME/Documents"
+export vd="[% home %]/Documents" # Will be replaced by ansible
 alias d="cd $vd"
-export vpjp="$VPJP" # Will be replaced by ansible
+export vpjp="[% git_rootrepo %]" # Will be replaced by ansible
 alias pjp="cd $vpjp"
-export vdw="$(python3 -c 'from gi.repository import GLib; print(GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOWNLOAD));')"
+export vdw="[% home %]/Downloads"
 alias dw="cd $vdw"
 
 # git related aliases
