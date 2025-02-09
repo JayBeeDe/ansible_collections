@@ -46,6 +46,7 @@
           - libnss3-dev
           - libreadline-dev
           - libsqlite3-dev
+      when: commander_store_dir is defined
 
     - name: "Install Python packages"
       pip:
@@ -55,6 +56,7 @@
         - matrix-commander # requires python 3.11 that has been installed manually from source (in addition to distribution's python 3.9), in the meantime 3.11 to be available as deb package
       loop_control:
         loop_var: pip_item
+      when: commander_store_dir is defined
 
     - name: "Logical evaluation..."
       stat:
@@ -79,7 +81,6 @@
           - docker-ce-cli
           - containerd.io
       notify: Restart docker
-      when: not f.stat.exists
 
     - name: "Install locate package..."
       apt:
