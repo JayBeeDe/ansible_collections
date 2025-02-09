@@ -1,0 +1,111 @@
+---
+- block:
+    - name: Create volume
+      community.docker.docker_volume:
+        name: wireguard-proxy-conf-vol
+
+    - name: Create network
+      community.docker.docker_network:
+        name: wg6
+        driver: bridge
+        ipam_driver: default
+        enable_ipv6: true
+        ipam_config:
+          - subnet: "{{ wireguard_proxy_cidrv6 }}"
+
+    - name: Run wireguard-proxy
+      docker_container:
+        detach: yes
+        hostname: wireguard-proxy
+        image: linuxserver/wireguard:latest
+        interactive: yes
+        name: wireguard-proxy
+        recreate: yes
+        restart_policy: always
+        restart: yes
+        state: started
+        tty: yes
+        privileged: true
+        capabilities:
+          - NET_ADMIN
+          - SYS_MODULE
+        networks:
+          - name: wg6
+        ports:
+          - "{{wireguard_proxy_port}}:51820/udp"
+        sysctls:
+          net.ipv6.conf.all.disable_ipv6: 0
+          net.ipv6.conf.all.forwarding: 1
+          net.ipv6.conf.eth0.proxy_ndp: 1
+        volumes:
+          - wireguard-proxy-conf-vol:/config
+          - /lib/modules:/lib/modules
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          TZ: Etc/UTC
+          SERVERURL: "{{ vpn_domain }}"
+          SERVERPORT: "{{ wireguard_proxy_port | string }}"
+          PEERS: "{{ wireguard_proxy_peers_list | length | string }}"
+          PEERDNS: "{{ network_dns }},{{ network_dns2 }},{{ network_dnsv6 }},{{ network_dnsv62 }}"
+          INTERNAL_SUBNET: 10.13.13.0/24
+          ALLOWEDIPS: 0.0.0.0/0, ::/0
+          PERSISTENTKEEPALIVE_PEERS: all
+          LOG_CONFS: "true"
+
+    - name: Configure wireguard server
+      template:
+        src: "{{ role_path }}/files/wg0.conf.tpl"
+        dest: "{{ vol_path }}/wireguard-proxy-conf-vol/_data/wg_confs/wg0.conf"
+        mode: "0755"
+        force: yes
+
+    - name: Configure wireguard peers
+      template:
+        src: "{{ role_path }}/files/peer.conf.tpl"
+        dest: "{{ vol_path }}/wireguard-proxy-conf-vol/_data/peer{{ count + 1 }}/peer{{ count + 1 }}.conf"
+        mode: "0755"
+        force: yes
+      no_log: true # prevent logging dict details with secrets
+      loop: "{{ wireguard_proxy_peers_list | dict2items }}"
+      loop_control:
+        index_var: count
+
+    - name: Apply additional configuration to wireguard-proxy
+      docker_container:
+        name: wireguard-proxy
+        restart: true
+        state: started
+
+    - name: Processing additional routes (1/4)...
+      set_fact:
+        wireguard_proxy_routes_list:
+          - ip: "{{ wireguard_proxy_route_cidrv6 }}"
+            next_hop: "{{ wireguard_proxy_route_gwv6 }}"
+      when: ipv6_flag == 1
+
+    - name: Processing additional routes (2/4)...
+      set_fact:
+        wireguard_proxy_routes_list: "{{ wireguard_proxy_routes_list + [{ 'ip': item.value.extra_allowed_ip_address_cidrv6, 'next_hop': wireguard_proxy_route_gwv6 }] }}"
+      no_log: true
+      loop: "{{ wireguard_proxy_peers_list | dict2items }}"
+      when: ipv6_flag == 1 and item.value.extra_allowed_ip_address_cidrv6 is defined
+
+    - name: Processing additional routes (3/4)...
+      command: "ip -6 route add {{ item.ip }} via {{ item.next_hop }}"
+      register: ext
+      ignore_errors: true
+      loop: "{{ wireguard_proxy_routes_list }}"
+      when: ipv6_flag == 1
+      changed_when: 'not ext.failed and ext.stderr != "RTNETLINK answers: File exists"'
+
+    - name: Processing additional routes (4/4)...
+      fail:
+        msg: "Error while applying additional route {{ item.cmd | join(' ') }}"
+      loop: "{{ ext.results }}"
+      when: 'ipv6_flag == 1 and item.failed and item.stderr != "RTNETLINK answers: File exists"'
+
+  become: yes
+  become_user: "root"
+  environment:
+    PWD: ""

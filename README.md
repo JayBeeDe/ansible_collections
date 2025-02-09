@@ -17,6 +17,7 @@ This repo contains ansible collections, roles, modules, etc.
       * Roles
         * [cron](jaybeede/linux_server/roles/cron/README.md)
         * [docker](jaybeede/linux_server/roles/docker/README.md)
+        * [docker_wireguard](jaybeede/linux_server/roles/docker_wireguard/README.md)
         * [packages](jaybeede/linux_server/roles/packages/README.md)
         * [system](jaybeede/linux_server/roles/system/README.md)
       * Modules

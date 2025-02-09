@@ -1,0 +1,16 @@
+---
+galaxy_info:
+  author: JayBee <jb.social@outlook.com>
+  description: Wireguard VPN for linux server
+  license: GPL-3.0-or-later
+  galaxy_tags:
+  - "linux"
+  - "debian"
+  - "docker"
+  - "wireguard"
+  - "vpn"
+  - "ipv6"
+  platforms:
+    - name: Debian
+      versions:
+        - any

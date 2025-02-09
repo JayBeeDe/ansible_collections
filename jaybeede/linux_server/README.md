@@ -10,6 +10,7 @@ linux_server collection provides a set of ready to use roles & modules to quickl
 * [system](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/system/README.md)
 * [docker](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/docker/README.md)
 * [cron](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/cron/README.md)
+* [docker_wireguard](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/docker_wireguard/README.md)
 
 ### Modules
 
@@ -33,6 +34,7 @@ Feature |
 [Matrix](https://matrix.org/) network for secure and decentralised communication
 [Nginx](https://nginx.org/) reverse proxy
 [Wordpress](https://wordpress.com/) blog
+[Wireguard](https://www.wireguard.com/) VPN
 
 ## Prerequisites
 
@@ -47,10 +49,10 @@ vault_password: "my vault_password"  # if user doesn't exist, user will be creat
 vault_email: "my vault_email"
 vault_nickname: "my vault_nickname"
 vault_ssh_port: "my vault_ssh_port"
-vault_ssh_host1: "my vault_ssh_host1"
 vault_become_pass: "my vault_become_pass"
 vault_domain: "my vault_domain"
 vault_matrix_domain: "my vault_matrix_domain"
+vault_vpn_domain: "my vault_vpn_domain"
 vault_blogdb_password: "my vault_blogdb_password"
 vault_virtualdesktopdb_password: "my vault_virtualdesktopdb_password"
 vault_limesurveyui_password: "my vault_limesurveyui_password"
@@ -76,6 +78,26 @@ vault_matrixwhatsappbridge_hstoken: "my vault_matrixwhatsappbridge_hstoken"
 vault_matrixwhatsappbridge_senderlocalpart: "my vault_matrixwhatsappbridge_senderlocalpart"
 vault_kdbx_path: "my vault_kdbx_path"
 vault_kdbx_key_path: "my vault_kdbx_key_path"
+vault_commander_store_dir: "my vault_commander_store_dir" # path to the .store directory that contains credentials
+vault_wireguard_proxy_cidrv6: "my vault_wireguard_proxy_cidrv6"
+vault_wireguard_proxy_ipv6: "my vault_wireguard_proxy_ipv6"
+vault_wireguard_proxy_peers_list:
+  peer1: # this is just a comment in the configuration to identify the peer
+    preshared_key: "my vault peer 1 preshared_key"
+    public_key: "my vault peer 1 public_key"
+    private_key: "my vault peer 1 private_key"
+    ipv6_address: "my vault peer 1 ipv6_address"
+  peer2:
+    preshared_key: "my vault peer 2 preshared_key"
+    public_key: "my vault peer 2 public_key"
+    private_key: "my vault peer 2 private_key"
+    ipv6_address: "my vault peer 2 ipv6_address"
+    extra_allowed_ip_address_cidrv6: "my vault peer 2 optional extra_allowed_ip_address_cidrv6"
+vault_wireguard_proxy_port: "my vault_wireguard_proxy_port"
+vault_wireguard_proxy_private_key: "my vault_wireguard_proxy_private_key"
+vault_wireguard_proxy_public_key: "my vault_wireguard_proxy_public_key"
+vault_wireguard_proxy_route_cidrv6: "my vault_wireguard_proxy_route_cidrv6"
+vault_wireguard_proxy_route_gwv6: "my vault_wireguard_proxy_route_gwv6"
 ```
 
 **Encrypt** that file.
@@ -97,14 +119,20 @@ You can put all the roles within the following order in your playbook (let's cal
   collections:
     - jaybeede.linux_server
   tasks:
-    - import_role:
-        name: packages
-    - import_role:
-        name: system
-    - import_role:
-        name: docker
-    - import_role:
-        name: cron
+    - include_role:
+        name: "{{ item }}"
+      loop:
+        - packages
+        - system
+    - include_role:
+        name: "{{ item }}"
+      loop:
+        - docker
+        - cron
+      when: inventory_hostname in groups["web"]
+    - include_role:
+        name: docker_wireguard
+      when: inventory_hostname in groups["vpn"]
 ```
 
 Warning: Order is important:

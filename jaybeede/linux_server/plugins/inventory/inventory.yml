@@ -11,8 +11,24 @@ all:
     locale: en_US
     network_dns: "8.8.8.8"
     network_dns2: "8.8.4.4"
+    network_dnsv6: "2001:4860:4860::8888"
+    network_dnsv62: "2001:4860:4860::8844"
     ssh_port: "{{ vault_ssh_port }}"
     allowed_ip: "{{ hostvars[inventory_hostname]['ansible_env'].SSH_CONNECTION.split(' ')[0] }}"
+  hosts:
+    server-web:
+      ansible_host: JBD-HST-OVH
+      ansible_port: "{{ ssh_port }}"
+      ansible_user: "{{ user }}"
+      ansible_become_pass: "{{ vault_become_pass }}"
+    server-vpn:
+      ansible_host: JBD-HST-CTO
+      ansible_port: "{{ ssh_port }}"
+      ansible_user: "{{ user }}"
+      ansible_become_pass: "{{ vault_become_pass }}"
+
+web:
+  vars:
     ini_path: "/opt/IniBackups"
     script_path: "/opt/scripts"
     lib_path: "{{ script_path }}/lib"
@@ -48,9 +64,18 @@ all:
     kdbx_path: "{{ vault_kdbx_path }}"
     kdbx_key_path: "{{ vault_kdbx_key_path }}"
     commander_store_dir: "{{ vault_commander_store_dir }}"
-  hosts:
-    server:
-      ansible_host: "{{ vault_ssh_host1 }}"
-      ansible_port: "{{ ssh_port }}"
-      ansible_user: "{{ user }}"
-      ansible_become_pass: "{{ vault_become_pass }}"
+  hosts: server-web
+
+vpn:
+  vars:
+    vpn_domain: "{{ vault_vpn_domain }}"
+    wireguard_proxy_cidrv6: "{{ vault_wireguard_proxy_cidrv6 }}"
+    wireguard_proxy_ipv6: "{{ vault_wireguard_proxy_ipv6 }}"
+    wireguard_proxy_peers_list: "{{ vault_wireguard_proxy_peers_list }}" # list of dicts, check documentation for more details 
+    wireguard_proxy_port: "{{ vault_wireguard_proxy_port }}"
+    wireguard_proxy_private_key: "{{ vault_wireguard_proxy_private_key }}"
+    wireguard_proxy_public_key: "{{ vault_wireguard_proxy_public_key }}"
+    wireguard_proxy_route_cidrv6: "{{ vault_wireguard_proxy_route_cidrv6 }}"
+    wireguard_proxy_route_gwv6: "{{ vault_wireguard_proxy_route_gwv6 }}"
+    ipv6_flag: 1
+  hosts: server-vpn

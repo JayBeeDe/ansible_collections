@@ -3,11 +3,17 @@
   collections:
     - jaybeede.linux_server
   tasks:
-    - import_role:
-        name: packages
-    - import_role:
-        name: system
-    - import_role:
-        name: docker
-    - import_role:
-        name: cron
+    - include_role:
+        name: "{{ item }}"
+      loop:
+        - packages
+        - system
+    - include_role:
+        name: "{{ item }}"
+      loop:
+        - docker
+        - cron
+      when: inventory_hostname in groups["web"]
+    - include_role:
+        name: docker_wireguard
+      when: inventory_hostname in groups["vpn"]

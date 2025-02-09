@@ -1,0 +1,8 @@
+user: default
+home: "/home/{{ user }}"
+network_dns: "8.8.8.8"
+network_dns2: "8.8.4.4"
+network_dnsv6: "2001:4860:4860::8888"
+network_dnsv62: "2001:4860:4860::8844"
+mnt_path: "/var/lib/docker/mounts"
+vol_path: "/var/lib/docker/volumes"
