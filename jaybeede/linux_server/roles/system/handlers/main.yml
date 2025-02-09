@@ -1,6 +1,3 @@
-- name: "Kernel attributes update"
-  command: sysctl -p
-
 - name: "Update grub"
   command: update-grub
 

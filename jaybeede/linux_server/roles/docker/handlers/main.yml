@@ -1,2 +1,0 @@
-- name: "Kernel attributes update"
-  command: sysctl -p
