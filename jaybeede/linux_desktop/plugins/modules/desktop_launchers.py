@@ -20,7 +20,7 @@ module: desktop_launchers
 author: JayBee
 version_added: "2.0.0"
 short_description: Create desktop files according the freedesktop.org specifications
-description: Ansible Module to create .desktop files according the freedesktop.org specifications: https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#recognized-keys
+description: Ansible Module to create .desktop files according the freedesktop.org specifications https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#recognized-keys
 
 options:
   source:
