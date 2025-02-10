@@ -1,0 +1,62 @@
+---
+name: Build, publish and release ansible collection
+on:
+  push:
+    branches:
+      - ci
+    tags:
+      - "linux_server_v*"
+      - "linux_desktop_v*"
+jobs:
+  publish-ansible-collection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Install packages
+        run: sudo apt-get install -y curl git jq yq
+      - name: Check tag
+        run: |
+          set -euo pipefail
+          source "${GITHUB_WORKSPACE}/.github/workflows/ansible_galaxy_libs.sh"
+          TAG="${GITHUB_REF##*/}"
+          if [ "$GITHUB_REF_TYPE" == "branch" ]; then
+            TAG="linux_server_v0.0.1"
+          fi
+          checkTag "$TAG"
+      - name: Set version
+        run: |
+          set -euo pipefail
+          source "${GITHUB_WORKSPACE}/.github/workflows/ansible_galaxy_libs.sh"
+          setVersion
+      - name: Install packages
+        run: sudo apt-get install -y ansible coreutils
+      - name: Build
+        run: |
+          set -euo pipefail
+          source "${GITHUB_WORKSPACE}/.github/workflows/ansible_galaxy_libs.sh"
+          build
+      - name: Publish
+        env:
+          GALAXY_TOKEN: ${{ secrets.GALAXY_TOKEN }}
+        run: |
+          set -euo pipefail
+          source "${GITHUB_WORKSPACE}/.github/workflows/ansible_galaxy_libs.sh"
+          publish
+      - name: Check Publication
+        env:
+          GALAXY_TOKEN: ${{ secrets.GALAXY_TOKEN }}
+        run: |
+          set -euo pipefail
+          source "${GITHUB_WORKSPACE}/.github/workflows/ansible_galaxy_libs.sh"
+          checkPublication
+      - name: Release
+        if: github.ref_type == 'tag'
+        uses: action-pack/github-release@v2
+        with:
+          tag: ${{ github.ref }}
+          title: "${{ env.COLLECTION }} v${{ env.COLLECTION_VERSION }}"
+          body: |
+            `ansible-galaxy collection install ${{ env.COLLECTION_NAMESPACE }}/${{ env.COLLECTION }}:${{ env.COLLECTION_VERSION }}`
+
+            **Ansible Galaxy**: https://galaxy.ansible.com/ui/repo/published/${{ env.COLLECTION_NAMESPACE }}/${{ env.COLLECTION }}/?version=${{ env.COLLECTION_VERSION }}

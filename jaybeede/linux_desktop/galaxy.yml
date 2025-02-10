@@ -1,7 +1,7 @@
 ---
 namespace: jaybeede
 name: linux_desktop
-version: 2.1.1
+version: 0.0.0
 readme: README.md
 authors:
   - JayBee <jb.social@outlook.com>

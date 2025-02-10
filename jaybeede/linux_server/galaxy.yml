@@ -1,7 +1,7 @@
 ---
 namespace: jaybeede
 name: linux_server
-version: 1.2.0
+version: 0.0.0
 readme: README.md
 authors:
   - JayBee <jb.social@outlook.com>
