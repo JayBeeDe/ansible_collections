@@ -32,7 +32,7 @@ enable_registration: false
 registration_shared_secret: "{{ matrixgtw_register_secret }}"
 serve_server_wellknown: true
 media_store_path: /data/media_store
-signing_key_path: "/data/{{ server_domain }}.signing.key"
+signing_key_path: "/data/{{ matrix_domain }}.signing.key"
 report_stats: true
 trusted_key_servers:
   - server_name: matrix.org

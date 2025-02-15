@@ -178,11 +178,13 @@ http {
 			proxy_set_header Host $host;
 		}
 		location /.well-known/matrix/server {
-			add_header Access-Control-Allow-Origin *;
+			add_header Content-Type application/json;
+			add_header Access-Control-Allow-Origin * always;
 			return 200 '{ "m.server": "{{ matrix_domain }}:8448" }';
 		}
 		location /.well-known/matrix/client {
-			add_header Access-Control-Allow-Origin *;
+			add_header Content-Type application/json;
+			add_header Access-Control-Allow-Origin * always;
 			return 200 '{ "m.homeserver": { "base_url": "{{ matrix_homeserver }}" }, "org.matrix.msc3575.proxy": { "url": "{{ matrix_homeserver }}/sliding-sync" } }';
 		}
 {% if acmechallenge_flag == 1 %}

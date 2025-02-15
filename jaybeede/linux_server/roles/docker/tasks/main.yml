@@ -64,7 +64,7 @@
     - name: The following file(s) is/are going to be used to reset database(s)
       debug:
         var: resetPaths
-      when: "{{ resetPaths | length > 0 }}"
+      when: resetPaths | length > 0
 
     - name: Resetting init mnt (2/2)...
       copy:
@@ -72,7 +72,7 @@
         src: "{{ item.value }}"
         dest: "{{ mnt_path }}/{{ item.key }}-init-mnt/init.sql"
       with_dict: "{{ resetPaths }}"
-      when: "{{ resetPaths | length > 0 }}"
+      when: resetPaths | length > 0
 
     # related to volume init >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
