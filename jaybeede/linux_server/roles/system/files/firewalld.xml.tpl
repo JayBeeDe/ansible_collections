@@ -44,7 +44,7 @@
     <port protocol="tcp" port="{{ ssh_port | string }}" />
     <accept />
   </rule>
-{% if virtualdesktopdb_password is defined %}
+{% if virtualdesktopdb_password is defined or wireguard_proxy_port is defined %}
   <rule family="ipv4">
     <source address="172.17.0.0/24"/>
     <port protocol="tcp" port="{{ ssh_port | string }}"/>
