@@ -61,4 +61,11 @@
     <port protocol="tcp" port="{{ ssh_port | string }}" />
     <accept />
   </rule>
+{% for host in ansible_play_hosts_all -%}
+{{ "  " }}<rule family="ipv4">
+    <source address="{{ hostvars[host]['ansible_default_ipv4']['address'] }}/32" />
+    <port protocol="tcp" port="{{ ssh_port | string }}" />
+    <accept />
+  </rule>
+{% endfor %}
 </zone>

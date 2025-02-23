@@ -119,4 +119,4 @@ Subsystem	sftp	/usr/lib/openssh/sftp-server
 #	PermitTTY no
 #	ForceCommand cvs server
 ClientAliveInterval 120
-AllowUsers {{ user }}@{{ allowed_ip }} root@localhost root@127.0.0.1 {{ user }}@127.0.0.1 {{ user }}@localhost{% if virtualdesktopdb_password is defined %} {{ user }}@172.18.* {{ user }}@172.17.*{% endif %}
+AllowUsers {% for host in ansible_play_hosts_all -%}{{ user }}@{{ hostvars[host]['ansible_default_ipv4']['address'] }} {% endfor %}{{ user }}@{{ allowed_ip }} root@localhost root@127.0.0.1 {{ user }}@127.0.0.1 {{ user }}@localhost{% if virtualdesktopdb_password is defined %} {{ user }}@172.18.* {{ user }}@172.17.*{% endif %}

@@ -1,16 +1,17 @@
 ---
 - block:
-    - name: Set a hostname (1/2)
+    - name: Setting hostname
       ansible.builtin.hostname:
         name: "{{ ansible_host }}"
 
-    - name: Set a hostname (2/2)
-      lineinfile:
-        dest: "/etc/hosts"
-        regexp: "^127.0.1.1\t+.+$"
-        line: "127.0.1.1\t{{ ansible_host }}"
-        state: present
-        backup: no
+    - name: Setting hosts file
+      template:
+        src: "{{ role_path }}/files/hosts.tpl"
+        dest: /etc/hosts
+        mode: "0644"
+        owner: "root"
+        group: "root"
+        force: yes
 
     - name: "Configuring system network..."
       nmcli:
@@ -78,6 +79,14 @@
       loop_control:
         loop_var: host_item
       ignore_errors: yes
+
+    - name: "Configuring ssh..."
+      template:
+        src: "{{ role_path }}/files/ssh-config.tpl"
+        dest: "{{ home }}/.ssh/config"
+        mode: "0664"
+        owner: "{{ user }}"
+        group: "{{ user }}"
 
     - name: "Configuring aliases(1/2)..."
       template:
