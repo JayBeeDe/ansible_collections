@@ -72,12 +72,12 @@ function setVersion() {
         echo "Cannot parse yaml data from template file ${GIT_ROOT_PATH}/${COLLECTION_NAMESPACE}/${COLLECTION}/galaxy.yml"
         exit 3
     fi
-    GALAXY_VERSION=$(jq -r '.version // empty' <(echo "$GALAXY_DATA"))
+    GALAXY_VERSION=$(jq -r '.version // empty' <<<"$GALAXY_DATA")
     if [ -z "$GALAXY_VERSION" ]; then
         echo "Cannot parse version to replace from template file ${GIT_ROOT_PATH}/${COLLECTION_NAMESPACE}/${COLLECTION}/galaxy.yml"
         exit 3
     fi
-    yq -y . <(jq -r '.version = "'"$COLLECTION_VERSION"'"' <(echo "$GALAXY_DATA")) >"${GIT_ROOT_PATH}/${COLLECTION_NAMESPACE}/${COLLECTION}/galaxy.yml"
+    yq -y . <(jq -r '.version = "'"$COLLECTION_VERSION"'"' <<<"$GALAXY_DATA") >"${GIT_ROOT_PATH}/${COLLECTION_NAMESPACE}/${COLLECTION}/galaxy.yml"
     echo "Version $COLLECTION_VERSION updated successfully to file ${GIT_ROOT_PATH}/${COLLECTION_NAMESPACE}/${COLLECTION}/galaxy.yml"
     cat "${GIT_ROOT_PATH}/${COLLECTION_NAMESPACE}/${COLLECTION}/galaxy.yml"
 }

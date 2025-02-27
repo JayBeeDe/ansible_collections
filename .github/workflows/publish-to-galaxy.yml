@@ -44,8 +44,6 @@ jobs:
           source "${GITHUB_WORKSPACE}/.github/workflows/ansible_galaxy_libs.sh"
           publish
       - name: Check Publication
-        env:
-          GALAXY_TOKEN: ${{ secrets.GALAXY_TOKEN }}
         run: |
           set -euo pipefail
           source "${GITHUB_WORKSPACE}/.github/workflows/ansible_galaxy_libs.sh"
@@ -55,7 +53,7 @@ jobs:
         uses: action-pack/github-release@v2
         with:
           tag: ${{ github.ref }}
-          title: "${{ env.COLLECTION }} v${{ env.COLLECTION_VERSION }}"
+          title: "${{ env.COLLECTION }}_v${{ env.COLLECTION_VERSION }}"
           body: |
             `ansible-galaxy collection install ${{ env.COLLECTION_NAMESPACE }}/${{ env.COLLECTION }}:${{ env.COLLECTION_VERSION }}`
 
