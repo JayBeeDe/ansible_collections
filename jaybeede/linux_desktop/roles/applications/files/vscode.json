@@ -192,4 +192,5 @@
     ],
     "workbench.colorTheme": "Violet Accentuation Dark High Contrast",
     "luahelper.format.column_limit": 500,
+    "cacdhc.accentuationColor": "#7764d8"
 }
