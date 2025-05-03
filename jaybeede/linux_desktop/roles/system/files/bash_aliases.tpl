@@ -36,9 +36,9 @@ export LANG=C
 
 ## personal aliases
 
-export vd="$HOME/Documents"
+export vd="[% home %]/Documents" # Will be replaced by ansible
 alias d="cd $vd"
-export vpjp="$VPJP" # Will be replaced by ansible
+export vpjp="[% git_rootrepo %]" # Will be replaced by ansible
 alias pjp="cd $vpjp"
 export vdw="$(python3 -c 'from gi.repository import GLib; print(GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOWNLOAD));')"
 alias dw="cd $vdw"
@@ -380,5 +380,4 @@ function decrypt {
 export GOOGLE_API_KEY="no"
 export GOOGLE_DEFAULT_CLIENT_ID="no"
 export GOOGLE_DEFAULT_CLIENT_SECRET="no"
-export QT_STYLE_OVERRIDE="Adwaita-Dark"
-export QT_QPA_PLATFORMTHEME=gtk2
+export QT_STYLE_OVERRIDE="{{ theme_primary_name }}"

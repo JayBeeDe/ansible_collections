@@ -17,9 +17,9 @@
     ignore_newline = true
     show_indicators = true
     icon_path = /usr/share/icons/gnome/48x48/status/:/usr/share/icons/gnome/48x48/devices/
-    icon_theme = "Yaru-purple-dark, Yaru-dark, Adwaita"
+    icon_theme = "{{ theme_secondary_name }}, {{ theme_primary_name }}"
     enable_recursive_icon_lookup = true
-    dmenu = "/usr/bin/dmenu -p dunst -m 0 -fn 'Ubuntu-20' -nf '#ffffff' -sb '#7764d8'"
+    dmenu = "/usr/bin/dmenu -p dunst -m 0 -fn 'Ubuntu-20' -nf '#ffffff' -sb '{{ theme_primary_color }}'"
     mouse_left_click = close_current
     mouse_middle_click= do_action
     mouse_right_click = close_all
@@ -32,13 +32,13 @@
 [urgency_low]
     background = "#2E3440"
     foreground = "#ffffff"
-    frame_color = "#7764d8"
+    frame_color = "{{ theme_primary_color }}"
     timeout = 3
 
 [urgency_normal]
     background = "#2E3440"
     foreground = "#ffffff"
-    frame_color = "#7764d8"
+    frame_color = "{{ theme_primary_color }}"
     timeout = 5
 
 [urgency_critical]

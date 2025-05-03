@@ -141,8 +141,8 @@
         group: "{{ user }}"
 
     - name: "Configuring vscode (2/5)..."
-      copy:
-        src: "{{ role_path }}/files/vscode.json"
+      template:
+        src: "{{ role_path }}/files/vscode.json.tpl"
         dest: "{{ home }}/.config/Code/User/settings.json"
         mode: "0644"
         owner: "{{ user }}"
@@ -228,8 +228,8 @@
         group: "{{ user }}"
 
     - name: "Configuring terminator (2/2)..."
-      copy:
-        src: "{{ role_path }}/files/terminator.ini"
+      template:
+        src: "{{ role_path }}/files/terminator.ini.tpl"
         dest: "{{ home }}/.config/terminator/config"
         mode: "0644"
         owner: "{{ user }}"

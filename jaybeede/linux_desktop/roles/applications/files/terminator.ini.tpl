@@ -1,9 +1,9 @@
 [global_config]
   window_state = maximise
   borderless = False
-  title_transmit_bg_color = "#5d2de6"
-  title_receive_bg_color = "#5d2de6"
-  title_inactive_bg_color = "#7764d8"
+  title_transmit_bg_color = "{{ theme_secondary_color }}"
+  title_receive_bg_color = "{{ theme_secondary_color }}"
+  title_inactive_bg_color = "{{ theme_primary_color }}"
   enabled_plugins = Logger, LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler
   suppress_multiple_term_dialog = True
 [keybindings]

@@ -170,7 +170,7 @@
           - com.github.wwmm.easyeffects
           - net.cozic.joplin_desktop
           - org.gnome.Evolution
-          - org.gtk.Gtk3theme.Yaru-dark
+          - "org.gtk.Gtk3theme.{{ theme_primary_name }}"
           - org.pipewire.Helvum
 
     - name: "Install Desktop Applications (3/3)..."

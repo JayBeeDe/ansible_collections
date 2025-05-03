@@ -1,5 +1,5 @@
 [Settings]
-gtk-theme-name=Adwaita
+gtk-theme-name={{ theme_primary_name }}
 gtk-fallback-icon-theme=gnome
 gtk-toolbar-style=GTK_TOOLBAR_BOTH
 gtk-font-name=Droid Sans 6

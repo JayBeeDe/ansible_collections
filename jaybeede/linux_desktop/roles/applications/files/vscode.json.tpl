@@ -192,5 +192,5 @@
     ],
     "workbench.colorTheme": "Custom Accentuation Color Dark High Contrast",
     "luahelper.format.column_limit": 500,
-    "cacdhc.accentuationColor": "#7764d8"
+    "cacdhc.accentuationColor": "{{ theme_primary_color }}"
 }

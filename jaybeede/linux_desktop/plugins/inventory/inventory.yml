@@ -25,6 +25,10 @@ all:
     rdp_user: "{{ vault_rdp_user }}"
     tokenGithub: "{{ vault_tokenGithub }}"
     tokenGitlab: "{{ vault_tokenGitlab }}"
+    theme_primary_name: "Yaru-dark"
+    theme_secondary_name: "Yaru-purple-dark"
+    theme_primary_color: "#7764d8"
+    theme_secondary_color: "#5d2de6"
   hosts:
     desktop:
       ansible_host: "{{ vault_ssh_host1 }}"

@@ -95,8 +95,8 @@
     - name: Setting theme color...
       dconf: key="/org/gnome/desktop/interface/{{ line_item.key }}" value="{{ line_item.value }}"
       with_items:
-        - { key: gtk-theme, value: "'Adwaita-dark'" }
-        - { key: icon-theme, value: "'Adwaita'" }
+        - { key: gtk-theme, value: "'{{ theme_primary_name }}'" }
+        - { key: icon-theme, value: "'{{ theme_primary_name }}'" }
         - { key: font-hinting, value: "'full'" }
       loop_control:
         loop_var: line_item
@@ -110,18 +110,18 @@
         owner: "{{ user }}"
         group: "{{ user }}"
       loop:
-        - srcDir: "/usr/share/themes/Yaru-purple-dark"
+        - srcDir: "/usr/share/themes/{{ theme_secondary_name }}"
           destDir: "{{ home }}/.themes/"
-        - srcDir: "/usr/share/icons/Yaru-purple-dark"
+        - srcDir: "/usr/share/icons/{{ theme_secondary_name }}"
           destDir: "{{ home }}/.icons/"
       loop_control:
         loop_var: line_item
 
     - name: Setting theme color for flatpak applications (2/2)...
-      shell: flatpak override --user --env=GTK_THEME=Yaru-purple-dark --env=ICON_THEME=Yaru-purple-dark
+      shell: "flatpak override --user --env=GTK_THEME={{ theme_secondary_name }} --env=ICON_THEME={{ theme_secondary_name }}"
 
     - name: Set dark mode
-      dconf: key="/org/gnome/shell/extensions/user-theme/name" value="'Adwaita-dark'"
+      dconf: key="/org/gnome/shell/extensions/user-theme/name" value="'{{ theme_primary_name }}'"
 
     - name: Configuring qt dark mode (1/2)...
       file:
@@ -156,16 +156,16 @@
         group: "{{ user }}"
 
     - name: Configuring gtk dark mode (3/4)...
-      copy:
-        src: "{{ role_path }}/files/gtk-3.0.ini"
+      template:
+        src: "{{ role_path }}/files/gtk-3.0.ini.tpl"
         dest: "{{ home }}/.config/gtk-3.0/settings.ini"
         mode: 0664
         owner: "{{ user }}"
         group: "{{ user }}"
 
     - name: Configuring gtk dark mode (4/4)...
-      copy:
-        src: "{{ role_path }}/files/gtk-4.0.ini"
+      template:
+        src: "{{ role_path }}/files/gtk-4.0.ini.tpl"
         dest: "{{ home }}/.config/gtk-4.0/settings.ini"
         mode: 0664
         owner: "{{ user }}"
