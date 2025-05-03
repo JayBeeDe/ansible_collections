@@ -95,8 +95,8 @@
     - name: Setting theme color...
       dconf: key="/org/gnome/desktop/interface/{{ line_item.key }}" value="{{ line_item.value }}"
       with_items:
-        - { key: gtk-theme, value: "'{{ theme_primary_name }}'" }
-        - { key: icon-theme, value: "'{{ theme_primary_name }}'" }
+        - { key: gtk-theme, value: "'{{ theme_secondary_name }}'" }
+        - { key: icon-theme, value: "'{{ theme_secondary_name }}'" }
         - { key: font-hinting, value: "'full'" }
       loop_control:
         loop_var: line_item
@@ -121,7 +121,7 @@
       shell: "flatpak override --user --env=GTK_THEME={{ theme_secondary_name }} --env=ICON_THEME={{ theme_secondary_name }}"
 
     - name: Set dark mode
-      dconf: key="/org/gnome/shell/extensions/user-theme/name" value="'{{ theme_primary_name }}'"
+      dconf: key="/org/gnome/shell/extensions/user-theme/name" value="'{{ theme_secondary_name }}'"
 
     - name: Configuring qt dark mode (1/2)...
       file:
