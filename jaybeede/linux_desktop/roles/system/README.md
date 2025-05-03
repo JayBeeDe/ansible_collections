@@ -44,6 +44,10 @@ printer_ip | Printer IP to be configured on target machine
 printer_model | (Brother) Printer model to be configured on target machine
 rdp_name | RDP name for the local virtual machine
 ssh_port | local SSH port (to configure SSH loopback)
+theme_primary_name | Primary gnome theme name (for example Yaru-dark)
+theme_secondary_name | Real gnome theme name (for example Yaru-purple-dark)
+theme_primary_color | Main accentuation color (hex code)
+theme_secondary_color | Secondary accentuation color (hex code)
 
 Example Playbook
 ----------------

@@ -22,6 +22,8 @@ legal_email | Legal email to display on the gnome banner message
 legal_name | Legal name to display on the gnome banner message
 git_rootrepo | Path to the git root repo (personal)
 tokenGithub | GitHub token to bypass GitHub API limitation when downloading gnome extension
+theme_primary_name | Primary gnome theme name (for example Yaru-dark)
+theme_secondary_name | Real gnome theme name (for example Yaru-purple-dark)
 
 Example Playbook
 ----------------

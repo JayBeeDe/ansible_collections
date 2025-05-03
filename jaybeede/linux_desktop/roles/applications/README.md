@@ -22,6 +22,8 @@ rdp_name | RDP name for the local virtual machine
 rdp_port | RDP port for the local virtual machine
 rdp_sharefolder | Path to the host machine share folder for the local virtual machine
 rdp_user | RDP user for the local virtual machine
+theme_primary_color | Main accentuation color (hex code)
+theme_secondary_color | Secondary accentuation color (hex code)
 
 Example Playbook
 ----------------
