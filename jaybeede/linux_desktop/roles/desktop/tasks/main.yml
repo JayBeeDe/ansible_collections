@@ -1,24 +1,26 @@
 ---
 - block:
     - name: "Configuring arc-menu shortcuts..."
-      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Google Chrome', 'google-chrome', 'google-chrome.desktop', 'Element', 'element-desktop', 'element-desktop.desktop', 'Fichiers', 'folder', 'nemo.desktop', 'Visual Studio Code', '', 'code.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'P3X OneNote', '', 'p3x-onenote_p3x-onenote.desktop', 'Skype', '', 'skype_skypeforlinux.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'MotionBox', '{{ home }}/.local/share/icons/motionbox.png', 'MotionBox.desktop', 'EasyEffects', '', 'com.github.wwmm.easyeffects.desktop']"
-
+      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Google Chrome', 'google-chrome', 'google-chrome.desktop', 'Messagerie et agenda d’Evolution', '', 'org.gnome.Evolution.desktop', 'Element', 'element-desktop', 'element-desktop.desktop', 'KeePassXC', '', 'org.keepassxc.KeePassXC.desktop', 'Joplin', '', 'net.cozic.joplin_desktop.desktop', 'Visual Studio Code', '', 'code.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'MotionBox', '{{ home }}/.local/share/icons/motionbox.png', 'MotionBox.desktop', 'EasyEffects', '', 'com.github.wwmm.easyeffects.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop']"
     - name: "Configuring gnome bookmarks..."
-      dconf: key="/org/gnome/shell/favorite-apps" value="['google-chrome.desktop', 'nemo.desktop', 'code.desktop', 'vlc.desktop', 'connectWindows.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'p3x-onenote_p3x-onenote.desktop', 'skype_skypeforlinux.desktop', 'simple-scan.desktop', 'MotionBox.desktop', 'com.github.wwmm.easyeffects.desktop']"
+      dconf: key="/org/gnome/shell/favorite-apps" value="['google-chrome.desktop', 'nemo.desktop', 'code.desktop', 'simple-scan.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'vlc.desktop', 'MotionBox.desktop', 'com.github.wwmm.easyeffects.desktop', 'connectWindows.desktop']"
     - name: "Configuring evolution desktop shortcut..."
       desktop_launchers:
-        source: "/usr/share/applications/org.gnome.Evolution.desktop"
-        target: 'bash -c ''for item in $(ps aux | grep evolution | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 10; evolution 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done'''
+        freedesktop_Name: "Evolution"
+        freedesktop_Icon: "org.gnome.Evolution"
+        target: 'bash -c ''for item in $(ps aux | grep evolution | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 10; flatpak run org.gnome.Evolution 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done'''
         location: "$DIRECTORY_DESKTOP/evolution.desktop"
-      register: testout
-    - name: dump test output
-      debug:
-        msg: "{{ testout }}"
     - name: "Configuring element desktop shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/element-desktop.desktop"
         target: 'bash -c ''for item in $(ps aux | grep element-desktop | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 5; element-desktop 2>/dev/null & pid=$!; xdotool windowactivate $(xdotool search --pid $pid | sort | head -n 1); sleep 2; xdotool key Control_L+w'''
         location: "$DIRECTORY_DESKTOP/element.desktop"
+    - name: "Configuring Joplin desktop shortcut..."
+      desktop_launchers:
+        freedesktop_Name: "Joplin"
+        freedesktop_Icon: "net.cozic.joplin_desktop"
+        target: 'bash -c ''for item in $(ps aux | grep joplin | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 10; flatpak run net.cozic.joplin_desktop 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done'''
+        location: "$DIRECTORY_DESKTOP/joplin.desktop"
     - name: "Configuring MotionBox desktop shortcut..."
       desktop_launchers:
         freedesktop_Name: "MotionBox"
@@ -50,7 +52,7 @@
     - name: "Configuring evolution autostart shortcut..."
       desktop_launchers:
         freedesktop_Name: "Evolution"
-        target: 'bash -c "sleep 10; evolution 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done"'
+        target: 'bash -c "sleep 10; flatpak run org.gnome.Evolution 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done"'
         location: "$HOME/.config/autostart/evolution.desktop"
     - name: "Configuring element autostart shortcut..."
       desktop_launchers:
@@ -62,6 +64,11 @@
         freedesktop_Name: "KeepassXC"
         target: 'bash -c "sleep 5; keepassxc "{{ kdbx_path }}" --keyfile "{{ key_path }}" 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done & disown;"'
         location: "$HOME/.config/autostart/keepassxc.desktop"
+    - name: "Configuring Joplin autostart shortcut..."
+      desktop_launchers:
+        freedesktop_Name: "Joplin"
+        target: 'bash -c "sleep 10; flatpak run net.cozic.joplin_desktop 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done"'
+        location: "$HOME/.config/autostart/joplin.desktop"
     - name: "Configuring nemo autostart shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/nemo-autostart.desktop"

@@ -16,6 +16,14 @@
         group: root
         recurse: yes
 
+    - name: Mounting themes & icons directories for flatpak applications...
+      shell: flatpak override --filesystem={{ target_item }}
+      loop:
+        - "{{ home }}/.themes"
+        - "{{ home }}/.icons"
+      loop_control:
+        loop_var: target_item
+
   become: yes
   become_user: root
 
@@ -92,6 +100,25 @@
         - { key: font-hinting, value: "'full'" }
       loop_control:
         loop_var: line_item
+
+    - name: Setting theme color for flatpak applications (1/2)...
+      copy:
+        src: "{{ line_item.srcDir }}"
+        dest: "{{ line_item.destDir }}"
+        remote_src: true
+        mode: 0755
+        owner: "{{ user }}"
+        group: "{{ user }}"
+      loop:
+        - srcDir: "/usr/share/themes/Yaru-purple-dark"
+          destDir: "{{ home }}/.themes/"
+        - srcDir: "/usr/share/icons/Yaru-purple-dark"
+          destDir: "{{ home }}/.icons/"
+      loop_control:
+        loop_var: line_item
+
+    - name: Setting theme color for flatpak applications (2/2)...
+      shell: flatpak override --user --env=GTK_THEME=Yaru-purple-dark --env=ICON_THEME=Yaru-purple-dark
 
     - name: Set dark mode
       dconf: key="/org/gnome/shell/extensions/user-theme/name" value="'Adwaita-dark'"
@@ -263,7 +290,6 @@
         - brasero
         - ca-desrt-dconf-editor
         - code
-        - com-github-wwmm-easyeffects
         - com-github-wwmm-pulseeffects
         - firefox
         - flameshot
@@ -292,7 +318,6 @@
         - org-midori-browser-midori
         - org-pop-os-transition
         - org-remmina-remmina
-        - p3x-onenote-p3x-onenote
         - snap-store-ubuntu-software
         - terminator
         - timeshift-gtk
