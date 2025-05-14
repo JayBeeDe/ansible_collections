@@ -588,7 +588,7 @@
 
     - name: "Configuring SSL for web-proxy..."
       shell: "rsync -avr --copy-unsafe-links /etc/letsencrypt/live {{ vol_path }}/web-proxy-conf-vol/_data/ssl"
-      when: https_flag == 1
+      when: https_flag
 
     - name: "Create /etc/letsencrypt/conf dir"
       ansible.builtin.file:
@@ -597,7 +597,7 @@
         recurse: yes
         mode: "0755"
 
-    - name: "Configuring web-proxy..."
+    - name: "Configuring web-proxy for production..."
       template:
         src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
         dest: "{{ vol_path }}/web-proxy-conf-vol/_data/nginx.conf"
@@ -605,8 +605,10 @@
         owner: "root"
         group: "root"
         force: yes
+      vars:
+        acmechallenge_flag: false
 
-    - name: "Configuring web-proxy 2..."
+    - name: "Configuring web-proxy for HTTPS mode..."
       template:
         src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
         dest: "/etc/letsencrypt/conf/nginx-https.conf"
@@ -614,31 +616,11 @@
         owner: "root"
         group: "root"
         force: yes
-      when: https_flag == 1
+      when: https_flag
+      vars:
+        acmechallenge_flag: false
 
-    - name: Logical evaluation...
-      set_fact:
-        old_https_flag: "{{ https_flag }}"
-        changed_when: false
-
-    - name: Logical evaluation...
-      set_fact:
-        old_acmechallenge_flag: "{{ acmechallenge_flag }}"
-        changed_when: false
-
-    - name: Logical evaluation...
-      set_fact:
-        https_flag: 0
-        changed_when: false
-      when: old_https_flag == 1
-
-    - name: Logical evaluation...
-      set_fact:
-        acmechallenge_flag: 1
-        changed_when: false
-      when: old_https_flag == 1
-
-    - name: "Configuring web-proxy 3..."
+    - name: "Configuring web-proxy for HTTP mode..."
       template:
         src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
         dest: "/etc/letsencrypt/conf/nginx-http.conf"
@@ -646,18 +628,9 @@
         owner: "root"
         group: "root"
         force: yes
-
-    - name: Logical evaluation...
-      set_fact:
-        https_flag: 1
-        changed_when: false
-      when: old_https_flag == 1
-
-    - name: Logical evaluation...
-      set_fact:
-        acmechallenge_flag: "{{ old_acmechallenge_flag }}"
-        changed_when: false
-      when: old_https_flag == 1
+      vars:
+        acmechallenge_flag: "{{ true if https_flag else false }}"
+        https_flag: false
 
     - name: Logical evaluation...
       set_fact:
@@ -668,7 +641,7 @@
     - name: Logical evaluation...
       set_fact:
         proxy_ports: "{{ proxy_ports + ['443:443'] }}"
-      when: https_flag == 1
+      when: https_flag
 
     - name: Running web-proxy
       community.docker.docker_container:

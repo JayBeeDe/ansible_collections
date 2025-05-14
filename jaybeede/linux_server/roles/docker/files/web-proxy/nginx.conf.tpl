@@ -31,7 +31,7 @@ http {
 		listen 80;
 		listen [::]:80;
 		server_name {{ server_domain }} www.{{ server_domain }};
-{% if https_flag == 1 %}
+{% if https_flag %}
 		return 301 https://$server_name$request_uri;
 	}
 	server {
@@ -100,7 +100,7 @@ http {
 		}
 	}
 	server {
-{% if https_flag == 0 %}
+{% if not https_flag %}
 		listen 8448;
 		listen [::]:8448;
 		server_name {{ matrix_domain }} www.{{ matrix_domain }};
@@ -138,7 +138,7 @@ http {
 		listen 80;
 		listen [::]:80;
 		server_name {{ matrix_domain }} www.{{ matrix_domain }};
-{% if https_flag == 1 %}
+{% if https_flag %}
 		return 301 https://$server_name$request_uri;
 	}
 	server {
