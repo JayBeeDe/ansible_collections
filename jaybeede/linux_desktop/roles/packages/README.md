@@ -8,7 +8,8 @@ Role Variables
 
 Variable Name | Description
 ------------- | -----------
-language | Display language to be configured (ISO code)
+country | Country local to be configured (ISO code), uppercase
+language | Display language to be configured (ISO code), lowercase
 theme_primary_name | Primary gnome theme name (for example Yaru-dark to download org.gtk.Gtk3theme.Yaru-dark flatpak package theme)
 
 Example Playbook

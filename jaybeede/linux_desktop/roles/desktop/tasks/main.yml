@@ -30,7 +30,7 @@
     - name: "Configuring keepassxc desktop shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/org.keepassxc.KeePassXC.desktop"
-        target: 'bash -c ''for item in $(ps aux | grep keepassx | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 5; keepassxc "{{ kdbx_path }}" --keyfile "{{ key_path }}" 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done & disown;'''
+        target: 'bash -H -c ''export LC_TIME="{{ language }}_{{ country }}.UTF-8"; for item in $(ps aux | grep keepassx | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 5; keepassxc "{{ kdbx_path }}" --keyfile "{{ key_path }}" 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done & disown;'''
         location: "$DIRECTORY_DESKTOP/keepassxc.desktop"
     - name: "Configuring connectWindows 1 desktop shortcut..."
       desktop_launchers:
@@ -62,7 +62,7 @@
     - name: "Configuring keepassxc autostart shortcut..."
       desktop_launchers:
         freedesktop_Name: "KeepassXC"
-        target: 'bash -c "sleep 5; keepassxc "{{ kdbx_path }}" --keyfile "{{ key_path }}" 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done & disown;"'
+        target: 'bash -c "sleep 5; export LC_TIME="{{ language }}_{{ country }}.UTF-8"; keepassxc "{{ kdbx_path }}" --keyfile "{{ key_path }}" 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done & disown;"'
         location: "$HOME/.config/autostart/keepassxc.desktop"
     - name: "Configuring Joplin autostart shortcut..."
       desktop_launchers:

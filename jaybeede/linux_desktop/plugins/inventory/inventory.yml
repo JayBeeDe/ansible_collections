@@ -12,6 +12,7 @@ all:
     git_rootrepo: "{{ home }}/Documents/Projets-Perso"
     kdbx_path: "{{ vault_kdbx_path }}"
     key_path: "{{ vault_key_path }}"
+    country: FR
     language: fr
     network_dns: "8.8.8.8"
     network_ip: "192.168.1.21"
