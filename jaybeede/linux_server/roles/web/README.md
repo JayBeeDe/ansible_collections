@@ -1,4 +1,4 @@
-docker
+web
 =========
 
 Services and shell configuration for linux server: networking, ssh, firewall, virtualization, grub, motd, printer, bash aliases, environment variables, rc local scripts.
@@ -47,7 +47,7 @@ Playbook should contain at least the following content:
     - jaybeede.linux_server
   tasks:
     - import_role:
-        name: docker
+        name: web
 ```
 
 License
