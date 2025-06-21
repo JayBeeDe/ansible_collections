@@ -58,52 +58,53 @@
         src: "{{ role_path }}/files/wg0.conf.tpl"
         dest: "{{ vol_path }}/wireguard-proxy-conf-vol/_data/wg_confs/wg0.conf"
         mode: "0755"
-        force: yes
+      notify: Restart wireguard container
 
     - name: Configure wireguard peers
       template:
         src: "{{ role_path }}/files/peer.conf.tpl"
         dest: "{{ vol_path }}/wireguard-proxy-conf-vol/_data/peer{{ count + 1 }}/peer{{ count + 1 }}.conf"
         mode: "0755"
-        force: yes
       no_log: true # prevent logging dict details with secrets
       loop: "{{ wireguard_proxy_peers_list | dict2items }}"
       loop_control:
         index_var: count
+      notify: Restart wireguard container
 
-    - name: Apply additional configuration to wireguard-proxy
-      docker_container:
-        name: wireguard-proxy
-        restart: true
-        state: started
+    - name: Configuring additional routes (1/3)...
+      file:
+        path: /etc/network/routes.d/
+        state: directory
+        mode: 0755
+        owner: "{{ user }}"
+        group: "{{ user }}"
 
-    - name: Processing additional routes (1/4)...
-      set_fact:
-        wireguard_proxy_routes_list:
-          - ip: "{{ wireguard_proxy_route_cidrv6 }}"
-            next_hop: "{{ wireguard_proxy_route_gwv6 }}"
+    - name: Configuring additional routes (2/3)...
+      template:
+        src: "{{ role_path }}/files/routes.tpl"
+        dest: "/etc/network/routes.d/wireguard-{{ line_item.if_state }}"
+        mode: 0755
+      vars:
+        action_route: "{{ line_item.action_route }}"
+      with_items:
+        - action_route: add
+          if_state: up
+        - action_route: del
+          if_state: down
+      loop_control:
+        loop_var: line_item
+      notify: Add routes
       when: ipv6_flag == 1
 
-    - name: Processing additional routes (2/4)...
-      set_fact:
-        wireguard_proxy_routes_list: "{{ wireguard_proxy_routes_list + [{ 'ip': item.value.extra_allowed_ip_address_cidrv6, 'next_hop': wireguard_proxy_route_gwv6 }] }}"
-      no_log: true
-      loop: "{{ wireguard_proxy_peers_list | dict2items }}"
-      when: ipv6_flag == 1 and item.value.extra_allowed_ip_address_cidrv6 is defined
-
-    - name: Processing additional routes (3/4)...
-      command: "ip -6 route add {{ item.ip }} via {{ item.next_hop }}"
-      register: ext
-      ignore_errors: true
-      loop: "{{ wireguard_proxy_routes_list }}"
+    - name: Configuring additional routes (3/3)...
+      blockinfile:
+        path: /etc/network/interfaces
+        block: |
+          post-up /etc/network/routes.d/wireguard-up
+          pre-down /etc/network/routes.d/wireguard-down
+        state: present
+      notify: Add routes
       when: ipv6_flag == 1
-      changed_when: 'not ext.failed and ext.stderr != "RTNETLINK answers: File exists"'
-
-    - name: Processing additional routes (4/4)...
-      fail:
-        msg: "Error while applying additional route {{ item.cmd | join(' ') }}"
-      loop: "{{ ext.results }}"
-      when: 'ipv6_flag == 1 and item.failed and item.stderr != "RTNETLINK answers: File exists"'
 
   become: yes
   become_user: "root"

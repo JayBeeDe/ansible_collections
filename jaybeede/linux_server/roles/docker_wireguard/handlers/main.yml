@@ -1,5 +1,10 @@
-- name: "Restart docker daemon"
-  systemd:
-    name: docker
-    state: restarted
-    enabled: yes
+- name: Restart wireguard container
+  docker_container:
+    name: wireguard-proxy
+    restart: true
+    state: started
+  become: yes
+
+- name: Add routes
+  command: bash -c '/etc/network/routes.d/wireguard-down; /etc/network/routes.d/wireguard-up'
+  become: yes
