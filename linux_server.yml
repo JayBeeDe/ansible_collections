@@ -15,5 +15,5 @@
         - cron
       when: inventory_hostname in groups["web"]
     - include_role:
-        name: docker_wireguard
+        name: wireguard
       when: inventory_hostname in groups["vpn"]

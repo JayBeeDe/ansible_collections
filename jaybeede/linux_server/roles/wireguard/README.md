@@ -1,4 +1,4 @@
-docker
+wireguard
 =========
 
 Wireguard VPN for linux server.
@@ -47,7 +47,7 @@ Playbook should contain at least the following content:
     - jaybeede.linux_server
   tasks:
     - import_role:
-        name: docker_wireguard
+        name: wireguard
       when: inventory_hostname in groups["vpn"]
 ```
 
