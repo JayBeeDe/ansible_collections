@@ -22,6 +22,7 @@
           - "{{ network_dns }}"
         autoconnect: yes
         state: present
+      when: inventory_hostname not in groups["edge"]
 
     - name: "Configuring sshd..."
       template:

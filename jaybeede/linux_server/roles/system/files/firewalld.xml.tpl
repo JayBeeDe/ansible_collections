@@ -44,6 +44,108 @@
     <port protocol="tcp" port="{{ ssh_port | string }}" />
     <accept />
   </rule>
+{% if nfs_subnet is defined %}
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="tcp" port="111"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="udp" port="111"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="tcp" port="2049"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="udp" port="2049"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="tcp" port="3000"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="udp" port="3000"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="tcp" port="3001"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="udp" port="3002"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="tcp" port="3003"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="udp" port="3003"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="{{ nfs_subnet }}"/>
+    <port protocol="tcp" port="6667"/>
+    <accept/>
+  </rule>
+{% endif %}
+{% if transmission_subnet is defined and transmission_rpc_port is defined %}
+  <rule family="ipv4">
+    <source address="{{ transmission_subnet }}"/>
+    <port protocol="tcp" port="{{ transmission_rpc_port }}"/>
+    <accept/>
+  </rule>
+{% endif %}
+{% if transmission_peer_port is defined %}
+  <rule family="ipv4">
+    <source address="10.13.13.0/24"/>
+    <port protocol="tcp" port="{{ transmission_peer_port }}"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <source address="10.13.13.0/24"/>
+    <port protocol="udp" port="{{ transmission_peer_port }}"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <destination address="10.13.13.0/24"/>
+    <port protocol="tcp" port="{{ transmission_peer_port }}"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <destination address="10.13.13.0/24"/>
+    <port protocol="udp" port="{{ transmission_peer_port }}"/>
+    <accept/>
+  </rule>
+  <rule family="ipv4">
+    <port protocol="tcp" port="{{ transmission_peer_port }}"/>
+    <drop/>
+  </rule>
+  <rule family="ipv4">
+    <port protocol="udp" port="{{ transmission_peer_port }}"/>
+    <drop/>
+  </rule>
+  <rule family="ipv6">
+    <port protocol="tcp" port="{{ transmission_peer_port }}"/>
+    <drop/>
+  </rule>
+  <rule family="ipv6">
+    <port protocol="udp" port="{{ transmission_peer_port }}"/>
+    <drop/>
+  </rule>
+{% endif %}
 {% if virtualdesktopdb_password is defined or wireguard_proxy_port is defined %}
   <rule family="ipv4">
     <source address="172.17.0.0/24"/>

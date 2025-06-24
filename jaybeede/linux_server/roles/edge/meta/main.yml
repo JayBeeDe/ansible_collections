@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: JayBee <jb.social@outlook.com>
+  description: Cron configuration for linux server
+  license: GPL-3.0-or-later
+  galaxy_tags:
+  - "linux"
+  - "debian"
+  - "raspberry"
+  platforms:
+    - name: Debian
+      versions:
+        - any
+    - name: ARM64
+      versions:
+        - any
+

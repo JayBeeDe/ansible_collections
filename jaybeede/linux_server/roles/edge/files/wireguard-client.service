@@ -1,0 +1,17 @@
+[Unit]
+Description=WireGuard Client
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/wg-quick up wg0
+ExecStartPost=pinctrl set 4 op dl
+ExecStop=/usr/bin/wg-quick down wg0
+ExecStopPost=pinctrl set 4 op dh
+Restart=on-failure
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,119 @@
+---
+- block:
+    - name: Configuring firmware (1/4)...
+      copy:
+        src: "{{ role_path }}/files/config.txt.ini"
+        dest: /boot/config_ansible.txt
+        owner: root
+        group: root
+        mode: 644
+
+    - name: Configuring firmware (2/4)...
+      command: diff -q /boot/config_ansible.txt /boot/firmware/config.txt
+      register: result
+      ignore_errors: true
+      changed_when: false
+      failed_when: false
+
+    - name: Configuring firmware (3/4)...
+      set_fact:
+        has_diff: "{{ result.rc > 0 }}"
+      changed_when: false
+
+    - name: Configuring firmware (4/4)...
+      command: cp -f /boot/config_ansible.txt /boot/firmware/config.txt
+      changed_when: has_diff
+      # we have to perform this trick because Ansible fails when copying directly to /boot/firmware partition although file is successfully updated...
+
+    - name: Disabling some services...
+      systemd:
+        name: "{{ item }}"
+        enabled: no
+        state: stopped
+      loop:
+        - avahi-daemon.service
+        - bluetooth
+      loop_control:
+        loop_var: item
+
+    - name: Configuring transmission-daemon (1/5)...
+      template:
+        src: "{{ role_path }}/files/transmission.json.tpl"
+        dest: /etc/transmission-daemon/settings_ansible.json
+        owner: root
+        group: root
+        mode: 0600
+        force: true
+
+    - name: Configuring transmission-daemon (2/5)...
+      command: diff -q /etc/transmission-daemon/settings_ansible.json /etc/transmission-daemon/settings.json
+      register: result
+      ignore_errors: true
+      changed_when: false
+      failed_when: false
+
+    - name: Configuring transmission-daemon (3/5)...
+      set_fact:
+        has_diff: "{{ result.rc > 0 }}"
+      changed_when: false
+
+    - name: Configuring transmission-daemon (4/5)...
+      systemd:
+        name: transmission-daemon
+        state: stopped
+      when: has_diff
+
+    - name: Configuring transmission-daemon (5/5)...
+      copy:
+        src: /etc/transmission-daemon/settings_ansible.json
+        dest: /etc/transmission-daemon/settings.json
+        owner: debian-transmission
+        group: debian-transmission
+        mode: 0600
+        remote_src: true
+      changed_when: has_diff
+      # service will be started afterward (if needed), important is after the start of the wireguard-client
+
+    - name: Configuring NFS share (1/2)...
+      copy:
+        src: "{{ role_path }}/files/nfs.ini"
+        dest: /etc/nfs.conf
+        mode: 0644
+      notify: Restart nfs server
+
+    - name: Configuring NFS share (2/2)...
+      template:
+        src: "{{ role_path }}/files/nfs-exports.cfg.tpl"
+        dest: /etc/exports
+        mode: 0644
+      notify: Restart nfs server
+
+    - name: Configuring wireguard-client (1/2)...
+      template:
+        src: "{{ role_path }}/files/wg0.conf.tpl"
+        dest: /etc/wireguard/wg0.conf
+        mode: 0644
+      notify: Restart wireguard client
+
+    - name: Configuring wireguard-client (2/2)...
+      copy:
+        src: "{{ role_path }}/files/wireguard-client.service"
+        dest: /etc/systemd/system/wireguard-client.service
+        mode: 0644
+      notify: Reload systemd daemon
+
+    - name: Configuring some services...
+      systemd:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      loop:
+        - nfs-kernel-server
+        - sshd
+        - transmission-daemon
+        - wireguard-client
+      loop_control:
+        loop_var: item
+
+  become: true
+  become_user: root

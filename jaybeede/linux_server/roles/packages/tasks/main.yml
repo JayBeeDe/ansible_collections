@@ -25,7 +25,6 @@
           - network-manager
           - nmap
           - pip
-          - python3-docker
           - python3-pykeepass
           - python3-pyotp
           - refind
@@ -67,20 +66,31 @@
       apt_key:
         url: https://download.docker.com/linux/debian/gpg
         state: present
-      when: not f.stat.exists
+      when: not f.stat.exists and inventory_hostname in groups["docker"]
 
     - name: "Configuring Docker Repo"
       apt_repository:
         repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
-      when: not f.stat.exists
+      when: not f.stat.exists and inventory_hostname in groups["docker"]
 
     - name: "Install Docker..."
       apt:
         pkg:
+          - containerd.io
           - docker-ce
           - docker-ce-cli
-          - containerd.io
+          - python3-docker
       notify: Restart docker
+      when: inventory_hostname in groups["docker"]
+
+    - name: "Install dependencies for edge..."
+      apt:
+        pkg:
+          - nfs-kernel-server
+          - resolvconf
+          - transmission-daemon
+          - wireguard
+      when: inventory_hostname in groups["edge"]
 
     - name: "Install locate package..."
       apt:

@@ -1,3 +1,4 @@
+---
 - name: "Update grub"
   command: update-grub
 
@@ -6,18 +7,26 @@
     name: "firewalld"
     state: restarted
     enabled: yes
+  become: yes
+  become_user: root
 
 - name: "Restart libvirtd"
   systemd:
     name: "libvirtd"
     state: restarted
     enabled: yes
+  become: yes
+  become_user: root
 
 - name: "Restart sshd"
   systemd:
     name: "ssh"
     state: restarted
     enabled: yes
+  become: yes
+  become_user: root
 
 - name: "Fix broken packages"
   shell: apt --fix-broken -y install
+  become: yes
+  become_user: root

@@ -10,6 +10,7 @@ linux_server collection provides a set of ready to use roles & modules to quickl
 * [system](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/system/README.md)
 * [web](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/web/README.md)
 * [cron](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/cron/README.md)
+* [edge](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/edge/README.md)
 * [wireguard](https://github.com/JayBeeDe/ansible_collections/blob/main/jaybeede/linux_server/roles/wireguard/README.md)
 
 ### Modules
@@ -133,6 +134,9 @@ You can put all the roles within the following order in your playbook (let's cal
     - include_role:
         name: wireguard
       when: inventory_hostname in groups["vpn"]
+    - include_role:
+        name: edge
+      when: inventory_hostname in groups["edge"]
 ```
 
 Warning: Order is important:

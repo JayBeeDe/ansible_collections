@@ -26,6 +26,14 @@ all:
       ansible_port: "{{ ssh_port }}"
       ansible_user: "{{ user }}"
       ansible_become_pass: "{{ vault_become_pass }}"
+    server-edge:
+      ansible_host: JBD-SRV-P17
+      ansible_port: "{{ ssh_port }}"
+      ansible_user: "{{ user }}"
+      ansible_become_pass: "{{ vault_become_pass }}"
+
+docker:
+  hosts: server-web,server-vpn
 
 web:
   vars:
@@ -56,7 +64,7 @@ web:
     matrix_userid: "{{ vault_matrix_userid }}"
     matrix_chatid: "{{ vault_matrix_chatid }}"
     matrix_token: "{{ vault_matrix_token }}"
-    matrix_homeserver: "{{ 'https://' if https_flag else 'http://' }}{{ matrix_domain }}"
+    matrix_homeserver: "https://{{ matrix_domain }}"
     matrixwhatsappbridge_astoken: "{{ vault_matrixwhatsappbridge_astoken }}"
     matrixwhatsappbridge_hstoken: "{{ vault_matrixwhatsappbridge_hstoken }}"
     matrixwhatsappbridge_senderlocalpart: "{{ vault_matrixwhatsappbridge_senderlocalpart }}"
@@ -70,7 +78,7 @@ vpn:
     vpn_domain: "{{ vault_vpn_domain }}"
     wireguard_proxy_cidrv6: "{{ vault_wireguard_proxy_cidrv6 }}"
     wireguard_proxy_ipv6: "{{ vault_wireguard_proxy_ipv6 }}"
-    wireguard_proxy_peers_list: "{{ vault_wireguard_proxy_peers_list }}" # list of dicts, check documentation for more details 
+    wireguard_proxy_peers_list: "{{ vault_wireguard_proxy_peers_list }}" # list of dicts, check documentation for more details
     wireguard_proxy_port: "{{ vault_wireguard_proxy_port }}"
     wireguard_proxy_private_key: "{{ vault_wireguard_proxy_private_key }}"
     wireguard_proxy_public_key: "{{ vault_wireguard_proxy_public_key }}"
@@ -78,3 +86,17 @@ vpn:
     wireguard_proxy_route_gwv6: "{{ vault_wireguard_proxy_route_gwv6 }}"
     ipv6_flag: 1
   hosts: server-vpn
+
+edge:
+  vars:
+    ipv6_flag: 1
+    assets_path: /Films
+    nfs_subnet: 192.168.88.0/24
+    transmission_subnet: 192.168.88.0/24
+    transmission_peer_port: "{{ vault_transmission_peer_port }}"
+    transmission_rpc_port: "{{ vault_transmission_rpc_port }}"
+    transmission_rpc_hash: "{{ vault_transmission_rpc_hash }}"
+    wireguard_client_peers_list: "{{ vault_wireguard_proxy_peers_list }}" # list of dicts, check documentation for more details
+    wireguard_client_public_key: "{{ vault_wireguard_proxy_public_key }}"
+    wireguard_client_endpoint: "{{ vault_vpn_domain }}:{{ vault_wireguard_proxy_port }}"
+  hosts: server-edge
