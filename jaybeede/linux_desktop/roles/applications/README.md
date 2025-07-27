@@ -1,7 +1,7 @@
 applications
 =========
 
-Desktop applications configuration: chrome, keepassxc, VLC, conky, flameshot, vscode, terminator, remmina, libreoffice, onedrive, git.
+Desktop applications configuration: chrome, keepassxc, VLC, conky, flameshot, vscode, terminator, remmina, libreoffice, git.
 
 Requirements
 ------------

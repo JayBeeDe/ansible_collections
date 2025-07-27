@@ -10,6 +10,7 @@ all:
     git_email: "{{ email }}"
     git_name: "{{ nickname }}"
     git_rootrepo: "{{ home }}/Documents/Projets-Perso"
+    cloud_path: "/Cloud"
     kdbx_path: "{{ vault_kdbx_path }}"
     key_path: "{{ vault_key_path }}"
     country: FR

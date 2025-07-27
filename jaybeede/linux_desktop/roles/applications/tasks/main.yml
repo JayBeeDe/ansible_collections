@@ -73,14 +73,6 @@
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring MotionBox..."
-      copy:
-        src: "{{ role_path }}/files/motionbox.png"
-        dest: "{{ home }}/.local/share/icons/motionbox.png"
-        mode: "0755"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-
     - name: "Configuring conky (1/5)..."
       file:
         path: "{{ home }}/.config/conky/"
@@ -235,7 +227,7 @@
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring remmina (1/10)..."
+    - name: "Configuring remmina (1/9)..."
       file:
         path: "{{ home }}/.config/remmina/"
         state: directory
@@ -243,7 +235,7 @@
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring remmina (2/10)..."
+    - name: "Configuring remmina (2/9)..."
       copy:
         src: "{{ role_path }}/files/remmina.ini"
         dest: "{{ home }}/.config/remmina/remmina.pref"
@@ -251,7 +243,7 @@
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring remmina (3/10)..."
+    - name: "Configuring remmina (3/9)..."
       file:
         path: "{{ home }}/.local/share/remmina/"
         state: directory
@@ -259,7 +251,7 @@
         owner: "{{ user }}"
         group: "{{ user }}"
 
-    - name: "Configuring remmina (4/10)..."
+    - name: "Configuring remmina (4/9)..."
       copy:
         src: "{{ role_path }}/files/remmina-2.ini"
         dest: "{{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"
@@ -268,7 +260,7 @@
         group: "{{ user }}"
         force: no
 
-    - name: "Configuring remmina (5/10)..."
+    - name: "Configuring remmina (5/9)..."
       lineinfile:
         path: "{{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"
         state: present
@@ -276,7 +268,7 @@
         line: "name={{ rdp_name }}"
         backup: no
 
-    - name: "Configuring remmina (6/10)..."
+    - name: "Configuring remmina (6/9)..."
       lineinfile:
         path: "{{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"
         state: present
@@ -284,7 +276,7 @@
         line: "server={{ rdp_name }}:{{ rdp_port }}"
         backup: no
 
-    - name: "Configuring remmina (7/10)..."
+    - name: "Configuring remmina (7/9)..."
       lineinfile:
         path: "{{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"
         state: present
@@ -292,7 +284,7 @@
         line: "username={{ rdp_user }}"
         backup: no
 
-    - name: "Configuring remmina (8/10)..."
+    - name: "Configuring remmina (8/9)..."
       lineinfile:
         path: "{{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"
         state: present
@@ -300,19 +292,11 @@
         line: "sharefolder={{ rdp_sharefolder }}"
         backup: no
 
-    - name: "Configuring remmina (9/10)..."
+    - name: "Configuring remmina (9/9)..."
       file:
         path: "{{ home }}/.local/share/icons/"
         state: directory
         mode: "0755"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-
-    - name: "Configuring remmina (10/10)..."
-      copy:
-        src: "{{ role_path }}/files/windows.png"
-        dest: "{{ home }}/.local/share/icons/windows.png"
-        mode: "0644"
         owner: "{{ user }}"
         group: "{{ user }}"
 
@@ -379,28 +363,6 @@
         mode: "0600"
         owner: "{{ user }}"
         group: "{{ user }}"
-
-    - name: "Logical evaluation..."
-      stat:
-        path: "{{ home }}/.config/onedrive/config"
-      register: onedrive
-
-    - name: "Configuring OneDrive (1/2)..."
-      copy:
-        src: "{{ role_path }}/files/onedrive.cfg"
-        dest: "{{ home }}/.config/onedrive/config"
-        mode: "0664"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-      when: not onedrive.stat.exists
-
-    - name: "Configuring OneDrive (2/2)..."
-      replace:
-        path: "{{ home }}/.config/onedrive/config"
-        regexp: "^sync_dir =.+$"
-        replace: 'sync_dir = "{{ onedrive_path }}"'
-        backup: no
-      when: not onedrive.stat.exists
 
     - name: "Setting up git identity (1/2)..."
       git_config:

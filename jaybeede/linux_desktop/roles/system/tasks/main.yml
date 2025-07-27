@@ -292,15 +292,31 @@
         path: "/tmp/packages/"
       changed_when: false
 
-    # - name: "Configuring fstab... (1/3)"
+    # - name: "Configuring fstab... (1/5)"
     #   mount:
-    #     path: /VMs
-    #     src: UUID=2890edb1-6786-4491-83cc-133667a80824
+    #     path: /Cloud
+    #     src: UUID=9412512e-6067-4c71-af92-167a429bea55
     #     fstype: ext4
     #     opts: defaults
     #     state: mounted
 
-    # - name: "Configuring fstab... (2/3)"
+    # - name: "Configuring fstab... (2/5)"
+    #   mount:
+    #     path: /VMs
+    #     src: UUID=98e934a0-fe74-4cc4-b2d8-2b3346e035a6
+    #     fstype: ext4
+    #     opts: defaults
+    #     state: mounted
+
+    # - name: "Configuring fstab... (3/5)"
+    #   mount:
+    #     path: /Jeux
+    #     src: UUID=06043a2d-b9e3-4775-8373-e10d832a6914
+    #     fstype: ext4
+    #     opts: defaults
+    #     state: mounted
+
+    # - name: "Configuring fstab... (4/5)"
     #   mount:
     #     path: /Films
     #     src: UUID=18B2EA1DB2E9FF5E
@@ -308,7 +324,7 @@
     #     opts: rw,auto,gid=100,uid=1000,nls=utf8,umask=002
     #     state: mounted
 
-    # - name: "Configuring fstab... (3/3)"
+    # - name: "Configuring fstab... (5/5)"
     #   mount:
     #     path: /Musique
     #     src: UUID=14D00075D0005F7C

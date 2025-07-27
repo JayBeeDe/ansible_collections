@@ -3,9 +3,9 @@ home: "/home/{{ user }}"
 git_email: "{{ user }}"
 git_name: "{{ user }}"
 git_rootrepo: "{{ home }}/git"
-onedrive_path: "{{ home }}/OneDrive"
+cloud_path: "{{ home }}/pCloudDrive"
 rdp_name: windows
 rdp_host: "{{ rdp_name }}"
 rdp_port: 3389
-rdp_sharefolder: "{{ onedrive_path }}"
+rdp_sharefolder: "{{ cloud_path }}"
 rdp_user: Administrator

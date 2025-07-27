@@ -1,78 +1,122 @@
 ---
 - block:
+    # icons
+
+    - name: "Configuring remmina icon..."
+      copy:
+        src: "{{ role_path }}/files/windows.png"
+        dest: "{{ home }}/.local/share/icons/windows.png"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+    - name: "Configuring MotionBox icon..."
+      copy:
+        src: "{{ role_path }}/files/motionbox.png"
+        dest: "{{ home }}/.local/share/icons/motionbox.png"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+    - name: "Configuring pCloudDrive icon..."
+      copy:
+        src: "{{ role_path }}/files/pCloudDrive.png"
+        dest: "{{ home }}/.local/share/icons/pCloudDrive.png"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    # gnome
+
     - name: "Configuring arc-menu shortcuts..."
       dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Google Chrome', 'google-chrome', 'google-chrome.desktop', 'Messagerie et agenda d’Evolution', '', 'org.gnome.Evolution.desktop', 'Element', 'element-desktop', 'element-desktop.desktop', 'KeePassXC', '', 'org.keepassxc.KeePassXC.desktop', 'Joplin', '', 'net.cozic.joplin_desktop.desktop', 'Visual Studio Code', '', 'code.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'MotionBox', '{{ home }}/.local/share/icons/motionbox.png', 'MotionBox.desktop', 'EasyEffects', '', 'com.github.wwmm.easyeffects.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop']"
     - name: "Configuring gnome bookmarks..."
       dconf: key="/org/gnome/shell/favorite-apps" value="['google-chrome.desktop', 'nemo.desktop', 'code.desktop', 'simple-scan.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'vlc.desktop', 'MotionBox.desktop', 'com.github.wwmm.easyeffects.desktop', 'connectWindows.desktop']"
+
+    # user applications
+
+    - name: "Configuring MotionBox application shortcut..."
+      desktop_launchers:
+        freedesktop_Name: "MotionBox"
+        freedesktop_Icon: "{{ home }}/.local/share/icons/motionbox.png"
+        target: 'bash -c "export LD_LIBRARY_PATH=/opt/MotionBox; export QT_PLUGIN_PATH=/opt/MotionBox; /opt/MotionBox/MotionBox"'
+        location: "{{ home }}/.local/share/applications/MotionBox.desktop"
+    - name: "Configuring connectWindows application shortcut..."
+      desktop_launchers:
+        freedesktop_Name: "Windows"
+        freedesktop_Comment: "Connect to Ms Windows"
+        freedesktop_Icon: "{{ home }}/.local/share/icons/windows.png"
+        freedesktop_Categories: "Utility"
+        target: 'bash -c "$HOME/.local/share/scripts/connectWindows.sh $HOME/.local/share/remmina/group_rdp_{{ rdp_name | lower }}_{{ rdp_name | lower }}-{{ rdp_port }}.remmina"'
+        location: "{{ home }}/.local/share/applications/connectWindows.desktop"
+
+    # desktop shortcuts
+
     - name: "Configuring evolution desktop shortcut..."
       desktop_launchers:
-        freedesktop_Name: "Evolution"
+        freedesktop_Name: Evolution
         freedesktop_Icon: "org.gnome.Evolution"
         target: 'bash -c ''for item in $(ps aux | grep evolution | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 10; flatpak run org.gnome.Evolution 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done'''
         location: "$DIRECTORY_DESKTOP/evolution.desktop"
     - name: "Configuring element desktop shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/element-desktop.desktop"
-        target: 'bash -c ''for item in $(ps aux | grep element-desktop | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 5; element-desktop 2>/dev/null & pid=$!; xdotool windowactivate $(xdotool search --pid $pid | sort | head -n 1); sleep 2; xdotool key Control_L+w'''
+        target: 'bash -c ''for item in $(ps aux | grep element-desktop | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 5; element-desktop 2>/dev/null'''
         location: "$DIRECTORY_DESKTOP/element.desktop"
     - name: "Configuring Joplin desktop shortcut..."
       desktop_launchers:
-        freedesktop_Name: "Joplin"
+        freedesktop_Name: Joplin
         freedesktop_Icon: "net.cozic.joplin_desktop"
-        target: 'bash -c ''for item in $(ps aux | grep joplin | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 10; flatpak run net.cozic.joplin_desktop 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done'''
+        target: 'bash -c ''for item in $(ps aux | grep joplin | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 10; flatpak run net.cozic.joplin_desktop 2>/dev/null'''
         location: "$DIRECTORY_DESKTOP/joplin.desktop"
-    - name: "Configuring MotionBox desktop shortcut..."
+    - name: "Configuring pCloudDrive desktop shortcut..."
       desktop_launchers:
-        freedesktop_Name: "MotionBox"
-        freedesktop_Icon: "{{ home }}/.local/share/icons/motionbox.png"
-        target: 'bash -c "export LD_LIBRARY_PATH=/opt/MotionBox; export QT_PLUGIN_PATH=/opt/MotionBox; /opt/MotionBox/MotionBox"'
-        location: "{{ home }}/.local/share/applications/MotionBox.desktop"
+        freedesktop_Name: pCloudDrive
+        freedesktop_Icon: "{{ home }}/.local/share/icons/pCloudDrive.png"
+        target: 'bash -c ''for item in $(ps aux | grep pCloud | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; rmdir $HOME/pCloudDrive/ || true; sleep 10; /opt/pCloud/pCloudDrive 2>>/var/log/pcloud.log >> /var/log/pcloud.log'''
+        location: "$DIRECTORY_DESKTOP/pCloudDrive.desktop"
+    # It's important to grep pCloud rather than pCloudDrive in order to kill items such as: /tmp/.mount_pCloudXXXXXX/pcloud --type=zygote --no-sandbox
     - name: "Configuring keepassxc desktop shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/org.keepassxc.KeePassXC.desktop"
         target: 'bash -H -c ''export LC_TIME="{{ language }}_{{ country }}.UTF-8"; for item in $(ps aux | grep keepassx | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 5; keepassxc "{{ kdbx_path }}" --keyfile "{{ key_path }}" 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done & disown;'''
         location: "$DIRECTORY_DESKTOP/keepassxc.desktop"
-    - name: "Configuring connectWindows 1 desktop shortcut..."
-      desktop_launchers:
-        freedesktop_Name: "Windows"
-        freedesktop_Comment: "Connect to Ms Windows"
-        freedesktop_Icon: "{{ home }}/.local/share/icons/windows.png"
-        freedesktop_Categories: "Utility"
-        target: 'bash -c "{{ home }}/.local/share/scripts/connectWindows.sh {{ home }}/.local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"'
-        location: "$HOME/.local/share/applications/connectWindows.desktop"
-    - name: "Configuring connectWindows 2 desktop shortcut..."
-      desktop_launchers:
-        target: 'bash -c "{{ home }}/.local/share/scripts/connectWindows.sh .local/share/remmina/group_rdp_{{ rdp_name }}_{{ rdp_host }}-{{ rdp_port }}.remmina"'
-        location: "$DIRECTORY_DESKTOP/connectWindows.desktop"
-    - name: "Configuring conky autostart shortcut..."
-      desktop_launchers:
-        freedesktop_Name: "Conky"
-        target: 'bash -c "cd $HOME/.config/conky/default; conky --config=default.conf --alignment=top_right -x 5 --daemonize"'
-        location: "$HOME/.config/autostart/conky.desktop"
-    - name: "Configuring evolution autostart shortcut..."
-      desktop_launchers:
-        freedesktop_Name: "Evolution"
-        target: 'bash -c "sleep 10; flatpak run org.gnome.Evolution 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done"'
-        location: "$HOME/.config/autostart/evolution.desktop"
-    - name: "Configuring element autostart shortcut..."
-      desktop_launchers:
-        freedesktop_Name: "Element"
-        target: 'bash -c "sleep 5; element-desktop 2>/dev/null & pid=$!; xdotool windowactivate $(xdotool search --pid $pid | sort | head -n 1); sleep 2; xdotool key Control_L+w"'
-        location: "$HOME/.config/autostart/element.desktop"
-    - name: "Configuring keepassxc autostart shortcut..."
-      desktop_launchers:
-        freedesktop_Name: "KeepassXC"
-        target: 'bash -c "sleep 5; export LC_TIME="{{ language }}_{{ country }}.UTF-8"; keepassxc "{{ kdbx_path }}" --keyfile "{{ key_path }}" 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done & disown;"'
-        location: "$HOME/.config/autostart/keepassxc.desktop"
-    - name: "Configuring Joplin autostart shortcut..."
-      desktop_launchers:
-        freedesktop_Name: "Joplin"
-        target: 'bash -c "sleep 10; flatpak run net.cozic.joplin_desktop 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done"'
-        location: "$HOME/.config/autostart/joplin.desktop"
+
+    # Auto start
+
     - name: "Configuring nemo autostart shortcut..."
       desktop_launchers:
         source: "/usr/share/applications/nemo-autostart.desktop"
         target: "nemo-desktop"
-        location: "$HOME/.config/autostart/nemo-autostart.desktop"
+        location: "{{ home }}/.config/autostart/nemo-autostart.desktop"
+    - name: "Configuring evolution autostart shortcut..."
+      desktop_launchers:
+        freedesktop_Name: Evolution
+        target: 'bash -c "flatpak run org.gnome.Evolution 2>/dev/null & pid=$!; sleep 5; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done"'
+        location: "{{ home }}/.config/autostart/evolution.desktop"
+    - name: "Configuring element autostart shortcut..."
+      desktop_launchers:
+        freedesktop_Name: Element
+        target: 'bash -c "sleep 3; element-desktop 2>/dev/null"'
+        location: "{{ home }}/.config/autostart/element.desktop"
+    - name: "Configuring Joplin autostart shortcut..."
+      desktop_launchers:
+        freedesktop_Name: Joplin
+        target: 'bash -c "sleep 5; flatpak run net.cozic.joplin_desktop 2>/dev/null"'
+        location: "{{ home }}/.config/autostart/joplin.desktop"
+    - name: "Configuring conky autostart shortcut..."
+      desktop_launchers:
+        freedesktop_Name: Conky
+        target: 'bash -c "sleep 7; cd $HOME/.config/conky/default; conky --config=default.conf --alignment=top_right -x 5 --daemonize"'
+        location: "{{ home }}/.config/autostart/conky.desktop"
+    - name: "Configuring pCloudDrive autostart shortcut..."
+      desktop_launchers:
+        freedesktop_Name: pCloudDrive
+        target: 'bash -c "rmdir $HOME/pCloudDrive/ || true; sleep 8; /opt/pCloud/pCloudDrive 2>>/var/log/pcloud.log >> /var/log/pcloud.log"'
+        location: "{{ home }}/.config/autostart/pCloudDrive.desktop"
+    - name: "Configuring keepassxc autostart shortcut..."
+      desktop_launchers:
+        freedesktop_Name: KeepassXC
+        target: 'bash -c "export LC_TIME="{{ language }}_{{ country }}.UTF-8"; keepassxc "{{ kdbx_path }}" --keyfile "{{ key_path }}" 2>/dev/null & pid=$!; sleep 10; for item in $(xdotool search --pid $pid); do xdotool windowminimize $item; done & disown;"'
+        location: "{{ home }}/.config/autostart/keepassxc.desktop"
+
   become: yes
   become_user: "{{ user }}"

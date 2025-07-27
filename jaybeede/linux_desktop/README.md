@@ -41,7 +41,7 @@ git | yes | no
 keepassXC | yes | yes
 libreoffice | yes | no
 nemo | yes | no
-onedrive | yes | no
+pCloudDrive | no | no
 remmina | yes | no
 terminator | yes | no
 VLC | yes | no

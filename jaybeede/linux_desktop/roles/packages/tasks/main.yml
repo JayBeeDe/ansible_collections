@@ -40,26 +40,6 @@
       command: mv "/etc/apt/sources.list.d/dl_google_com_linux_chrome_deb.list" "/etc/apt/sources.list.d/google-chrome.list"
       when: not f2.stat.exists
 
-    - name: "Logical evaluation..."
-      stat:
-        path: "/etc/apt/sources.list.d/onedrive.list"
-      register: f3
-
-    - name: "Adding onedrive Repo key"
-      apt_key:
-        url: https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/Release.key
-        state: present
-      when: not f3.stat.exists
-
-    - name: "Configuring onedrive Repo"
-      apt_repository:
-        repo: deb https://download.opensuse.org/repositories/home:/npreining:/debian-ubuntu-onedrive/xUbuntu_22.04/ ./
-      when: not f3.stat.exists
-
-    - name: "Fixing onedrive Repo..."
-      command: mv "/etc/apt/sources.list.d/download_opensuse_org_repositories_home_npreining_debian_ubuntu_onedrive_xUbuntu_22_04.list" "/etc/apt/sources.list.d/onedrive.list"
-      when: not f3.stat.exists
-
     # - name: "install system updates for ubuntu systems"
     #   apt:
     #     upgrade: safe
@@ -123,6 +103,7 @@
           - libgettextpo-dev # needed by arc-menu gnome extension
           - libglib2.0-bin # needed by arc-menu gnome extension
           - flatpak # needed by flatpak module
+          - libfuse2 # needed by pCloudDrive
 
     - name: "Install locate package..."
       apt:
@@ -158,9 +139,9 @@
     - name: "Install motionbox related packages..."
       apt:
         pkg:
-        - libtorrent-dev
-        - libdvd-pkg
-        - ubuntu-restricted-extras
+          - libtorrent-dev
+          - libdvd-pkg
+          - ubuntu-restricted-extras
 
     - name: "Install Desktop Applications (2/3)..."
       flatpak:
@@ -184,15 +165,6 @@
           - dmd
         classic: yes
 
-    - name: "Install onedrive related packages..."
-      apt:
-        pkg:
-          - build-essential
-          - libcurl4-openssl-dev
-          - libsqlite3-dev
-          - libnotify-dev
-          - onedrive
-
     - name: "Install Regional Packages..."
       apt:
         pkg:
@@ -201,6 +173,37 @@
           - "libreoffice-l10n-{{ language }}"
           - "hyphen-{{ language }}"
           - "mythes-{{ language }}"
+
+    - name: Installing pCloudDrive (1/3)...
+      file:
+        path: /opt/pCloud/
+        state: directory
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    - name: "Logical evaluation..."
+      stat:
+        path: /opt/pCloud/pCloudDrive
+      register: f
+
+    - name: Installing pCloudDrive (2/3)...
+      ansible.builtin.get_url:
+        url: https://p-lux4.pcloud.com/cBZPneaGcZx94ojD7ZZZdjixVkZ2ZZHK0ZkZyQbxVZIpZfYZpQZnQZkHZ28ZRzZ6HZUQZhQZ2YZRLZo4ZqFZevXB5ZNoKXnGzYT5Xjjz9firCfufPgpQO7/pcloud
+        dest: /opt/pCloud/pCloudDrive
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 777
+      when: not f.stat.exists
+
+    - name: Setting correct permissions to /opt/pCloud/pCloudDrive (3/3)...
+      file:
+        path: /opt/pCloud
+        mode: "0755"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        recurse: yes
+      when: not f.stat.exists
 
     - name: "Logical evaluation..."
       stat:

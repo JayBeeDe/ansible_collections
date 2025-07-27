@@ -367,7 +367,7 @@
         group: "{{ user }}"
       loop:
         - favicon
-        - onedrive
+        - pCloudDrive-white
       loop_control:
         loop_var: png_item
 
@@ -384,7 +384,7 @@
         - { key: default-menu-view, value: "'Pinned_Apps'" }
         - {
             key: directory-shortcuts-list,
-            value: "[['Documents', 'ArcMenu_Documents', 'ArcMenu_Documents'], ['Downloads', 'ArcMenu_Downloads', 'ArcMenu_Downloads'], ['Pictures', 'ArcMenu_Pictures', 'ArcMenu_Pictures'], ['OneDrive', '{{ home }}/.local/share/icons/onedrive.png', '{{ home }}/OneDrive']]",
+            value: "[['Documents', 'ArcMenu_Documents', 'ArcMenu_Documents'], ['Downloads', 'ArcMenu_Downloads', 'ArcMenu_Downloads'], ['Pictures', 'ArcMenu_Pictures', 'ArcMenu_Pictures'], ['pCloudDrive', '{{ home }}/.local/share/icons/pCloudDrive-white.png', '{{ home }}/pCloudDrive']]",
           }
         - { key: disable-recently-installed-apps, value: "true" }
         - { key: disable-tooltips, value: "true" }
