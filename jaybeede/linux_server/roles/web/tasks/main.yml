@@ -588,7 +588,7 @@
 
     - name: "Configuring SSL for web-proxy..."
       shell: "rsync -avr --copy-unsafe-links /etc/letsencrypt/live {{ vol_path }}/web-proxy-conf-vol/_data/ssl"
-      when: https_flag
+      when: use_https
 
     - name: "Create /etc/letsencrypt/conf dir"
       ansible.builtin.file:
@@ -607,20 +607,21 @@
         force: yes
       vars:
         acmechallenge_flag: false
+        https_flag: "{{ use_https }}"
 
-    - name: "Configuring web-proxy for HTTPS mode..."
+    - name: "Configuring web-proxy for {{ 'HTTPS' if use_https else 'HTTP' }} mode..."
       template:
         src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
-        dest: "/etc/letsencrypt/conf/nginx-https.conf"
+        dest: "/etc/letsencrypt/conf/nginx-{{ 'https' if use_https else 'http' }}.conf"
         mode: "0755"
         owner: "root"
         group: "root"
         force: yes
-      when: https_flag
       vars:
         acmechallenge_flag: false
+        https_flag: "{{ use_https }}"
 
-    - name: "Configuring web-proxy for HTTP mode..."
+    - name: "Configuring web-proxy for temporary HTTP mode during ACME Challenge..."
       template:
         src: "{{ role_path }}/files/web-proxy/nginx.conf.tpl"
         dest: "/etc/letsencrypt/conf/nginx-http.conf"
@@ -628,8 +629,9 @@
         owner: "root"
         group: "root"
         force: yes
+      when: use_https
       vars:
-        acmechallenge_flag: "{{ true if https_flag else false }}"
+        acmechallenge_flag: true
         https_flag: false
 
     - name: Logical evaluation...
@@ -641,7 +643,7 @@
     - name: Logical evaluation...
       set_fact:
         proxy_ports: "{{ proxy_ports + ['443:443'] }}"
-      when: https_flag
+      when: use_https
 
     - name: Running web-proxy
       community.docker.docker_container:

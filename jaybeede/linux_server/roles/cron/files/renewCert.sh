@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eo pipefail
+
 # shellcheck disable=SC1091
 source "${HOME}/.bash_aliases"
 
@@ -12,12 +14,14 @@ read -r m_chatid m_deviceid <<<"$(kdbxQuery -g others -t matrix2)"
 #########################functions
 
 function notify() {
+    set +e
     msg=$1
     echo "$msg"
     curl -sS -X POST -H "Content-Type: application/json" -d "{\"chat_id\":\"$t_chatid\",\"text\":\"$msg\", \"disable_notification\": false}" "https://api.telegram.org/bot${t_token}/sendMessage"
     echo "{\"homeserver\": \"${m_url}\", \"device_id\": \"${m_deviceid}\", \"user_id\": \"${m_userid}\", \"room_id\": \"${m_chatid}\", \"access_token\": \"${m_token}\"}" > "${HOME}/.config/matrix-commander/credentials.json"
     matrix-commander -m "$msg" --encrypted -s "${COMMANDER_STORE_DIR}" -c "${HOME}/.config/matrix-commander/credentials.json"
     rm -f "${HOME}/.config/matrix-commander/credentials.json"
+    set -e
 }
 
 function restartProxy() {
@@ -69,7 +73,7 @@ function getCertificateExpiration() {
 
 # shellcheck disable=SC2128
 if [[ "$BASH_SOURCE" != "$0" ]]; then
-    echo -e "\e[31mThe script must be runned with sh command: no source or dot!\e[0m"
+    echo -e "\e[31mThe script must be run with sh command: no source or dot!\e[0m"
     return 1
 fi
 
@@ -111,7 +115,9 @@ else
     done
 fi
 
+echo "${CMD[@]}"
 "${CMD[@]}"
+echo $?
 
 mkdir -p "/var/lib/docker/volumes/web-proxy-conf-vol/_data/ssl/${domain}/"
 # /etc/letsencrypt/live/${domain}/ is a symlink to /etc/letsencrypt/archive/${domain}-00XX/, where 00XX is incrementing at each renew

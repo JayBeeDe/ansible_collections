@@ -15,7 +15,7 @@ server_domain | Server domain
 matrix_domain | Matrix server domain
 network_dns | nginx primary resolver
 network_dns2 | nginx secondary resolver
-https_flag | Use HTTPS when set to true
+use_https | Use HTTPS when set to true
 blogdb_password | Blog database password
 etherpaddb_password | Etherpad database password
 limesurveydb_password | Limesurvey database password

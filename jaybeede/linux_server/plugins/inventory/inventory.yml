@@ -43,7 +43,7 @@ web:
     cron_path: "{{ script_path }}/cron-scripts"
     server_domain: "{{ vault_domain }}"
     matrix_domain: "{{ vault_matrix_domain }}"
-    https_flag: true
+    use_https: true
     blogdb_password: "{{ vault_blogdb_password }}"
     virtualdesktopdb_password: "{{ vault_virtualdesktopdb_password }}"
     limesurveyui_password: "{{ vault_limesurveyui_password }}"

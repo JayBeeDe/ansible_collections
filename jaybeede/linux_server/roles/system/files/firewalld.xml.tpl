@@ -20,7 +20,7 @@
     <accept/>
   </rule>
 {% endif %}
-{% if https_flag is defined and https_flag and server_domain is defined %}
+{% if use_https is defined and use_https and server_domain is defined %}
   <rule family="ipv4">
     <port protocol="tcp" port="443"/>
     <accept/>
