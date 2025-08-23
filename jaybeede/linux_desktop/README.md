@@ -34,8 +34,8 @@ keyboard_shortcuts | Manage keyboard shortcut | create, edit remove builtin or c
 
 Application | Configuration | Policy Restriction
 ----------- | ------------- | ------------------
-chrome + extensions | yes | yes
 conky | yes | no
+firefox + extensions | yes | yes
 flameshot | yes | no
 git | yes | no
 keepassXC | yes | yes
@@ -105,8 +105,6 @@ Partitioning is **NOT** configured by the collection.<br />
 
 Warning: All roles dependencies must be met:<br />
 
-* applications role:<br />
-  - Add the chrome Bookmarks file into the [files/](https://github.com/JayBeeDe/ansible_collections/tree/main/jaybeede/linux_desktop/roles/applications/files) directory. On Linux, you can find this file under $HOME/.config/google-chrome/Default/Bookmarks.<br />
 * desktop role:<br />
   - PyGObject is required for the desktop_launchers module: see [official installation instructions](https://pygobject.readthedocs.io/en/latest/getting_started.html).<br />
 * gnome role:<br />

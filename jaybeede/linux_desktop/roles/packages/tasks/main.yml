@@ -20,26 +20,6 @@
       command: mv "/etc/apt/sources.list.d/packages_microsoft_com_repos_vscode.list" "/etc/apt/sources.list.d/vscode.list"
       when: not f.stat.exists
 
-    - name: "Logical evaluation..."
-      stat:
-        path: "/etc/apt/sources.list.d/google-chrome.list"
-      register: f2
-
-    - name: "Adding Google Repo key"
-      apt_key:
-        url: https://dl-ssl.google.com/linux/linux_signing_key.pub
-        state: present
-      when: not f2.stat.exists
-
-    - name: "Configuring Google Repo"
-      apt_repository:
-        repo: deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main
-      when: not f2.stat.exists
-
-    - name: "Fixing Google Repo..."
-      command: mv "/etc/apt/sources.list.d/dl_google_com_linux_chrome_deb.list" "/etc/apt/sources.list.d/google-chrome.list"
-      when: not f2.stat.exists
-
     # - name: "install system updates for ubuntu systems"
     #   apt:
     #     upgrade: safe
@@ -114,10 +94,10 @@
       apt:
         pkg:
           - element-desktop
+          - firefox
           - vlc
           - libreoffice-gtk
           - libreoffice
-          - google-chrome-stable
           - code
           - krita
           - flameshot

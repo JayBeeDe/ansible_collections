@@ -14,21 +14,21 @@
         mode: "0777"
       changed_when: false
 
-    - name: "Configuring chrome..."
+    - name: Configuring Firefox...
       file:
-        path: /etc/opt/chrome/policies/managed/
+        path: /etc/firefox/policies/
         state: directory
         mode: "0755"
-        owner: "root"
-        group: "root"
+        owner: root
+        group: root
 
-    - name: "Configuring chrome - Policies..."
+    - name: Configuring Firefox - Policies...
       copy:
-        src: "{{ role_path }}/files/chromium.json"
-        dest: "/etc/opt/chrome/policies/managed/settings.json"
+        src: "{{ role_path }}/files/firefox.json"
+        dest: /etc/firefox/policies/policies.json
         mode: "0644"
-        owner: "root"
-        group: "root"
+        owner: root
+        group: root
 
   become: yes
   become_user: "root"
@@ -337,30 +337,6 @@
         src: "{{ role_path }}/files/Default.ott"
         dest: "{{ home }}/Templates/Default.ott"
         mode: "0664"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-
-    - name: "Configuring chrome - Bookmarks (1/2)..."
-      file:
-        path: "{{ home }}/.config/google-chrome/Default/"
-        state: directory
-        mode: "0755"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-
-    - name: "Configuring chrome - Bookmarks (2/2)..."
-      copy:
-        src: "{{ role_path }}/files/Bookmarks"
-        dest: "{{ home }}/.config/google-chrome/Default/Bookmarks"
-        mode: "0600"
-        owner: "{{ user }}"
-        group: "{{ user }}"
-
-    - name: "Configuring chrome - Search Engines..."
-      copy:
-        src: "{{ role_path }}/files/chromium-2.conf"
-        dest: "{{ home }}/.config/google-chrome/Default/Web Data"
-        mode: "0600"
         owner: "{{ user }}"
         group: "{{ user }}"
 

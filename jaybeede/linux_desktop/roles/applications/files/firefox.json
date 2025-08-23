@@ -1,0 +1,178 @@
+{
+    "policies": {
+        "AutofillAddressEnabled": false,
+        "AutofillCreditCardEnabled": false,
+        "Cookies": {
+            "Allow": [
+                "https://de.wikipedia.org",
+                "https://duckduckgo.com",
+                "https://en.wikipedia.org",
+                "https://fr.wikipedia.org",
+                "https://github.com",
+                "https://my.pcloud.com",
+                "https://www.google.com",
+                "https://www.google.de",
+                "https://www.google.fr",
+                "https://www.youtube.com"
+            ],
+            "Locked": true,
+            "Behavior": "accept",
+            "BehaviorPrivateBrowsing": "reject-foreign"
+        },
+        "DisableBuiltinPDFViewer": true,
+        "DisableFeedbackCommands": true,
+        "DisableFirefoxAccounts": true,
+        "DisableFirefoxScreenshots": true,
+        "DisableFirefoxStudies": true,
+        "DisableSetDesktopBackground": true,
+        "DisableTelemetry": true,
+        "DisplayBookmarksToolbar": "always",
+        "DisplayMenuBar": "never",
+        "DontCheckDefaultBrowser": true,
+        "ExtensionSettings": {
+            "*": {
+                "blocked_install_message": "Blocked by policy ExtensionSettings",
+                "installation_mode": "blocked",
+                "allowed_types": [
+                    "dictionary",
+                    "extension",
+                    "locale",
+                    "theme"
+                ]
+            },
+            "{024dd701-1855-47ee-b031-7b68e57c82c2}": {
+                "installation_mode": "force_installed",
+                "private_browsing": false,
+                "updates_disabled": false
+            },
+            "{e4b175da-c346-4934-89be-43247e90894c}": {
+                "installation_mode": "force_installed",
+                "private_browsing": false,
+                "updates_disabled": false
+            },
+            "chrome-gnome-shell@gnome.org": {
+                "installation_mode": "force_installed",
+                "private_browsing": false,
+                "updates_disabled": false
+            },
+            "keepassxc-browser@keepassxc.org": {
+                "installation_mode": "force_installed",
+                "private_browsing": true,
+                "updates_disabled": false
+            },
+            "uBlock0@raymondhill.net": {
+                "installation_mode": "force_installed",
+                "private_browsing": true,
+                "updates_disabled": false
+            }
+        },
+        "Homepage": {
+            "URL": "about:blank",
+            "Locked": true,
+            "StartPage": "homepage-locked"
+        },
+        "NoDefaultBookmarks": true,
+        "OfferToSaveLogins": false,
+        "OfferToSaveLoginsDefault": false,
+        "OverrideFirstRunPage": "",
+        "OverridePostUpdatePage": "",
+        "PasswordManagerEnabled": false,
+        "PDFjs": {
+            "Enabled": false
+        },
+        "Permissions": {
+            "Autoplay": {
+                "BlockNewRequests": true
+            },
+            "Location": {
+                "BlockNewRequests": true
+            },
+            "Notifications": {
+                "BlockNewRequests": true
+            },
+            "VirtualReality": {
+                "BlockNewRequests": true
+            }
+        },
+        "SanitizeOnShutdown": {
+            "Cache": false,
+            "Cookies": true,
+            "FormData": true,
+            "Sessions": true,
+            "SiteSettings": true,
+            "Locked": true
+        },
+        "SearchEngines": {
+            "Add": [
+                {
+                    "Name": "Bing",
+                    "URLTemplate": "https://www.bing.com/search?q={searchTerms}",
+                    "Method": "GET",
+                    "IconURL": "https://www.bing.com/favicon.ico",
+                    "Alias": "b"
+                },
+                {
+                    "Name": "DuckDuckGo",
+                    "URLTemplate": "https://duckduckgo.com/?q={searchTerms}&kbg=-1&kbe=0&kbj=1&kw=s&k5=2",
+                    "Method": "GET",
+                    "IconURL": "https://duckduckgo.com/favicon.ico",
+                    "Alias": "d"
+                },
+                {
+                    "Name": "GitHub",
+                    "URLTemplate": "https://github.com/search?q={searchTerms}&ref=opensearch",
+                    "Method": "GET",
+                    "IconURL": "https://github.com/favicon.ico",
+                    "Alias": "gh"
+                },
+                {
+                    "Name": "Google",
+                    "URLTemplate": "https://www.google.com/search?q={searchTerms}",
+                    "Method": "GET",
+                    "IconURL": "https://www.google.com/favicon.ico",
+                    "Alias": "g"
+                },
+                {
+                    "Name": "Google Maps",
+                    "URLTemplate": "https://www.google.com/maps/search/{searchTerms}",
+                    "Method": "GET",
+                    "IconURL": "https://maps.google.com/favicon.ico",
+                    "Alias": "gm"
+                },
+                {
+                    "Name": "Le Bon Coin",
+                    "URLTemplate": "https://www.leboncoin.fr/recherche/?text={searchTerms}",
+                    "Method": "GET",
+                    "IconURL": "https://www.leboncoin.fr/_next/static/media/favicon.6fd07af6.svg",
+                    "Alias": "lbc"
+                },
+                {
+                    "Name": "Translate EN -> FR",
+                    "URLTemplate": "https://translate.google.com/?tl=fr&text={searchTerms}",
+                    "Method": "GET",
+                    "IconURL": "https://translate.google.com/favicon.ico",
+                    "Alias": "tf"
+                },
+                {
+                    "Name": "Translate FR -> EN",
+                    "URLTemplate": "https://translate.google.com/?sl=fr&tl=en&text={searchTerms}",
+                    "Method": "GET",
+                    "IconURL": "https://translate.google.com/favicon.ico",
+                    "Alias": "te"
+                },
+                {
+                    "Name": "YouTube",
+                    "URLTemplate": "https://www.youtube.com/results?search_query={searchTerms}&page={startPage?}&utm_source=opensearch",
+                    "Method": "GET",
+                    "IconURL": "https://www.youtube.com/favicon.ico",
+                    "Alias": "y"
+                }
+            ]
+        },
+        "SearchSuggestEnabled": false,
+        "ShowHomeButton": true,
+        "SkipTermsOfUse": true,
+        "TranslateEnabled": false,
+        "UseSystemPrintDialog": true
+    }
+}

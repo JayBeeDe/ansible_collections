@@ -1,12 +1,7 @@
 applications
 =========
 
-Desktop applications configuration: chrome, keepassxc, VLC, conky, flameshot, vscode, terminator, remmina, libreoffice, git.
-
-Requirements
-------------
-
-:warning: Add the chrome Bookmarks file into the [files/](files) directory. On Linux, you can find this file under $HOME/.config/google-chrome/Default/Bookmarks.
+Desktop applications configuration: firefox, keepassxc, VLC, conky, flameshot, vscode, terminator, remmina, libreoffice, git.
 
 Role Variables
 --------------

@@ -325,8 +325,6 @@
         - vino-server
         - virt-manager
         - vlc
-        # - chromium-chromium
-        # - chromium-browser
       loop_control:
         loop_var: notification_item
 

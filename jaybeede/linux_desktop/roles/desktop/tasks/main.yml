@@ -27,9 +27,9 @@
     # gnome
 
     - name: "Configuring arc-menu shortcuts..."
-      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Google Chrome', 'google-chrome', 'google-chrome.desktop', 'Messagerie et agenda d’Evolution', '', 'org.gnome.Evolution.desktop', 'Element', 'element-desktop', 'element-desktop.desktop', 'KeePassXC', '', 'org.keepassxc.KeePassXC.desktop', 'Joplin', '', 'net.cozic.joplin_desktop.desktop', 'Visual Studio Code', '', 'code.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'MotionBox', '{{ home }}/.local/share/icons/motionbox.png', 'MotionBox.desktop', 'EasyEffects', '', 'com.github.wwmm.easyeffects.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop']"
+      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Firefox', 'firefox', 'firefox.desktop', 'Messagerie et agenda d’Evolution', '', 'org.gnome.Evolution.desktop', 'Element', 'element-desktop', 'element-desktop.desktop', 'KeePassXC', '', 'org.keepassxc.KeePassXC.desktop', 'Joplin', '', 'net.cozic.joplin_desktop.desktop', 'Visual Studio Code', '', 'code.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'MotionBox', '{{ home }}/.local/share/icons/motionbox.png', 'MotionBox.desktop', 'EasyEffects', '', 'com.github.wwmm.easyeffects.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop']"
     - name: "Configuring gnome bookmarks..."
-      dconf: key="/org/gnome/shell/favorite-apps" value="['google-chrome.desktop', 'nemo.desktop', 'code.desktop', 'simple-scan.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'vlc.desktop', 'MotionBox.desktop', 'com.github.wwmm.easyeffects.desktop', 'connectWindows.desktop']"
+      dconf: key="/org/gnome/shell/favorite-apps" value="['firefox.desktop', 'nemo.desktop', 'code.desktop', 'simple-scan.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'vlc.desktop', 'MotionBox.desktop', 'com.github.wwmm.easyeffects.desktop', 'connectWindows.desktop']"
 
     # user applications
 

@@ -12,8 +12,8 @@ tags:
   - "linux"
   - "desktop"
   - "apt"
-  - "chrome"
   - "dashtopanel"
+  - "firefox"
   - "freedesktop"
   - "gnomebookmarks"
   - "gnomeextensions"
@@ -37,6 +37,5 @@ build_ignore:
   - '*/__pycache__/*'
   - '*.log'
   - '*.old'
-  - '*/files/Bookmarks'
   - '*/group_vars/all.yml'
   - '*/vault-tmp'
