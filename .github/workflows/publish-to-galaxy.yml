@@ -11,10 +11,17 @@ jobs:
   publish-ansible-collection:
     runs-on: ubuntu-latest
     steps:
+      - name: Check Initiating User
+        if: github.actor != 'JayBeeDe'
+        run: |
+          echo "::error title=Unauthorized Access::User ${GITHUB_ACTOR} is not authorized."
+          exit 1
+      - name: Install packages (1/2)
+        run: sudo apt-get install -y curl git jq yq
       - name: Check out repository
         uses: actions/checkout@v2
-      - name: Install packages
-        run: sudo apt-get install -y curl git jq yq
+        with:
+          fetch-depth: 0
       - name: Check tag
         run: |
           set -euo pipefail
@@ -22,6 +29,9 @@ jobs:
           TAG="${GITHUB_REF##*/}"
           if [ "$GITHUB_REF_TYPE" == "branch" ]; then
             TAG="linux_server_v0.0.1"
+          elif !git tag -v "$TAG" > /dev/null 2>&1; then
+            echo "::error::Tag '$TAG' is not signed or could not be verified."
+            exit 1
           fi
           checkTag "$TAG"
       - name: Set version
@@ -29,8 +39,8 @@ jobs:
           set -euo pipefail
           source "${GITHUB_WORKSPACE}/.github/workflows/ansible_galaxy_libs.sh"
           setVersion
-      - name: Install packages
-        run: sudo apt-get install -y ansible coreutils
+      - name: Install packages (2/2)
+        run: sudo apt-get install -y ansible
       - name: Build
         run: |
           set -euo pipefail
