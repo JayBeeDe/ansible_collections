@@ -47,6 +47,7 @@ alias dw="cd $vdw"
 
 export MAXCHARS=72
 export ISSUE_TYPE=fix
+export AUTO_PUSH=0
 
 alias gs="git status"
 
@@ -54,7 +55,7 @@ function gpu {
     if [ "$LOCAL_GIT" == 1 ]; then
         return 0
     fi
-    cmd=(git push)
+    cmd=(git push --no-verify)
     remote="origin"
     if [ -n "$1" ] && [ -n "$2" ]; then
         remote="$2"
@@ -90,7 +91,7 @@ function gpl {
     if [ -z "$defaultBranch" ]; then
         defaultBranch="master"
     fi
-    cmd=(git rebase "origin/${defaultBranch}")
+    cmd=(git rebase --no-verify "origin/${defaultBranch}")
     if [ "$DEBUG" == 1 ]; then
         echo "${cmd[@]}"
         return 0
@@ -133,7 +134,7 @@ function gl {
     if [ "$prevCommitRef" != "0" ]; then
         cmd+=("${prevCommitRef}..HEAD")
     fi
-    cmd+=(--graph)
+    cmd+=(--graph "--date=iso8601" "--format=%C(yellow)commit %h %C(auto)%d%C(reset) %C(red)%G?%C(reset)%C(reset)%n%C(blue)%an <%ae>%C(reset)%n%C(green)%ad%C(reset)%n%s%n%b")
     if [ "$longFlag" == "0" ]; then
         cmd+=(--abbrev-commit)
     fi
@@ -152,7 +153,11 @@ function grb {
     if [ "$prevCommitRef" == "0" ]; then
         prevCommitRef="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed -r "s:^refs/remotes/origin/::g")"
     fi
-    cmd=(git rebase -i "$prevCommitRef")
+    if [ -n "$SIGNED_GPG" ]; then
+        cmd=(git rebase --no-verify --exec "git commit --amend --no-edit -S" -i "$prevCommitRef")
+    else
+        cmd=(git rebase --no-verify -i "$prevCommitRef")
+    fi
     if [ "$lastCommitRef" != "0" ]; then
         cmd+=("$lastCommitRef")
     fi
@@ -166,7 +171,9 @@ function grb {
         DEBUG=1
         return 0
     fi
-    gpu 1
+    if [ "$AUTO_PUSH" == 1 ]; then
+        gpu 1
+    fi
 }
 
 function autoRebase {
@@ -185,7 +192,11 @@ function autoRebase {
     currentRebaseInstructionFormat="$(git config --get rebase.instructionFormat)"
     git config --global --replace-all core.editor "sleep 0.5 && mkfifo $fifoPath && cat $fifoPath #"
     git config --add rebase.instructionFormat "%H %s"
-    git rebase -i "$prevCommitRef" >/dev/null 2>&1 &
+    if [ -n "$SIGNED_GPG" ]; then
+        git rebase --no-verify --exec "git commit --amend --no-edit -S" -i "$prevCommitRef" >/dev/null 2>&1 &
+    else
+        git rebase --no-verify -i "$prevCommitRef" >/dev/null 2>&1 &
+    fi
     sleep 0.5
     rebaseTodoPath="$(mktemp)"
     cp "${repoRootPath}/.git/rebase-merge/git-rebase-todo" "$rebaseTodoPath"
@@ -216,7 +227,9 @@ function autoRebase {
         gpl 1 # revert change
         DEBUG=1
     fi
-    gpu 1
+    if [ "$AUTO_PUSH" == 1 ]; then
+        gpu 1
+    fi
 }
 
 function gfi { # fixup
@@ -238,31 +251,37 @@ function gc {
     if [ -z "$1" ]; then
         return 1
     fi
-    line1="$(echo "$1" | awk '{ split($0, chars, "¤"); lowerFlag=1; for (i=1; i <= length(chars); i++) { if(lowerFlag==1){newchars=newchars""tolower(chars[i]); lowerFlag=0} else{newchars=newchars""chars[i]; lowerFlag=1} }; print newchars}')"
+    line1=$1
     component="dedicated"
-    unset line2
     if [ -n "$2" ]; then
-        if [ -n "$3" ]; then
-            line2="${2,,}"
-            component=$3
-        else
-            component=$2
-        fi
+        component=$1
+        line1=$2
     fi
+    if [ -n "$3" ]; then
+        line2="${3,,}"
+    fi
+    line1="$(echo "$line1" | awk '{ split($0, chars, "¤"); lowerFlag=1; for (i=1; i <= length(chars); i++) { if(lowerFlag==1){newchars=newchars""tolower(chars[i]); lowerFlag=0} else{newchars=newchars""chars[i]; lowerFlag=1} }; print newchars}')"
+    unset line2
     delim=""
     if [ "$DEBUG" == 1 ]; then
         delim="\""
     fi
     cmd=(git commit)
-    if [ -n "$SIGNEDOFF" ]; then
+    if [ -n "$SIGNED_OFF" ]; then
         cmd+=(-s)
+    fi
+    if [ -n "$SIGNED_GPG" ]; then
+        cmd+=(-S)
     fi
     currentBranch="$(git branch 2>/dev/null | awk '$1 == "*" {print $2}')"
     if [ -z "$currentBranch" ]; then
         return 1
     fi
     issueType="$(awk -F / -v issuetype="$ISSUE_TYPE" '{ if ( $1 ~ "^(fix|feat|test)$" ) {print $1} else {print issuetype} }' <<<"$currentBranch")"
-    linkedIssue="$(awk -F / '$NF ~ "[A-Z]+-[0-9]+" {print $NF}' <<<"$currentBranch")"
+    issueRef="$(sed -r "s:^.*\/([A-Z]+-[0-9]+).*$:\1:g" <<<"$currentBranch")"
+    if [ -n "$ISSUE_REF" ]; then
+        issueRef=$ISSUE_REF
+    fi
     line1="${delim}${issueType}(${component}): ${line1}${delim}"
     if [ -n "$MAXCHARS" ]; then
         if [ ${#line1} -gt "$MAXCHARS" ]; then
@@ -271,8 +290,8 @@ function gc {
         fi
     fi
     cmd+=(-m "${line1}")
-    if [ -n "$linkedIssue" ]; then
-        cmd+=(-m "${delim}ref: ${linkedIssue}${delim}")
+    if [ -n "$issueRef" ] && [ "$issueRef" != "$currentBranch" ]; then
+        cmd+=(-m "${delim}ref: #${issueRef}${delim}")
     elif [ -n "$line2" ]; then
         cmd+=(-m "${delim}${line2}${delim}")
     fi
@@ -283,31 +302,71 @@ function gc {
     fi
     git add -A
     "${cmd[@]}"
-    gpu 1
+    if [ "$AUTO_PUSH" == 1 ]; then
+        gpu 1
+    fi
 }
 
-function gcs {
-    SIGNEDOFF=1
-    gc "$@"
-    unset SIGNEDOFF
+function gt {
+    if [ -z "$1" ]; then
+        return 1
+    fi
+    tagName="$1"
+    if [ "${tagName/#v/}" == "$tagName" ] && [ "${tagName/_v/}" == "$tagName" ]; then
+        tagName="v${tagName}"
+    fi
+    tagCommitRef="$(human2GitHash "${2:-1}" 0)"
+    cmd=(git tag)
+    if [ -n "$SIGNED_GPG" ]; then
+        cmd+=(-s -m "Signed Tag") # yes that's a lowercase...
+    fi
+    cmd+=("$tagName" "$tagCommitRef")
+    cmd2=(git push origin --tags)
+    if [ "$DEBUG" == 1 ]; then
+        echo "${cmd[@]}"
+        echo "${cmd2[@]}"
+        return 0
+    fi
+    "${cmd[@]}"
+    "${cmd2[@]}"
+}
+
+function gtr {
+    if [ -z "$1" ]; then
+        return 1
+    fi
+    tagName="$1"
+    if [ "${tagName/#v/}" == "$tagName" ] && [ "${tagName/_v/}" == "$tagName" ]; then
+        tagName="v${tagName}"
+    fi
+    cmd=(git tag --delete "$tagName")
+    cmd2=(git push origin ":refs/tags/${tagName}")
+    if [ "$DEBUG" == 1 ]; then
+        echo "${cmd[@]}"
+        echo "${cmd2[@]}"
+        return 0
+    fi
+    "${cmd[@]}"
+    "${cmd2[@]}"
 }
 
 function ga {
     cmd=(git commit --amend --no-edit --no-verify)
+    if [ -n "$SIGNED_OFF" ]; then
+        cmd+=(-s)
+    fi
+    if [ -n "$SIGNED_GPG" ]; then
+        cmd+=(-S)
+    fi
     if [ "$DEBUG" == 1 ]; then
         echo "${cmd[@]}"
         return 0
     fi
     git add -A
     "${cmd[@]}"
-}
-
-function gac {
-    ga
-    if [ "$DEBUG" == 1 ]; then
-        return 0
+    if [ "$AUTO_PUSH" == 1 ]; then
+        gpu 1
     fi
-    gpu 1
 }
 
 # log related aliases
