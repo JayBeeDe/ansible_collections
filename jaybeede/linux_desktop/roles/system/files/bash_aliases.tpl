@@ -47,6 +47,8 @@ alias dw="cd $vdw"
 
 export MAXCHARS=72
 export ISSUE_TYPE=fix
+export AUTO_PUSH=1
+export SIGNED_GPG=1
 
 alias gs="git status"
 
@@ -133,7 +135,7 @@ function gl {
     if [ "$prevCommitRef" != "0" ]; then
         cmd+=("${prevCommitRef}..HEAD")
     fi
-    cmd+=(--graph)
+    cmd+=(--graph "--date=iso8601" "--format=%C(yellow)commit %h %C(auto)%d%C(reset) %C(red)%G?%C(reset)%C(reset)%n%C(blue)%an <%ae>%C(reset)%n%C(green)%ad%C(reset)%n%s%n%b")
     if [ "$longFlag" == "0" ]; then
         cmd+=(--abbrev-commit)
     fi
@@ -152,7 +154,11 @@ function grb {
     if [ "$prevCommitRef" == "0" ]; then
         prevCommitRef="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed -r "s:^refs/remotes/origin/::g")"
     fi
-    cmd=(git rebase --no-verify -i "$prevCommitRef")
+    if [ -n "$SIGNED_GPG" ]; then
+        cmd=(git rebase --no-verify --exec "git commit --amend --no-edit -S" -i "$prevCommitRef")
+    else
+        cmd=(git rebase --no-verify -i "$prevCommitRef")
+    fi
     if [ "$lastCommitRef" != "0" ]; then
         cmd+=("$lastCommitRef")
     fi
@@ -166,7 +172,9 @@ function grb {
         DEBUG=1
         return 0
     fi
-    gpu 1
+    if [ "$AUTO_PUSH" == 1 ]; then
+        gpu 1
+    fi
 }
 
 function autoRebase {
@@ -185,7 +193,11 @@ function autoRebase {
     currentRebaseInstructionFormat="$(git config --get rebase.instructionFormat)"
     git config --global --replace-all core.editor "sleep 0.5 && mkfifo $fifoPath && cat $fifoPath #"
     git config --add rebase.instructionFormat "%H %s"
-    git rebase --no-verify -i "$prevCommitRef" >/dev/null 2>&1 &
+    if [ -n "$SIGNED_GPG" ]; then
+        git rebase --no-verify --exec "git commit --amend --no-edit -S" -i "$prevCommitRef" >/dev/null 2>&1 &
+    else
+        git rebase --no-verify -i "$prevCommitRef" >/dev/null 2>&1 &
+    fi
     sleep 0.5
     rebaseTodoPath="$(mktemp)"
     cp "${repoRootPath}/.git/rebase-merge/git-rebase-todo" "$rebaseTodoPath"
@@ -216,7 +228,9 @@ function autoRebase {
         gpl 1 # revert change
         DEBUG=1
     fi
-    gpu 1
+    if [ "$AUTO_PUSH" == 1 ]; then
+        gpu 1
+    fi
 }
 
 function gfi { # fixup
@@ -254,8 +268,11 @@ function gc {
         delim="\""
     fi
     cmd=(git commit)
-    if [ -n "$SIGNEDOFF" ]; then
+    if [ -n "$SIGNED_OFF" ]; then
         cmd+=(-s)
+    fi
+    if [ -n "$SIGNED_GPG" ]; then
+        cmd+=(-S)
     fi
     currentBranch="$(git branch 2>/dev/null | awk '$1 == "*" {print $2}')"
     if [ -z "$currentBranch" ]; then
@@ -275,7 +292,7 @@ function gc {
     fi
     cmd+=(-m "${line1}")
     if [ -n "$issueRef" ] && [ "$issueRef" != "$currentBranch" ]; then
-        cmd+=(-m "${delim}ref: ${issueRef}${delim}")
+        cmd+=(-m "${delim}ref: #${issueRef}${delim}")
     elif [ -n "$line2" ]; then
         cmd+=(-m "${delim}${line2}${delim}")
     fi
@@ -286,13 +303,9 @@ function gc {
     fi
     git add -A
     "${cmd[@]}"
-    gpu 1
-}
-
-function gcs {
-    SIGNEDOFF=1
-    gc "$@"
-    unset SIGNEDOFF
+    if [ "$AUTO_PUSH" == 1 ]; then
+        gpu 1
+    fi
 }
 
 function gt {
@@ -304,7 +317,11 @@ function gt {
         tagName="v${tagName}"
     fi
     tagCommitRef="$(human2GitHash "${2:-1}" 0)"
-    cmd=(git tag "$tagName" "$tagCommitRef")
+    cmd=(git tag)
+    if [ -n "$SIGNED_GPG" ]; then
+        cmd+=(-s -m "Signed Tag") # yes that's a lowercase...
+    fi
+    cmd+=("$tagName" "$tagCommitRef")
     cmd2=(git push origin --tags)
     if [ "$DEBUG" == 1 ]; then
         echo "${cmd[@]}"
@@ -336,20 +353,21 @@ function gtr {
 
 function ga {
     cmd=(git commit --amend --no-edit --no-verify)
+    if [ -n "$SIGNED_OFF" ]; then
+        cmd+=(-s)
+    fi
+    if [ -n "$SIGNED_GPG" ]; then
+        cmd+=(-S)
+    fi
     if [ "$DEBUG" == 1 ]; then
         echo "${cmd[@]}"
         return 0
     fi
     git add -A
     "${cmd[@]}"
-}
-
-function gac {
-    ga
-    if [ "$DEBUG" == 1 ]; then
-        return 0
+    if [ "$AUTO_PUSH" == 1 ]; then
+        gpu 1
     fi
-    gpu 1
 }
 
 # log related aliases

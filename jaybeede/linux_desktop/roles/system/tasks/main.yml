@@ -369,8 +369,6 @@
         mode: "0755"
         owner: "{{ line_item.user }}"
         group: "{{ line_item.user }}"
-        block_start_string: "<%"
-        block_end_string: "%>"
         variable_start_string: "[%" # because script contains default character
         variable_end_string: "%]" # because script contains default character
         comment_start_string: "{=" # because script contains default character
