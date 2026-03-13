@@ -32,6 +32,10 @@ enable_registration: false
 registration_shared_secret: "{{ matrixgtw_register_secret }}"
 serve_server_wellknown: true
 media_store_path: /data/media_store
+dynamic_thumbnails: true
+media_retention:
+  local_media_lifetime: 45d
+  remote_media_lifetime: 15d
 signing_key_path: "/data/{{ matrix_domain }}.signing.key"
 report_stats: true
 trusted_key_servers:
