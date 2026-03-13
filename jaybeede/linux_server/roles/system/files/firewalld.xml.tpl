@@ -3,13 +3,13 @@
   <short>Public</short>
   <description>For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.</description>
   <service name="dhcpv6-client" />
-{% if wireguard_proxy_port is defined %}
+{% if wireguard_port is defined %}
   <rule family="ipv4">
-    <port protocol="udp" port="{{ wireguard_proxy_port | string }}"/>
+    <port protocol="udp" port="{{ wireguard_port | string }}"/>
     <accept/>
   </rule>
   <rule family="ipv6">
-    <port protocol="udp" port="{{ wireguard_proxy_port | string }}"/>
+    <port protocol="udp" port="{{ wireguard_port | string }}"/>
     <accept/>
   </rule>
   <masquerade/>
@@ -146,7 +146,7 @@
     <drop/>
   </rule>
 {% endif %}
-{% if virtualdesktopdb_password is defined or wireguard_proxy_port is defined %}
+{% if virtualdesktopdb_password is defined or wireguard_port is defined %}
   <rule family="ipv4">
     <source address="172.17.0.0/24"/>
     <port protocol="tcp" port="{{ ssh_port | string }}"/>

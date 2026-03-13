@@ -21,11 +21,6 @@ all:
       ansible_port: "{{ ssh_port }}"
       ansible_user: "{{ user }}"
       ansible_become_pass: "{{ vault_become_pass }}"
-    server-vpn:
-      ansible_host: JBD-HST-CTO
-      ansible_port: "{{ ssh_port }}"
-      ansible_user: "{{ user }}"
-      ansible_become_pass: "{{ vault_become_pass }}"
     server-edge:
       ansible_host: JBD-SRV-P17
       ansible_port: "{{ ssh_port }}"
@@ -33,7 +28,7 @@ all:
       ansible_become_pass: "{{ vault_become_pass }}"
 
 docker:
-  hosts: server-web,server-vpn
+  hosts: server-web
 
 web:
   vars:
@@ -73,20 +68,6 @@ web:
     commander_store_dir: "{{ vault_commander_store_dir }}"
   hosts: server-web
 
-vpn:
-  vars:
-    vpn_domain: "{{ vault_vpn_domain }}"
-    wireguard_proxy_cidrv6: "{{ vault_wireguard_proxy_cidrv6 }}"
-    wireguard_proxy_ipv6: "{{ vault_wireguard_proxy_ipv6 }}"
-    wireguard_proxy_peers_list: "{{ vault_wireguard_proxy_peers_list }}" # list of dicts, check documentation for more details
-    wireguard_proxy_port: "{{ vault_wireguard_proxy_port }}"
-    wireguard_proxy_private_key: "{{ vault_wireguard_proxy_private_key }}"
-    wireguard_proxy_public_key: "{{ vault_wireguard_proxy_public_key }}"
-    wireguard_proxy_route_cidrv6: "{{ vault_wireguard_proxy_route_cidrv6 }}"
-    wireguard_proxy_route_gwv6: "{{ vault_wireguard_proxy_route_gwv6 }}"
-    ipv6_flag: 1
-  hosts: server-vpn
-
 edge:
   vars:
     ipv6_flag: 1
@@ -96,7 +77,7 @@ edge:
     transmission_peer_port: "{{ vault_transmission_peer_port }}"
     transmission_rpc_port: "{{ vault_transmission_rpc_port }}"
     transmission_rpc_hash: "{{ vault_transmission_rpc_hash }}"
-    wireguard_client_peers_list: "{{ vault_wireguard_proxy_peers_list }}" # list of dicts, check documentation for more details
-    wireguard_client_public_key: "{{ vault_wireguard_proxy_public_key }}"
-    wireguard_client_endpoint: "{{ vault_vpn_domain }}:{{ vault_wireguard_proxy_port }}"
+    wireguard_peers_list: "{{ vault_wireguard_peers_list }}" # list of dicts, check documentation for more details
+    wireguard_public_key: "{{ vault_wireguard_public_key }}"
+    wireguard_endpoint: "{{ vault_vpn_domain }}:{{ vault_wireguard_port }}"
   hosts: server-edge

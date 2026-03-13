@@ -80,9 +80,7 @@ vault_matrixwhatsappbridge_senderlocalpart: "my vault_matrixwhatsappbridge_sende
 vault_kdbx_path: "my vault_kdbx_path"
 vault_kdbx_key_path: "my vault_kdbx_key_path"
 vault_commander_store_dir: "my vault_commander_store_dir" # path to the .store directory that contains credentials
-vault_wireguard_proxy_cidrv6: "my vault_wireguard_proxy_cidrv6"
-vault_wireguard_proxy_ipv6: "my vault_wireguard_proxy_ipv6"
-vault_wireguard_proxy_peers_list:
+vault_wireguard_peers_list:
   peer1: # this is just a comment in the configuration to identify the peer
     preshared_key: "my vault peer 1 preshared_key"
     public_key: "my vault peer 1 public_key"
@@ -93,12 +91,8 @@ vault_wireguard_proxy_peers_list:
     public_key: "my vault peer 2 public_key"
     private_key: "my vault peer 2 private_key"
     ipv6_address: "my vault peer 2 ipv6_address"
-    extra_allowed_ip_address_cidrv6: "my vault peer 2 optional extra_allowed_ip_address_cidrv6"
-vault_wireguard_proxy_port: "my vault_wireguard_proxy_port"
-vault_wireguard_proxy_private_key: "my vault_wireguard_proxy_private_key"
-vault_wireguard_proxy_public_key: "my vault_wireguard_proxy_public_key"
-vault_wireguard_proxy_route_cidrv6: "my vault_wireguard_proxy_route_cidrv6"
-vault_wireguard_proxy_route_gwv6: "my vault_wireguard_proxy_route_gwv6"
+vault_wireguard_port: "my vault_wireguard_port"
+vault_wireguard_public_key: "my vault_wireguard_public_key"
 ```
 
 **Encrypt** that file.
@@ -131,9 +125,6 @@ You can put all the roles within the following order in your playbook (let's cal
         - web
         - cron
       when: inventory_hostname in groups["web"]
-    - include_role:
-        name: wireguard
-      when: inventory_hostname in groups["vpn"]
     - include_role:
         name: edge
       when: inventory_hostname in groups["edge"]

@@ -50,18 +50,6 @@
         state: absent
       when: ipv6_flag == 1
 
-    - name: "Configuring IPv4 forwarding..."
-      sysctl:
-        name: net.ipv4.ip_forward
-        value: 1
-      when: inventory_hostname in groups["vpn"]
-
-    - name: "Configuring IPv6 forwarding..."
-      sysctl:
-        name: net.ipv6.conf.all.forwarding
-        value: 1
-      when: ipv6_flag == 1 and inventory_hostname in groups["vpn"]
-
     - name: "Masking ctrl-alt-del.target..."
       systemd:
         name: "ctrl-alt-del.target"
