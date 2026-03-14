@@ -278,7 +278,7 @@
       community.docker.docker_container:
         detach: yes
         hostname: jawanndenn-ui
-        image: jbd92/jawanndenn:latest
+        image: ghcr.io/jaybeede/jawanndenn:latest
         interactive: yes
         name: jawanndenn-ui
         recreate: yes
