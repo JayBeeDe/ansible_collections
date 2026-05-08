@@ -380,6 +380,21 @@ function logc {
     cat $1 | grep -v "end]" | grep -v "<ending>" | sed -r "s/\[<([0-9]+)\:.*>\]/[\1:]/g" | sed -r "s:((\[.*\].){1})(\[.*\].):\1:g" | sed -r "s:([A-Za-z]{3})\s([A-Za-z]{3})\s([0-9]+)\s([0-9]{2}\:)([0-9]{2}\:)([0-9]{2})\s([0-9]{4}):\7-\2-\3 \4\5\6 UTC:g" | sed -r "s:-Jan-:-01-:g" | sed -r "s:-Feb-:-02-:g" | sed -r "s:-Mar-:-03-:g" | sed -r "s:-Apr-:-04-:g" | sed -r "s:-May-:-05-:g" | sed -r "s:-Jun-:-06-:g" | sed -r "s:-Jul-:-07-:g" | sed -r "s:-Aug-:-08-:g" | sed -r "s:-Sep-:-09-:g" | sed -r "s:-Oct-:-10-:g" | sed -r "s:-Nov-:-11-:g" | sed -r "s:-Dec-:-12-:g" | grep -v "error_details" | ccze -m ansi
 }
 
+# image manipulation aliases
+
+function filigrane {
+	if ! [ -r "$1" ]; then
+		echo "Input file not readable"
+	fi
+	if [ -z "$2" ]; then
+		echo "Please provide a text"
+	fi
+	text_content=$2
+	input_file=$1
+	output_file="${input_file%.*}-output.${input_file##*.}"
+	convert -size 140x80 xc:none -fill grey -gravity NorthWest -draw 'text 10,10 "'$text_content'"' -gravity SouthEast -draw 'text 5,15 "'$text_content'"' miff:- |composite -tile - "$input_file" "$output_file"
+}
+
 # desktop related aliases
 
 function decrypt {
