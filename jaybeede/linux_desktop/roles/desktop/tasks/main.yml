@@ -23,25 +23,40 @@
         mode: "0644"
         owner: "{{ user }}"
         group: "{{ user }}"
+    - name: "Configuring Joplin icon..."
+      copy:
+        src: "{{ role_path }}/files/joplin.png"
+        dest: "{{ home }}/.local/share/icons/joplin.png"
+        mode: "0644"
+        owner: "{{ user }}"
+        group: "{{ user }}"
 
     # gnome
 
     - name: "Configuring arc-menu shortcuts..."
-      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Firefox', 'firefox', 'firefox.desktop', 'Messagerie et agenda d’Evolution', '', 'org.gnome.Evolution.desktop', 'Element', 'element-desktop', 'element-desktop.desktop', 'KeePassXC', '', 'org.keepassxc.KeePassXC.desktop', 'Joplin', '', 'net.cozic.joplin_desktop.desktop', 'Visual Studio Code', '', 'code.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'MotionBox', '{{ home }}/.local/share/icons/motionbox.png', 'MotionBox.desktop', 'EasyEffects', '', 'com.github.wwmm.easyeffects.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop']"
+      dconf: key="/org/gnome/shell/extensions/arcmenu/pinned-app-list" value="['Navigateur Web Firefox', 'firefox', 'firefox.desktop', 'Messagerie et agenda d’Evolution', '', 'org.gnome.Evolution.desktop', 'Element', 'element-desktop', 'element-desktop.desktop', 'KeePassXC', '', 'org.keepassxc.KeePassXC.desktop', 'Joplin', '{{ home }}/.local/share/icons/joplin.png', 'Joplin.desktop', 'Visual Studio Code', '', 'code.desktop', 'Numériseur de documents', 'org.gnome.SimpleScan', 'simple-scan.desktop', 'Krita', '', 'org.kde.krita.desktop', 'draw.io', '', 'drawio_drawio.desktop', 'VLC media player', 'vlc', 'vlc.desktop', 'MotionBox', '{{ home }}/.local/share/icons/motionbox.png', 'MotionBox.desktop', 'EasyEffects', '', 'com.github.wwmm.easyeffects.desktop', 'Windows', '{{ home }}/.local/share/icons/windows.png', 'connectWindows.desktop']"
     - name: "Configuring gnome bookmarks..."
       dconf: key="/org/gnome/shell/favorite-apps" value="['firefox.desktop', 'nemo.desktop', 'code.desktop', 'simple-scan.desktop', 'org.kde.krita.desktop', 'drawio_drawio.desktop', 'vlc.desktop', 'MotionBox.desktop', 'com.github.wwmm.easyeffects.desktop', 'connectWindows.desktop']"
 
     # user applications
 
+    - name: "Configuring Joplin application shortcut..."
+      desktop_launchers:
+        freedesktop_Name: Joplin
+        freedesktop_Icon: "{{ home }}/.local/share/icons/joplin.png"
+        freedesktop_StartupWMClass: joplin
+        target: "/opt/Joplin/Joplin --disable-gpu --ozone-platform=x11"
+        location: "{{ home }}/.local/share/applications/Joplin.desktop"
+
     - name: "Configuring MotionBox application shortcut..."
       desktop_launchers:
-        freedesktop_Name: "MotionBox"
+        freedesktop_Name: MotionBox
         freedesktop_Icon: "{{ home }}/.local/share/icons/motionbox.png"
         target: 'bash -c "export LD_LIBRARY_PATH=/opt/MotionBox; export QT_PLUGIN_PATH=/opt/MotionBox; /opt/MotionBox/MotionBox"'
         location: "{{ home }}/.local/share/applications/MotionBox.desktop"
     - name: "Configuring connectWindows application shortcut..."
       desktop_launchers:
-        freedesktop_Name: "Windows"
+        freedesktop_Name: Windows
         freedesktop_Comment: "Connect to Ms Windows"
         freedesktop_Icon: "{{ home }}/.local/share/icons/windows.png"
         freedesktop_Categories: "Utility"
@@ -64,8 +79,9 @@
     - name: "Configuring Joplin desktop shortcut..."
       desktop_launchers:
         freedesktop_Name: Joplin
-        freedesktop_Icon: "net.cozic.joplin_desktop"
-        target: 'bash -c ''for item in $(ps aux | grep joplin | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 10; flatpak run net.cozic.joplin_desktop 2>/dev/null'''
+        freedesktop_Icon: "{{ home }}/.local/share/icons/joplin.png"
+        freedesktop_StartupWMClass: joplin
+        target: 'bash -c ''for item in $(ps aux | grep joplin | grep -v grep | sed -r "s:^(\\S+\\s+)(\\S+)(.*)$:\\2:g"); do kill -9 $item; done; sleep 2; /opt/Joplin/Joplin --disable-gpu --ozone-platform=x11'''
         location: "$DIRECTORY_DESKTOP/joplin.desktop"
     - name: "Configuring pCloudDrive desktop shortcut..."
       desktop_launchers:
@@ -100,7 +116,9 @@
     - name: "Configuring Joplin autostart shortcut..."
       desktop_launchers:
         freedesktop_Name: Joplin
-        target: 'bash -c "sleep 5; flatpak run net.cozic.joplin_desktop 2>/dev/null"'
+        freedesktop_Icon: "{{ home }}/.local/share/icons/joplin.png"
+        freedesktop_StartupWMClass: joplin
+        target: 'bash -c "sleep 5; /opt/Joplin/Joplin --disable-gpu --ozone-platform=x11"'
         location: "{{ home }}/.config/autostart/joplin.desktop"
     - name: "Configuring conky autostart shortcut..."
       desktop_launchers:

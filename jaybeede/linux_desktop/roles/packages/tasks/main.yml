@@ -129,7 +129,6 @@
           - flathub
           - com.github.tchx84.Flatseal
           - com.github.wwmm.easyeffects
-          - net.cozic.joplin_desktop
           - org.gnome.Evolution
           - "org.gtk.Gtk3theme.{{ theme_primary_name }}"
           - org.pipewire.Helvum
@@ -183,6 +182,28 @@
         owner: "{{ user }}"
         group: "{{ user }}"
         recurse: yes
+      when: not f.stat.exists
+
+    - name: "Logical evaluation..."
+      stat:
+        path: /opt/Joplin/Joplin
+      register: f
+
+    - name: Installing Joplin (1/2)...
+      ansible.builtin.get_url:
+        url: https://github.com/laurent22/joplin/releases/download/v3.7.16/Joplin-3.7.16.AppImage
+        dest: /opt/Joplin-3.7.16/Joplin
+        checksum: sha512:https://github.com/laurent22/joplin/releases/download/v3.7.16/Joplin-3.7.16.AppImage.sha512
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 775
+      when: not f.stat.exists
+
+    - name: Preparing Joplin (2/2)...
+      ansible.builtin.file:
+        dest: /opt/Joplin
+        src: /opt/Joplin-3.7.16
+        state: link
       when: not f.stat.exists
 
     - name: "Logical evaluation..."
