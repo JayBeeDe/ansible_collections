@@ -22,7 +22,7 @@ alias rs="rsync -avr --progress"
 alias agu="sudo apt-get update"
 alias agg="sudo apt-get upgrade"
 function agi() {
-    sudo apt-get install -y "$1"
+    sudo apt-get install -y "$@"
 }
 
 export HISTTIMEFORMAT="%F %T  "
@@ -45,8 +45,7 @@ alias dw="cd $vdw"
 
 # git related aliases
 
-export MAXCHARS=72
-export ISSUE_TYPE=fix
+export MAX_CHARS=72
 export AUTO_PUSH=0
 
 alias gs="git status"
@@ -139,6 +138,53 @@ function gl {
         cmd+=(--abbrev-commit)
     fi
     "${cmd[@]}"
+}
+
+function gprd {
+    if [ -z "$1" ]; then
+        defaultBranch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed -r "s:^refs/remotes/::g")
+    else
+        defaultBranch=$1
+    fi
+    prFlag="${2:-0}"
+    prevCommitRef="$(human2GitHash "$defaultBranch" 0)"
+    lastCommitRef="$(human2GitHash 1 0)"
+    cmd=(git log)
+    cmd+=("${prevCommitRef}..${lastCommitRef}")
+    cmd2=("${cmd[@]}")
+    cmd+=("--pretty=%x2a%x20%s")
+    if [ "$prFlag" != "0" ]; then
+        "${cmd[@]}" | sed -r "s:\s+\[ft/.*\]::g" | grep --color=never -i "pull request #"
+    else
+        "${cmd[@]}" | sed -r "s:\s+\[ft/.*\]::g" | grep --color=never -vi "pull request #"
+    fi
+    cmd2+=("--pretty=%b")
+    "${cmd2[@]}" | awk -F'#' '/ref: #[A-Z]+-[0-9]+/ {
+		ref_line = $2
+		gsub(/[,:]/, " ", ref_line)
+		for (i=1; i<=split(ref_line, refs_array, " "); i++) {
+			if (refs_array[i] ~ /^[A-Z]+-[0-9]+$/) {
+				refs[refs_array[i]] = 1
+				nbRefs++
+			}
+		}
+	}
+	END {
+		if (!nbRefs) {
+			exit
+		}
+		printf "refs: ";
+		first = 1
+		PROCINFO["sorted_in"] = "@ind_str_asc"
+		for (ref in refs) {
+			if (!first) {
+				printf ", "
+			}
+			printf "%s", ref
+			first = 0
+		}
+		print ""
+	}'
 }
 
 function grb {
@@ -277,15 +323,19 @@ function gc {
     if [ -z "$currentBranch" ]; then
         return 1
     fi
-    issueType="$(awk -F / -v issuetype="$ISSUE_TYPE" '{ if ( $1 ~ "^(fix|feat|test)$" ) {print $1} else {print issuetype} }' <<<"$currentBranch")"
+    if [ -n "$ISSUE_TYPE" ]; then
+        issueType="$ISSUE_TYPE"
+    else
+        issueType="$(awk -F / '{ if ( $1 ~ "^(fix|feat|test|specs|docs)$" ) {print $1} else {print "fix"} }' <<<"$currentBranch")"
+    fi
     issueRef="$(sed -r "s:^.*\/([A-Z]+-[0-9]+).*$:\1:g" <<<"$currentBranch")"
     if [ -n "$ISSUE_REF" ]; then
         issueRef=$ISSUE_REF
     fi
     line1="${delim}${issueType}(${component}): ${line1}${delim}"
-    if [ -n "$MAXCHARS" ]; then
-        if [ ${#line1} -gt "$MAXCHARS" ]; then
-            echo "Message is too long (${#line1} chars instead of ${MAXCHARS} max)"
+    if [ -n "$MAX_CHARS" ]; then
+        if [ ${#line1} -gt "$MAX_CHARS" ]; then
+            echo "Message is too long (${#line1} chars instead of ${MAX_CHARS} max)"
             return 1
         fi
     fi
@@ -300,7 +350,9 @@ function gc {
         echo "${cmd[@]}"
         return 0
     fi
-    git add -A
+    if git diff --cached --quiet; then
+        git add -A
+    fi
     "${cmd[@]}"
     if [ "$AUTO_PUSH" == 1 ]; then
         gpu 1
@@ -362,7 +414,9 @@ function ga {
         echo "${cmd[@]}"
         return 0
     fi
-    git add -A
+    if git diff --cached --quiet; then
+        git add -A
+    fi
     "${cmd[@]}"
     if [ "$AUTO_PUSH" == 1 ]; then
         gpu 1
