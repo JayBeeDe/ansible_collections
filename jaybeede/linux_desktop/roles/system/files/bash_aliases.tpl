@@ -22,7 +22,7 @@ alias rs="rsync -avr --progress"
 alias agu="sudo apt-get update"
 alias agg="sudo apt-get upgrade"
 function agi() {
-    sudo apt-get install -y "$1"
+    sudo apt-get install -y "$@"
 }
 
 export HISTTIMEFORMAT="%F %T  "
@@ -45,8 +45,7 @@ alias dw="cd $vdw"
 
 # git related aliases
 
-export MAXCHARS=72
-export ISSUE_TYPE=fix
+export MAX_CHARS=72
 export AUTO_PUSH=1
 export SIGNED_GPG=1
 
@@ -140,6 +139,53 @@ function gl {
         cmd+=(--abbrev-commit)
     fi
     "${cmd[@]}"
+}
+
+function gprd {
+    if [ -z "$1" ]; then
+        defaultBranch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed -r "s:^refs/remotes/::g")
+    else
+        defaultBranch=$1
+    fi
+    prFlag="${2:-0}"
+    prevCommitRef="$(human2GitHash "$defaultBranch" 0)"
+    lastCommitRef="$(human2GitHash 1 0)"
+    cmd=(git log)
+    cmd+=("${prevCommitRef}..${lastCommitRef}")
+    cmd2=("${cmd[@]}")
+    cmd+=("--pretty=%x2a%x20%s")
+    if [ "$prFlag" != "0" ]; then
+        "${cmd[@]}" | sed -r "s:\s+\[ft/.*\]::g" | grep --color=never -i "pull request #"
+    else
+        "${cmd[@]}" | sed -r "s:\s+\[ft/.*\]::g" | grep --color=never -vi "pull request #"
+    fi
+    cmd2+=("--pretty=%b")
+    "${cmd2[@]}" | awk -F'#' '/ref: #[A-Z]+-[0-9]+/ {
+		ref_line = $2
+		gsub(/[,:]/, " ", ref_line)
+		for (i=1; i<=split(ref_line, refs_array, " "); i++) {
+			if (refs_array[i] ~ /^[A-Z]+-[0-9]+$/) {
+				refs[refs_array[i]] = 1
+				nbRefs++
+			}
+		}
+	}
+	END {
+		if (!nbRefs) {
+			exit
+		}
+		printf "refs: ";
+		first = 1
+		PROCINFO["sorted_in"] = "@ind_str_asc"
+		for (ref in refs) {
+			if (!first) {
+				printf ", "
+			}
+			printf "%s", ref
+			first = 0
+		}
+		print ""
+	}'
 }
 
 function grb {
@@ -278,15 +324,19 @@ function gc {
     if [ -z "$currentBranch" ]; then
         return 1
     fi
-    issueType="$(awk -F / -v issuetype="$ISSUE_TYPE" '{ if ( $1 ~ "^(fix|feat|test)$" ) {print $1} else {print issuetype} }' <<<"$currentBranch")"
+    if [ -n "$ISSUE_TYPE" ]; then
+        issueType="$ISSUE_TYPE"
+    else
+        issueType="$(awk -F / '{ if ( $1 ~ "^(fix|feat|test|specs|docs)$" ) {print $1} else {print "fix"} }' <<<"$currentBranch")"
+    fi
     issueRef="$(sed -r "s:^.*\/([A-Z]+-[0-9]+).*$:\1:g" <<<"$currentBranch")"
     if [ -n "$ISSUE_REF" ]; then
         issueRef=$ISSUE_REF
     fi
     line1="${delim}${issueType}(${component}): ${line1}${delim}"
-    if [ -n "$MAXCHARS" ]; then
-        if [ ${#line1} -gt "$MAXCHARS" ]; then
-            echo "Message is too long (${#line1} chars instead of ${MAXCHARS} max)"
+    if [ -n "$MAX_CHARS" ]; then
+        if [ ${#line1} -gt "$MAX_CHARS" ]; then
+            echo "Message is too long (${#line1} chars instead of ${MAX_CHARS} max)"
             return 1
         fi
     fi
@@ -301,7 +351,9 @@ function gc {
         echo "${cmd[@]}"
         return 0
     fi
-    git add -A
+    if git diff --cached --quiet; then
+        git add -A
+    fi
     "${cmd[@]}"
     if [ "$AUTO_PUSH" == 1 ]; then
         gpu 1
@@ -363,7 +415,9 @@ function ga {
         echo "${cmd[@]}"
         return 0
     fi
-    git add -A
+    if git diff --cached --quiet; then
+        git add -A
+    fi
     "${cmd[@]}"
     if [ "$AUTO_PUSH" == 1 ]; then
         gpu 1
@@ -383,22 +437,151 @@ function logc {
 # image manipulation aliases
 
 function filigrane {
-	if ! [ -r "$1" ]; then
-		echo "Input file not readable"
-	fi
-	if [ -z "$2" ]; then
-		echo "Please provide a text"
-	fi
-	text_content=$2
-	input_file=$1
-	output_file="${input_file%.*}-output.${input_file##*.}"
-	convert -size 140x80 xc:none -fill grey -gravity NorthWest -draw 'text 10,10 "'$text_content'"' -gravity SouthEast -draw 'text 5,15 "'$text_content'"' miff:- |composite -tile - "$input_file" "$output_file"
+    if ! [ -r "$1" ]; then
+        echo "Input file not readable"
+    fi
+    if [ -z "$2" ]; then
+        echo "Please provide a text"
+    fi
+    text_content=$2
+    input_file=$1
+    output_file="${input_file%.*}-output.${input_file##*.}"
+    convert -size 140x80 xc:none -fill grey -gravity NorthWest -draw 'text 10,10 "'$text_content'"' -gravity SouthEast -draw 'text 5,15 "'$text_content'"' miff:- | composite -tile - "$input_file" "$output_file"
+}
+
+# AI related aliases
+
+export AI_MODEL="default"
+export AI_INTERACTIVE=1
+
+function ai {
+    # set -x
+    local config_file="$HOME/.continue/config.yaml"
+    if ! yq eval '.models' "$config_file" >/dev/null; then
+        echo "Error while reading file $config_file"
+        return 1
+    fi
+    models_data=$(yq eval '.models' "$config_file")
+    if [ "$AI_MODEL" == "default" ] || [ -z "$AI_MODEL" ]; then
+        model_name=$(yq eval '.[0].name' <<<"$models_data")
+        if [ "$DEBUG" == 1 ]; then
+            echo "Using default model name $model_name"
+        fi
+    else
+        model_name=$AI_MODEL
+    fi
+    if ! yq eval '.[].name' <<<"$models_data" | grep -q "$model_name"; then
+        models_names="$(yq eval '.[].name' <<<"$models_data" | sed -zr "s:\n:, :g")"
+        echo "Please choose on of ${models_names%??}"
+        return 1
+    fi
+    # shellcheck disable=SC2086
+    model_item=$(yq eval '.[] | select(.name == "'$model_name'")' <<<"$models_data")
+
+    cmd=("tgpt")
+    if [ "$AI_INTERACTIVE" == 1 ]; then
+        cmd+=("-m")
+    else
+        cmd+=("-w")
+    fi
+    cmd+=("--provider" "$(yq eval '.provider' <<<"$model_item")")
+    cmd+=("--key" "$(yq eval '.apiKey' <<<"$model_item")")
+    cmd+=("--model" "$(yq eval '.model' <<<"$model_item")")
+    cmd+=("--url" "$(yq eval '.apiBase' <<<"$model_item")/chat/completions")
+    cmd+=("$@")
+    if [ "$DEBUG" == 1 ]; then
+        echo "${cmd[@]}"
+        return 0
+    fi
+    "${cmd[@]}"
 }
 
 # desktop related aliases
 
 function decrypt {
     xsel | gpg --decrypt | xsel --clipboard
+}
+
+function rm {
+    local force=false
+    local recursive=false
+    local files=()
+    local OPTIND=1
+    # Parse options
+    while getopts ":fr" opt; do
+        case $opt in
+        f)
+            force=true
+            ;;
+        r)
+            recursive=true
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            return 1
+            ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+    # Collect file arguments
+    files=("$@")
+    if [ ${#files[@]} -eq 0 ]; then # Check if any files were provided
+        echo "No files specified." >&2
+        return 1
+    fi
+
+    for file in "${files[@]}"; do
+        volume_root="$(df "$file" | awk 'NR > 1 { print $6 }')"
+        if [ "$volume_root" == "/" ]; then
+            volume_root="/tmp"
+        fi
+        trash_dir="${volume_root}/.Trash-${UID}"
+        cmd=("trash-put")
+        if [ -d "$file" ] && [ "$recursive" = true ]; then # Call trash-put with the appropriate options
+            cmd+=("-r")
+        fi
+        if [ "$volume_root" != "/home" ]; then
+            mkdir -p "$trash_dir"
+            cmd+=("--trash-dir" "$trash_dir")
+        fi
+        cmd+=("$file")
+        "${cmd[@]}"
+    done
+}
+
+function icode {
+    # Check if a sub_folder argument is provided
+    if [ -n "$1" ]; then
+        # Subfolder provided as argument
+        folder="$1"
+
+        # Check if the folder exists
+        if [ ! -d "$folder" ]; then
+            echo "Error: Folder $folder does not exist"
+            exit 1
+        fi
+    else
+        root_folder=$vpj
+        # No sub_folder provided, show dropdown UI
+        mapfile -t sub_folders < <(find "$root_folder" -mindepth 2 -maxdepth 2 -type d -not -path '*/.*' -printf "%P\n" | sort)
+
+        if [ ${#sub_folders[@]} -eq 0 ]; then
+            echo "Error: No sub_folders found in $root_folder"
+            exit 1
+        fi
+
+        # Display dropdown UI using zenity
+        sub_folder=$(zenity --list --column="Projects" "${sub_folders[@]}")
+
+        # Check if a sub_folder was chosen
+        if [ $? -ne 0 ]; then
+            echo "No sub_folder chosen. Exiting."
+            exit 1
+        fi
+        folder="$root_folder/$sub_folder"
+    fi
+    # Open VSCode in the specified sub_folder
+    code "$folder"
 }
 
 alias gnome-reload="killall -1 gnome-shell"
